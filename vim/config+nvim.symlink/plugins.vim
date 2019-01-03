@@ -85,7 +85,11 @@ Plug 'scrooloose/nerdtree'          " Directory & files tree
 Plug 'Xuyuanp/nerdtree-git-plugin'  " Nerdtree plugin to show GIT flags
 
 " Skim fuzzy finder
-Plug 'lotabout/skim',               {'dir': '~/.skim', 'do': './install --bin', 'on': ['SK']} " FZF option in Rust lang
+" Plug 'lotabout/skim',               {'dir': '~/.skim', 'do': './install --bin', 'on': ['SK']} " FZF option in Rust lang
+
+"fzf fuzzy finder
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 
 " Denite
 Plug 'Shougo/denite.nvim'           " Multiple helpful functions: open files, search, change folder, etc.
@@ -93,6 +97,12 @@ Plug 'Shougo/neomru.vim'            " Most recent used files source for denite/u
 
 " Testing
 Plug 'janko-m/vim-test'             " Run tests from inside Neovim
+
+" better everything about text objects
+Plug 'wellle/targets.vim'
+
+" Incremental search
+Plug 'haya14busa/incsearch.vim'
 
 " Other tools
 Plug 'bogado/file-line'                 " Open a file on arbitrary line: filename:line

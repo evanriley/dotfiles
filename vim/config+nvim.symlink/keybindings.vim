@@ -136,3 +136,9 @@ tmap <leader>d <c-\><c-n>:bd!<cr>
 nnoremap <localleader>cc :botright cope<cr>
 nnoremap <localleader>n :cn<cr>
 nnoremap <localleader>p :cp<cr>
+
+
+" Mapping incsearch bindings
+map /  <Plug>(incsearch-forward)
+map ?  <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
