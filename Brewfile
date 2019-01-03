@@ -27,6 +27,8 @@ brew 'wget'
 brew 'yarn'
 brew 'youtube-dl'
 
+brew 'neovim'
+
 cask '1password'
 cask 'adium'
 cask 'atom'
