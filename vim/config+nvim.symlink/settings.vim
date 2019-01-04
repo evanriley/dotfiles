@@ -29,7 +29,7 @@ set omnifunc=syntaxcomplete#Complete
 
 " Positioning
 set number                                      " Set line number
-set relativenumber                              " Set relative number
+" set relativenumber                              " Set relative number
 set ruler                                       " Set line/col of cursor
 
 " UI

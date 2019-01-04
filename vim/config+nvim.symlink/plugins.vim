@@ -48,9 +48,11 @@ Plug 'rhysd/vim-crystal',           {'for': 'crystal'} " Crystal language highli
 Plug 'vim-ruby/vim-ruby',           {'for': 'ruby'} " Ruby language syntax & highlighting
 Plug 'tpope/vim-rails',             {'for': 'ruby'} " Rails syntax and helpers
 
+" Swift
+Plug 'keith/swift.vim'
+
 " Tools
 Plug 'tmux-plugins/vim-tmux',       {'for': 'tmux'} " Tmux file highlighting
-Plug 'dag/vim-fish',                {'for': 'fish'} " Fish shell highlighting
 Plug 'cespare/vim-toml',            {'for': 'toml'} " Toml syntax highlighting
 Plug 'chr4/nginx.vim',              {'for': 'nginx'} " Nginx syntax highlighting
 
@@ -109,8 +111,6 @@ Plug 'bogado/file-line'                 " Open a file on arbitrary line: filenam
 Plug 'AndrewRadev/switch.vim'           " Quickly switch between patterns
 Plug 'christoomey/vim-tmux-navigator'   " Navigate between Tmux and Vim splits
 Plug 'mtth/scratch.vim'                 " Create scratch buffer for quick notes and todo lists
-Plug 'ludovicchabant/vim-gutentags'     " ctags all the way!!!
-Plug 'majutsushi/tagbar',               {'on': 'TagbarToggle'} " Inmemory ctags window visualizer
 Plug 'terryma/vim-multiple-cursors'     " Multiple cursors like Sublime Text's
 Plug 'justinmk/vim-sneak'               " Jump to location specifies by 2 character
 Plug 'hauleth/sad.vim'                  " Quick change and replace!

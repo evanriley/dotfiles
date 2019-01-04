@@ -110,7 +110,7 @@ let g:NERDTreeQuitOnOpen = 1
 
 " lotabout/skim
 " ==================================
-nnoremap <C-s> :<C-u>SK --color=selected:238,current_match:214<cr>
+" nnoremap <C-s> :<C-u>SK --color=selected:238,current_match:214<cr>
 
 " AndrewRadev/switch.vim
 " ==================================
