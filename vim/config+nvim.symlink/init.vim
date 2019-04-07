@@ -7,7 +7,12 @@ set encoding=utf-8
 set nocompatible
 
 " Config file path
-let g:config_path = "~/.config/nvim/"
+if has('win32')
+	let g:config_path = "C:\\Users\\me\\AppData\\Local\\nvim\\"
+elseif has('mac')
+	let g:config_path = "~/.config/nvim/"
+endif
+
 
 " Function for sourcing config modules
 function! ConfigInc(module)
