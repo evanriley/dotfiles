@@ -113,3 +113,11 @@ set iskeyword+=-,_                              " Consider - and _ part of a wor
 set history=200                                 " Remember more commands and search history
 set undolevels=100                              " Maximum levels of changes that can be undone
 
+" Rainbow
+let g:rainbow_conf = {
+\   'guifgs': ['DarkRed', 'Red3', 'OrangeRed1', 'Orange3', 'Yellow4', 'GreenYellow',
+\              'SpringGreen3', 'Green4',  'DeepSkyBlue3', 'DodgerBlue3','Purple3'
+\             ]
+\}
+
+

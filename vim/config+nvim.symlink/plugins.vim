@@ -51,6 +51,11 @@ Plug 'tpope/vim-rails',             {'for': 'ruby'} " Rails syntax and helpers
 " Swift
 Plug 'keith/swift.vim'
 
+" Clojure
+Plug 'tpope/vim-fireplace'
+Plug 'tpope/vim-salve'
+Plug 'guns/vim-clojure-static'
+
 " Tools
 Plug 'tmux-plugins/vim-tmux',       {'for': 'tmux'} " Tmux file highlighting
 Plug 'cespare/vim-toml',            {'for': 'toml'} " Toml syntax highlighting
@@ -76,6 +81,12 @@ Plug 'sbdchd/neoformat'             " Format code: standard.js, prettier etc.
 Plug 'junegunn/vim-easy-align'      " Easy alignement
 Plug 'Yggdroot/indentLine'          " Show a line to display indentation level
 Plug 'AndrewRadev/splitjoin.vim',   {'on': ['SplitjoinJoin', 'SplitjoinSplit']} " Transition between multiline and single-line code
+
+" Editing S-expresions
+Plug 'guns/vim-sexp'
+Plug 'tpope/vim-sexp-mappings-for-regular-people'
+Plug 'vim-scripts/paredit.vim'
+Plug 'luochen1990/rainbow'
 
 " Git
 " Plug 'lambdalisue/gina.vim'         " Control GIT repos from nvim session
