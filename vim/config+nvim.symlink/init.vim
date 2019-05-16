@@ -209,6 +209,13 @@ let g:airline_skip_empty_sections = 1
 " let g:airline_theme='oceanicnext'
 let g:airline#extensions#ale#enabled = 1
 
+" itmammoth/doorboy.vim
+" ===================================
+let g:doorboy_nomap_quotations = {
+  \ 'clojure': ["'"]
+  \ }
+
+
 " -------------------------------------------------------------------------------------------
 "  FUNCTIONS
 " -------------------------------------------------------------------------------------------
