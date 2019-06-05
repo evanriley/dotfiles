@@ -34,4 +34,6 @@
 [user]
 	signingkey = 3FF9B5ABEC210768
 [commit]
-	gpgsign = false
+	gpgsign = true
+[gpg]
+	program = gpg
