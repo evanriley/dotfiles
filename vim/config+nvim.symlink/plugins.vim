@@ -55,6 +55,7 @@ Plug 'keith/swift.vim'
 Plug 'tpope/vim-fireplace'
 Plug 'tpope/vim-salve'
 Plug 'guns/vim-clojure-static'
+Plug 'clojure-vim/acid.nvim', { 'do': ':UpdateRemotePlugins' }
 
 " Tools
 Plug 'tmux-plugins/vim-tmux',       {'for': 'tmux'} " Tmux file highlighting
