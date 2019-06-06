@@ -10,3 +10,10 @@ atom.symlink/blob-store
 atom.symlink/recovery
 
 git/gitconfig.local.symlink
+
+weechat/weechat.symlink/logs
+weechat/weechat.symlink/weechat.log
+weechat/weechat.symlink/weeget
+weechat/weechat.symlink/xfer
+weechat/weechat.symlink/irc.conf
+weechat/weechat.symlink/jabber.conf
