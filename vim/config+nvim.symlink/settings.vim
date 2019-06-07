@@ -104,6 +104,7 @@ set hlsearch                                    " Highligh search
 set incsearch                                   " Search as you type
 set infercase                                   " Ignore case in matching
 set smartcase                                   " Match capitals in search
+set ignorecase
 
 " Other
 set completeopt+=noselect                       " Don't select a match in menu
