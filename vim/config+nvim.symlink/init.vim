@@ -104,6 +104,15 @@ let g:gitgutter_map_keys = 0
 nmap <leader>g <Plug>GitGutterNextHunk
 nmap <leader>G <Plug>GitGutterPrevHunk
 
+" jreybert/vimagit
+" ==================================
+nnoremap <leader>gs :Magit<CR>
+nnoremap <leader>gP :! git push<CR>
+
+" tpope/vim-fugitive
+" ==================================
+nnoremap <Leader>gb :Gblame<CR>  " git blame
+
 " scrooloose/nerdtree
 " ==================================
 map <leader>n :NERDTreeToggle<cr>
