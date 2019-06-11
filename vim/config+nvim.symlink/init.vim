@@ -115,12 +115,23 @@ nnoremap <Leader>gb :Gblame<CR>  " git blame
 
 " scrooloose/nerdtree
 " ==================================
-map <leader>n :NERDTreeToggle<cr>
-map <leader>b :NERDTreeFind<cr>
-let g:NERDTreeShowHidden = 1
-let g:NERDTreeAutoDeleteBuffer = 1
-let g:NERDTreeCascadeOpenSingleChildDir = 1
-let g:NERDTreeQuitOnOpen = 1
+" map <leader>n :NERDTreeToggle<cr>
+" map <leader>b :NERDTreeFind<cr>
+" let g:NERDTreeShowHidden = 1
+" let g:NERDTreeAutoDeleteBuffer = 1
+" let g:NERDTreeCascadeOpenSingleChildDir = 1
+" let g:NERDTreeQuitOnOpen = 1
+
+" netrw 
+" ==================================
+map <leader>n :Explore<cr>
+map <leader>sn :Sexplore<cr>
+map <leader>vn :Vexplore<cr>
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_browse_split = 0
+let g:netrw_altv = 1
+let g:netrw_winsize = 10
 
 " lotabout/skim
 " ==================================
