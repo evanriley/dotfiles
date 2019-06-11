@@ -93,13 +93,14 @@ Plug 'luochen1990/rainbow'
 " Plug 'lambdalisue/gina.vim'         " Control GIT repos from nvim session
 Plug 'airblade/vim-gitgutter'       " Show GIT changes status in the gutter
 Plug 'jreybert/vimagit',            {'on': 'Magit'} " Easier GIT workflow
+Plug 'tpope/vim-fugitive'          " mainly for showing Git status in netrw
 
 " Nerdtree
 " Plug 'scrooloose/nerdtree'          " Directory & files tree
 " Plug 'Xuyuanp/nerdtree-git-plugin'  " Nerdtree plugin to show GIT flags
 
 "vim-vinegar
-" Plug 'tpope/vim-vinegar' " makes netrw better
+Plug 'tpope/vim-vinegar' " makes netrw better
 
 " Skim fuzzy finder
 " Plug 'lotabout/skim',               {'dir': '~/.skim', 'do': './install --bin', 'on': ['SK']} " FZF option in Rust lang
