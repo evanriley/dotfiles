@@ -86,7 +86,7 @@ Plug 'AndrewRadev/splitjoin.vim',   {'on': ['SplitjoinJoin', 'SplitjoinSplit']} 
 " Editing S-expresions
 Plug 'guns/vim-sexp'
 Plug 'tpope/vim-sexp-mappings-for-regular-people'
-Plug 'vim-scripts/paredit.vim'
+" Plug 'vim-scripts/paredit.vim'
 Plug 'luochen1990/rainbow'
 
 " Git

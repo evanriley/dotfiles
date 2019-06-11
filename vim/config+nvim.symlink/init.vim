@@ -224,6 +224,9 @@ let g:doorboy_nomap_quotations = {
   \ 'clojure': ["'"]
   \ }
 
+" luochen1990/rainbow
+" ===================================
+let g:rainbow_active = 1 " adds color to my ()
 
 " -------------------------------------------------------------------------------------------
 "  FUNCTIONS
