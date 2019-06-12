@@ -100,7 +100,7 @@ Plug 'tpope/vim-fugitive'          " mainly for showing Git status in netrw
 " Plug 'Xuyuanp/nerdtree-git-plugin'  " Nerdtree plugin to show GIT flags
 
 "vim-vinegar
-Plug 'tpope/vim-vinegar' " makes netrw better
+Plug 'tpope/vim-vinegar'              " makes netrw better
 
 " Skim fuzzy finder
 " Plug 'lotabout/skim',               {'dir': '~/.skim', 'do': './install --bin', 'on': ['SK']} " FZF option in Rust lang
@@ -176,9 +176,11 @@ Plug 'w0rp/ale'
 " THEMES & UI
 " -------------------------------------------------------------------------------------------
 
-" Status line
-Plug 'mhartington/oceanic-next'   " Oceanic Next theme
+Plug 'arcticicestudio/nord-vim'     " Nord Vim theme
+Plug 'mhartington/oceanic-next'     " Oceanic Next theme
 Plug 'trevordmiller/nova-vim'       " Nova theme
+
+" Status line
 Plug 'vim-airline/vim-airline'      " Airline plugin
 
 call plug#end()
