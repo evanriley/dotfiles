@@ -256,8 +256,12 @@ call ConfigInc('keybindings.vim')
 "----------------------------------------------------------------------------------------------
 
 " If colorscheme = OceanicNext
-colorscheme OceanicNext
-highlight CursorLineNr guifg=#fac863
+" colorscheme OceanicNext
+" highlight CursorLineNr guifg=#fac863
+
+" If colorscheme = Nord
+colorscheme nord
+highlight CursorLineNr guifg=#5E81AC
 
 " If colorscheme = nova
 " colorscheme nova
