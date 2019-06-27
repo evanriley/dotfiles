@@ -33,6 +33,7 @@
         default = simple
 [user]
 	signingkey = 3FF9B5ABEC210768
+	name = Evan Riley
 [commit]
 	gpgsign = true
 [gpg]
