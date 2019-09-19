@@ -57,10 +57,14 @@ Plug 'tpope/vim-salve'
 Plug 'guns/vim-clojure-static'
 Plug 'clojure-vim/acid.nvim', { 'do': ':UpdateRemotePlugins' }
 
+" Nim
+Plug 'zah/nim.vim'
+
 " Tools
 Plug 'tmux-plugins/vim-tmux',       {'for': 'tmux'} " Tmux file highlighting
 Plug 'cespare/vim-toml',            {'for': 'toml'} " Toml syntax highlighting
 Plug 'chr4/nginx.vim',              {'for': 'nginx'} " Nginx syntax highlighting
+
 
 " -------------------------------------------------------------------------------------------
 " UTILITIES

@@ -239,6 +239,20 @@ let g:doorboy_nomap_quotations = {
 " ===================================
 let g:rainbow_active = 1 " adds color to my ()
 
+
+" zah/nim.vim
+" ===================================
+fun! JumpToDef()
+  if exists("*GotoDefinition_" . &filetype)
+    call GotoDefinition_{&filetype}()
+  else
+    exe "norm! \<C-]"
+  endif
+endfun
+" Jump to tag
+nn <M-g> :call JumpToDef()<cr>
+ino <M-g> <esc>:call JumpToDef()<cr>i
+
 " -------------------------------------------------------------------------------------------
 "  FUNCTIONS
 " -------------------------------------------------------------------------------------------
