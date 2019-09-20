@@ -37,3 +37,6 @@ alias mkcd='foo(){ mkdir -p "$1"; cd "$1" }; foo '
 
 ##wtf is my ip address...##
 alias myip="curl http://ipecho.net/plain; echo"
+
+## copy public ssh key
+alias pubkey='pbcopy < ~/.ssh/id_rsa.pub'
