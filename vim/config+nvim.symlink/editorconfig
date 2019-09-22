@@ -20,7 +20,8 @@ insert_final_newline = true
   eex,
   css,
   scss,
-  styl
+  styl,
+  gtpl
 }]
 indent_size = 2
 

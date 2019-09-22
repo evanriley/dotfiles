@@ -32,6 +32,7 @@ augroup filetype_detect
   autocmd BufNewFile,BufRead *.styl setf stylus
   autocmd BufRead,BufNewFile .babelrc setf json
   autocmd BufRead,BufNewFile .eslintrc setf json
+  autocmd BufRead,BufNewFile *.gtpl setf gtpl
 
   autocmd FileType vue syntax sync fromstart
 augroup END
