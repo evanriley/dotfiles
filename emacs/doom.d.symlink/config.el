@@ -50,6 +50,26 @@
 (add-hook! reason-mode
   (add-hook 'before-save-hook #'refmt-before-save nil t))
 
+(def-package! org-super-agenda
+  :after org-agenda
+  :init
+  (setq org-super-agenda-groups '((:name "Today"
+                                         :time-grid t
+                                         :scheduled today)
+                                  (:name "Due today"
+                                         :deadline today)
+                                  (:name "Important"
+                                         :priority "A")
+                                  (:name "Overdue"
+                                         :deadline past)
+                                  (:name "Due soon"
+                                         :deadline future)
+                                  (:name "Big Outcomes"
+                                         :tag "bo")))
+  :config
+  (org-super-agenda-mode)
+  )
+
 (add-hook!
   js2-mode 'prettier-js-mode
   (add-hook 'before-save-hook #'refmt-before-save nil t))
