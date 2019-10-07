@@ -8,7 +8,10 @@
  web-mode-markup-indent-offset 2
  web-mode-code-indent-offset 2
  web-mode-css-indent-offset 2
+ mac-option-key-is-meta nil
+ mac-command-key-is-meta t
  mac-command-modifier 'meta
+ mac-option-modifier nil
  org-agenda-skip-scheduled-if-done t
  js-indent-level 2
  type-script-indent-level 2
@@ -16,7 +19,8 @@
  prettier-js-args '("--single-quote")
  projectile-project-search-path '("~/Code"
                                   "~/Code/go/src/git.sr.ht/evanriley"
-                                  "~/Code/clojure-code")
+                                  "~/Code/clojure-code"
+                                  "~/Exercism")
  dired-dwim-target t
  org-ellipsis " ▾ "
  org-bullets-bullet-list '("·")
