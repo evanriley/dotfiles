@@ -56,6 +56,8 @@ Plug 'tpope/vim-fireplace'
 Plug 'tpope/vim-salve'
 Plug 'guns/vim-clojure-static'
 Plug 'clojure-vim/acid.nvim', { 'do': ':UpdateRemotePlugins' }
+Plug 'eraserhd/parinfer-rust', {'do':
+        \  'cargo build --release'}
 
 " Nim
 Plug 'zah/nim.vim'
@@ -91,7 +93,7 @@ Plug 'AndrewRadev/splitjoin.vim',   {'on': ['SplitjoinJoin', 'SplitjoinSplit']} 
 Plug 'guns/vim-sexp'
 Plug 'tpope/vim-sexp-mappings-for-regular-people'
 " Plug 'vim-scripts/paredit.vim'
-Plug 'luochen1990/rainbow'
+" Plug 'luochen1990/rainbow'
 
 " Git
 " Plug 'lambdalisue/gina.vim'         " Control GIT repos from nvim session

@@ -17,10 +17,8 @@
  type-script-indent-level 2
  json-reformat:indent-width 2
  prettier-js-args '("--single-quote")
- projectile-project-search-path '("~/Code"
-                                  "~/Code/go/src/git.sr.ht/evanriley"
-                                  "~/Code/clojure-code"
-                                  "~/Exercism")
+  projectile-project-search-path '("~/Code"
+                                  "~/Code/go/src/github.com/evanriley")
  dired-dwim-target t
  org-ellipsis " ▾ "
  org-bullets-bullet-list '("·")
@@ -138,6 +136,9 @@
 (after! web-mode
   (add-to-list 'auto-mode-alist '("\\.njk\\'" . web-mode)))
 
+
+(add-hook! go-mode
+  (add-hook 'before-save-hook #'gofmt-before-save nil t))
 
 (defun +data-hideshow-forward-sexp (arg)
   (let ((start (current-indentation)))
