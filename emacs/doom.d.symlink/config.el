@@ -5,6 +5,7 @@
 (setq
  doom-themes-enable-bold t
  doom-themes-enable-italic t
+ doom-foont (font-spec :family "Fira Code" :size 12)
  web-mode-markup-indent-offset 2
  web-mode-code-indent-offset 2
  web-mode-css-indent-offset 2
@@ -17,7 +18,7 @@
  type-script-indent-level 2
  json-reformat:indent-width 2
  prettier-js-args '("--single-quote")
-  projectile-project-search-path '("~/Code"
+ projectile-project-search-path '("~/Code"
                                   "~/Code/go/src/github.com/evanriley")
  dired-dwim-target t
  org-ellipsis " ▾ "

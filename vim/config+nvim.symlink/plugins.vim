@@ -48,16 +48,12 @@ Plug 'rhysd/vim-crystal',           {'for': 'crystal'} " Crystal language highli
 Plug 'vim-ruby/vim-ruby',           {'for': 'ruby'} " Ruby language syntax & highlighting
 Plug 'tpope/vim-rails',             {'for': 'ruby'} " Rails syntax and helpers
 
-" Swift
-Plug 'keith/swift.vim'
-
 " Clojure
-Plug 'tpope/vim-fireplace'
-Plug 'tpope/vim-salve'
-Plug 'guns/vim-clojure-static'
-Plug 'clojure-vim/acid.nvim', { 'do': ':UpdateRemotePlugins' }
+" Plug 'tpope/vim-salve'
 Plug 'eraserhd/parinfer-rust', {'do':
         \  'cargo build --release'}
+Plug 'tpope/vim-fireplace'
+" Plug 'Olical/conjure', { 'tag': 'v2.1.0', 'do': 'bin/compile' }
 
 " Nim
 Plug 'zah/nim.vim'
@@ -73,7 +69,8 @@ Plug 'chr4/nginx.vim',              {'for': 'nginx'} " Nginx syntax highlighting
 " -------------------------------------------------------------------------------------------
 
 " Delimiters
-Plug 'itmammoth/doorboy.vim'        " Auto close brackets, quotations, etc.
+Plug 'jiangmiao/auto-pairs', { 'tag': 'v2.0.0' }
+" Plug 'itmammoth/doorboy.vim'        " Auto close brackets, quotations, etc.
 Plug 'tpope/vim-surround'           " Easily change surroundings (parenthesis, brackets, etc)
 Plug 'tpope/vim-endwise'            " Add 'end' automatically for ruby, elixir and others
 
@@ -90,8 +87,8 @@ Plug 'Yggdroot/indentLine'          " Show a line to display indentation level
 Plug 'AndrewRadev/splitjoin.vim',   {'on': ['SplitjoinJoin', 'SplitjoinSplit']} " Transition between multiline and single-line code
 
 " Editing S-expresions
-Plug 'guns/vim-sexp'
-Plug 'tpope/vim-sexp-mappings-for-regular-people'
+" Plug 'guns/vim-sexp'
+" Plug 'tpope/vim-sexp-mappings-for-regular-people'
 " Plug 'vim-scripts/paredit.vim'
 " Plug 'luochen1990/rainbow'
 
@@ -114,6 +111,9 @@ Plug 'tpope/vim-vinegar'              " makes netrw better
 "fzf fuzzy finder
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+
+" popup window with fuzzy finding
+Plug 'liuchengxu/vim-clap'
 
 " Denite
 Plug 'Shougo/denite.nvim'           " Multiple helpful functions: open files, search, change folder, etc.
@@ -141,6 +141,7 @@ Plug 'EinfachToll/DidYouMean'           " Ask for confirmation to open file if s
 Plug 'airblade/vim-rooter'              " Chage working directory to project root
 Plug 'tpope/vim-eunuch'                 " UNIX file shell command helpers
 Plug 'rizzatti/dash.vim',           {'on': ['Dash', 'DashKeywords', '<Plug>DashSearch']} " Easy documentation with Dash.app (OSX)
+Plug 'easymotion/vim-easymotion'        " Easily move aroudn your buffer 
 
 " -------------------------------------------------------------------------------------------
 " COMPLETION
@@ -151,6 +152,9 @@ Plug 'Shougo/deoplete.nvim',        { 'do': ':UpdateRemotePlugins' } " Completio
 Plug 'Shougo/context_filetype.vim'  " Find nested filetypes for example javascript on html files
 Plug 'Shougo/neoinclude.vim'        " Include completion framework
 Plug 'Shougo/neco-syntax'           " Syntax source
+
+" Floating code compleition window.
+Plug 'ncm2/float-preview.nvim'
 
 " Language Server Protocol (LSP)
 Plug 'autozimu/LanguageClient-neovim', { 'branch': 'next', 'do': 'bash install.sh' }
@@ -185,8 +189,10 @@ Plug 'w0rp/ale'
 Plug 'arcticicestudio/nord-vim'     " Nord Vim theme
 Plug 'mhartington/oceanic-next'     " Oceanic Next theme
 Plug 'trevordmiller/nova-vim'       " Nova theme
+Plug 'junegunn/seoul256.vim'        " Seoul256 Theme
 
 " Status line
-Plug 'vim-airline/vim-airline'      " Airline plugin
+" Plug 'vim-airline/vim-airline'      " Airline plugin
+Plug 'itchyny/lightline.vim'
 
 call plug#end()

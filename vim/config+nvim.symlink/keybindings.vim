@@ -121,8 +121,8 @@ nnoremap <Leader>j mjJ`j
 noremap <leader>m <c-^>
 
 " Reload & easy edit Neovim configuration
-nnoremap <leader>r :source ~/.config/nvim/init.vim<cr>
-nnoremap <leader>e :e ~/.config/nvim/init.vim<cr>
+" nnoremap <leader>r :source ~/.config/nvim/init.vim<cr>
+" nnoremap <leader>e :e ~/.config/nvim/init.vim<cr>
 
 " Enter normal mode in terminal buffer and change buffers
 tnoremap <Esc> <C-\><C-n>

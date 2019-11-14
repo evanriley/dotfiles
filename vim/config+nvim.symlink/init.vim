@@ -178,6 +178,18 @@ let g:rooter_manual_only = 1
 let g:rooter_patterns = ['Gemfile', 'mix.exs', 'package.json', '*.yml', '*.yaml', '.git/', 'node_modules/', '.hg/', '.gitignore']
 let g:rooter_change_directory_for_non_project_files = ''
 
+" deoplete
+" ==================================
+let g:deoplete#enable_at_startup = 1
+call deoplete#custom#option('keyword_patterns', {'clojure': '[\w!$%&*+/:<=>?@\^_~\-\.#]*'})
+set completeopt-=preview
+
+" float-preview
+" =================================
+let g:float_preview#docked = 0
+let g:float_preview#max_width = 80
+let g:float_preview#max_height = 40
+
 " carlitux/deoplete-ternjs
 " ==================================
 let g:tern_request_timeout = 1
@@ -229,6 +241,13 @@ let g:airline_skip_empty_sections = 1
 " let g:airline_theme='oceanicnext'
 let g:airline#extensions#ale#enabled = 1
 
+" itchyny/lightline.vim
+" ===================================
+let g:lightline = {
+      \ 'colorscheme': 'seoul256',
+      \ }
+
+
 " itmammoth/doorboy.vim
 " ===================================
 let g:doorboy_nomap_quotations = {
@@ -253,6 +272,49 @@ endfun
 nn <M-g> :call JumpToDef()<cr>
 ino <M-g> <esc>:call JumpToDef()<cr>i
 
+
+" w0rp/ale
+" ===================================
+let g:ale_linters = {
+      \ 'clojure': ['clj-kondo', 'joker']
+      \}
+
+" vim-clap 
+" ===================================
+
+let g:clap_provider_grep_delay = 50
+let g:clap_provider_grep_opts = '-H --no-heading --vimgrep --smart-case --hidden -g "!.git/"'
+
+
+nnoremap <space>* :Clap grep ++query=<cword><cr>
+nnoremap <leader>fg :Clap grep<cr>
+nnoremap <leader>ff :Clap files --hidden<cr>
+nnoremap <leader>fb :Clap buffers<cr>
+nnoremap <leader>fw :Clap windows<cr>
+nnoremap <leader>fr :Clap history<cr>
+nnoremap <leader>fh :Clap command_history<cr>
+nnoremap <leader>fj :Clap jumps<cr>
+nnoremap <leader>fl :Clap blines<cr>
+nnoremap <leader>fL :Clap lines<cr>
+nnoremap <leader>ft :Clap filetypes<cr>
+nnoremap <leader>fm :Clap marks<cr>
+
+
+" FZF/Ripgrep Stuff 
+" ===================================
+" --column: Show column number
+" --line-number: Show line number
+" --no-heading: Do not show file headings in results
+" --fixed-strings: Search term as a literal string
+" --ignore-case: Case insensitive search
+" --no-ignore: Do not respect .gitignore, etc...
+" --hidden: Search hidden files and folders
+" --follow: Follow symlinks
+" --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
+" --color: Search color options
+command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1, <bang>0)
+nnoremap <leader>Nn :Find <CR>
+
 " -------------------------------------------------------------------------------------------
 "  FUNCTIONS
 " -------------------------------------------------------------------------------------------
@@ -270,8 +332,8 @@ call ConfigInc('keybindings.vim')
 "----------------------------------------------------------------------------------------------
 
 " If colorscheme = OceanicNext
-colorscheme OceanicNext
-highlight CursorLineNr guifg=#fac863
+" colorscheme OceanicNext
+" highlight CursorLineNr guifg=#fac863
 
 " If colorscheme = Nord
 " colorscheme nord
@@ -280,3 +342,7 @@ highlight CursorLineNr guifg=#fac863
 " If colorscheme = nova
 " colorscheme nova
 " highlight CursorLineNr guifg=#f2c38f
+
+" If colorscheme = Seoul256
+colorscheme seoul256
+let g:seoul256_background = 233
