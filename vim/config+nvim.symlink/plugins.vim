@@ -53,7 +53,7 @@ Plug 'tpope/vim-rails',             {'for': 'ruby'} " Rails syntax and helpers
 Plug 'eraserhd/parinfer-rust', {'do':
         \  'cargo build --release'}
 Plug 'tpope/vim-fireplace'
-" Plug 'Olical/conjure', { 'tag': 'v2.1.0', 'do': 'bin/compile' }
+Plug 'Olical/conjure', { 'tag': 'v2.1.0', 'do': 'bin/compile' }
 
 " Nim
 Plug 'zah/nim.vim'
@@ -186,10 +186,11 @@ Plug 'w0rp/ale'
 " THEMES & UI
 " -------------------------------------------------------------------------------------------
 
-Plug 'arcticicestudio/nord-vim'     " Nord Vim theme
+Plug 'arcticicestudio/nord-vim', { 'as': 'nord' }     " Nord Vim theme
 Plug 'mhartington/oceanic-next'     " Oceanic Next theme
 Plug 'trevordmiller/nova-vim'       " Nova theme
 Plug 'junegunn/seoul256.vim'        " Seoul256 Theme
+Plug 'sonph/onehalf'
 
 " Status line
 " Plug 'vim-airline/vim-airline'      " Airline plugin

@@ -5,7 +5,8 @@
 (setq
  doom-themes-enable-bold t
  doom-themes-enable-italic t
- doom-foont (font-spec :family "Fira Code" :size 12)
+ mac-auto-operator-composition-mode t
+ doom-font (font-spec :family "Fira Code" :size 12)
  web-mode-markup-indent-offset 2
  web-mode-code-indent-offset 2
  web-mode-css-indent-offset 2

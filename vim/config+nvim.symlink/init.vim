@@ -7,11 +7,7 @@ set encoding=utf-8
 set nocompatible
 
 " Config file path
-if has('win32')
-	let g:config_path = "C:\\Users\\me\\AppData\\Local\\nvim\\"
-elseif has('mac')
-	let g:config_path = "~/.config/nvim/"
-endif
+let g:config_path = "~/.config/nvim/"
 
 
 " Function for sourcing config modules
@@ -331,8 +327,8 @@ call ConfigInc('keybindings.vim')
 " THEMES / COLORS / UI
 "----------------------------------------------------------------------------------------------
 
-" If colorscheme = OceanicNext
-" colorscheme OceanicNext
+" If colorscheme = onehalfdark
+" colorscheme onehalfdark
 " highlight CursorLineNr guifg=#fac863
 
 " If colorscheme = Nord
@@ -344,5 +340,6 @@ call ConfigInc('keybindings.vim')
 " highlight CursorLineNr guifg=#f2c38f
 
 " If colorscheme = Seoul256
-colorscheme seoul256
 let g:seoul256_background = 233
+set background=dark
+colorscheme seoul256
