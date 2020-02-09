@@ -199,8 +199,6 @@ call plug#begin('~/.vim/plugged')
 
 " General
 Plug 'sheerun/vim-polyglot'			" Collection of language packs for Vim
-Plug 'neoclide/coc.nvim', {'branch': 'release'} " IntelliSense like features for VIM
-Plug 'dense-analysis/ale'           " Easily lint/fix messy code
 
 " HTML
 Plug 'valloric/MatchTagAlways'			" Highlights matching HTML tags.
