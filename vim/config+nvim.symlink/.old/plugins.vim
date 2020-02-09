@@ -53,7 +53,7 @@ Plug 'tpope/vim-rails',             {'for': 'ruby'} " Rails syntax and helpers
 Plug 'eraserhd/parinfer-rust', {'do':
         \  'cargo build --release'}
 Plug 'tpope/vim-fireplace'
-Plug 'Olical/conjure', { 'tag': 'v2.1.0', 'do': 'bin/compile' }
+" Plug 'Olical/conjure', { 'tag': 'v2.1.0', 'do': 'bin/compile' }
 
 " Nim
 Plug 'zah/nim.vim'
@@ -83,7 +83,7 @@ Plug 'mattn/emmet-vim',             {'for': ['html', 'vue', 'css', 'scss', 'java
 " Format/Indentation
 Plug 'sbdchd/neoformat'             " Format code: standard.js, prettier etc.
 Plug 'junegunn/vim-easy-align'      " Easy alignement
-Plug 'Yggdroot/indentLine'          " Show a line to display indentation level
+" Plug 'Yggdroot/indentLine'          " Show a line to display indentation level
 Plug 'AndrewRadev/splitjoin.vim',   {'on': ['SplitjoinJoin', 'SplitjoinSplit']} " Transition between multiline and single-line code
 
 " Editing S-expresions

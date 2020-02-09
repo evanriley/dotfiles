@@ -1,19 +1,13 @@
 
+"------------------------------------------------------------------------------"
+"                                   Settings                                   "
+"------------------------------------------------------------------------------"
 
 scriptencoding utf-8
 set encoding=utf-8
 
 " Use full Vim features
 set nocompatible
-
-" Config file path
-let g:config_path = "~/.config/nvim/"
-
-
-" Function for sourcing config modules
-function! ConfigInc(module)
-    execute 'source ' . fnameescape(g:config_path) . fnameescape(a:module)
-endfunction
 
 " Python 3 is needed for some plugins to work
 let g:python3_host_prog = '/usr/local/bin/python3'
@@ -22,32 +16,274 @@ set termguicolors
 " I like block & always blinking cursor
 set guicursor=a:block-blinkwait100-blinkoff150-blinkon175
 
-" -------------------------------------------------------------------------------------------
-"  SETTINGS
-" -------------------------------------------------------------------------------------------
+" Remap leader (Use space as leader)
+let g:mapleader = ' '
+" Map local leader
+let g:maplocalleader = ','
 
-call ConfigInc('settings.vim')
+" Release keymappings prefixes, evict entirely for use of plug-ins.
+nnoremap <Space> <Nop>
+xnoremap <Space> <Nop>
+nnoremap ,       <Nop>
+xnoremap ,       <Nop>
+nnoremap ;       <Nop>
+xnoremap ;       <Nop>
 
-" -------------------------------------------------------------------------------------------
-"  AUTOCOMMANDS
-" -------------------------------------------------------------------------------------------
+" Global Settings
+filetype plugin indent on                       " Enable full filetype detection
+syntax on                                       " Syntax highlighting on
+syntax enable                                   " Syntax highlighting on
+set nopaste
+set title                                       " Let Vim set window title
+set hidden                                      " Enable buffers on background without saving
+set autochdir                                   " Change dir to file on current window
+set synmaxcol=240                               " Don't syntax highlight long lines
+set omnifunc=syntaxcomplete#Complete
 
-call ConfigInc('autocmds.vim')
 
-" -------------------------------------------------------------------------------------------
-"  PLUGINS
-" -------------------------------------------------------------------------------------------
+" Positioning
+set number                                      " Set line number
+set ruler                                       " Set line/col of cursor
 
-call ConfigInc('plugins.vim')
+" UI
+set noshowmode                                  " Dont display current mode (Using vim-airline for that)
+set scrolloff=999                               " Cursor always on center of screen
+set sidescrolloff=5                             " Keep at least 5 lines left/right
+set shortmess=aoOtTI                            " Short messages
+set showcmd                                     " Shows current command combo
+set showmatch                                   " Show matching brackets
+set mat=2                                       " How many tenths of a second to blink matching brackets
+set mouse=n                                     " Use basic mouse for changing windows split sizes
+set clipboard+=unnamedplus                      " Yank and paste with the system clipboard
+set pumheight=10                                " Completion window max height
+set numberwidth=2                               " Keep line number gutter cozy
+set list                                        " Show hidden characters
+set listchars=tab:▸\ ,trail:·,nbsp:␣            " Display tabs and trailing spaces
+set listchars+=extends:»                        " show a » when a line goes off the right edge of the screen
+set listchars+=precedes:«                       " show a « when a line goes off the left edge of the screenk
+set conceallevel=2
+set colorcolumn=81                              " Color the colum 81
+
+" Files
+set autowrite                                   " Autosave before :next, :make, etc.
+set autoread                                    " Autoread file when changed outside of Vim
+set noswapfile                                  " No swapfile for buffer
+set nobackup                                    " Don't create annoying backup files
+set confirm                                     " Ask for confirmation if unsaved file
+
+" Completion
+set wildmenu                                    " Menu for command line completion using <TAB>
+set wildmode=list:longest,list:full
+set wildignorecase                              " Ignore case
+set wildignore+=*.zip,*.tar,*.tar*,*.rar        " Ignore archive files
+set wildignore+=*.png,*.jpg,*.jpeg,*.gif        " Ignore images
+set wildignore+=*.pdf                           " Ignore several files and directories
+set wildignore+=*.DS_Store
+set wildignore+=*yarn.lock*
+set wildignore+=*.gem,*.obj,*.out,*.swp
+set wildignore+=.git,.hg,*/.git/*,**/.git/**
+set wildignore+=*/.bundle/*
+set wildignore+=*/.sass-cache/*
+set wildignore+=*/node_modules/*,**/node_modules/**
+set wildignore+=**/vendor/**
+set wildignore+=**/build/**
+set wildignore+=**/deps/**
+set wildignore+=**/log/**
+set wildignore+=*/tmp/*,**/tmp/**
+
+
+" Tabs/Spaces
+set autoindent                                  " Auto indent
+set smartindent                                 " Smart autoindenting on new lines
+set expandtab                                   " Always use spaces
+set tabstop=2                                   " Tab size (Columns per tab)
+set shiftwidth=2                                " Amount to shift by
+set softtabstop=2                               " Delete x spaces on backsp.
+set smarttab                                    " use 'shiftwidth' when inserting
+set backspace=indent,eol,start                  " Intuitive backspacing in insert mode
+set whichwrap+=<,>,h,l
+
+" Format
+set textwidth=80                                " Wrap text starting here
+set nowrap                                      " Disable softwrap
+set breakindent                                 " Breack with an indentation
+set breakat=\ \	;:,!?                           " Long lines break chars
+set linebreak                                   " Break long lines at 'breakat'
+set showbreak=+                                 " Show a '+' at the beggining of wrapped lines
+set splitbelow                                  " Open horizontal splits below
+set splitright                                  " Open vertical splits right
+
+" Search
+set hlsearch                                    " Highligh search
+set incsearch                                   " Search as you type
+set infercase                                   " Ignore case in matching
+set smartcase                                   " Match capitals in search
+set ignorecase
+
+
+" Other
+set completeopt+=noselect                       " Don't select a match in menu
+set visualbell                                  " Don't beep
+set noerrorbells                                " Don't beep
+set iskeyword+=-,_                              " Consider - and _ part of a word
+set history=200                                 " Remember more commands and search history
+set undolevels=100                              " Maximum levels of changes that can be undone
+
+
+
+"------------------------------------------------------------------------------"
+"                                 Autocommands                                 "
+"------------------------------------------------------------------------------"
+
+" Main autocomands
+augroup main_autocmds
+  autocmd!
+  autocmd CompleteDone * pclose
+  autocmd VimResized * wincmd =
+augroup END
+
+" Use a tab spacing of four spaces for these file types
+augroup filetype_tabs
+  autocmd!
+  autocmd FileType go setlocal shiftwidth=4 softtabstop=4 tabstop=4
+augroup END
+
+" Autodetect some filetypes
+augroup filetype_detect
+  autocmd!
+  autocmd BufNewFile,BufRead .tmux.conf*,tmux.conf* setf tmux
+  autocmd BufNewFile,BufRead .nginx.conf*,nginx.conf*,*/nginx/* setf nginx
+  autocmd BufNewFile,BufRead Procfile,config.ru,Rakefile,Gemfile,rdoc setf ruby
+  autocmd BufNewFile,BufRead *.es6,*.jsx setf javascript
+  autocmd BufNewFile,BufRead .tern-project setf json
+  autocmd BufNewFile,BufRead *.md,*markdown setf markdown
+  autocmd BufNewFile,BufRead *.yml setf yaml
+  autocmd BufNewFile,BufRead *.eex setf eelixir
+  autocmd BufNewFile,BufRead *.vue setf vue
+  autocmd BufNewFile,BufRead *.toml setf toml
+  autocmd BufNewFile,BufRead *.styl setf stylus
+  autocmd BufRead,BufNewFile .babelrc setf json
+  autocmd BufRead,BufNewFile .eslintrc setf json
+  autocmd BufRead,BufNewFile *.gtpl setf gtpl
+
+  autocmd FileType vue syntax sync fromstart
+augroup END
+
+" Wrap lines on these file types
+augroup filetype_wrap
+  autocmd!
+  autocmd FileType markdown,html,text setlocal wrap linebreak
+augroup END
+
+" Mark these files as CSS style files.
+augroup CSS_syntax
+  autocmd!
+  autocmd FileType css,scss,sass,stylus,styl setlocal iskeyword+=-
+augroup END
+
+
+
+
+"------------------------------------------------------------------------------"
+"                                    Plugins                                   "
+"------------------------------------------------------------------------------"
 
 " Map vim-plug most used functions
 nnoremap <localleader>pu :PlugUpdate<cr>
 nnoremap <localleader>pc :PlugClean<cr>
 nnoremap <localleader>pi :PlugInstall<cr>
 
-" *******************************************************************
-" Plugins with many lines of configuration are under 'plugins' folder
-" *******************************************************************
+
+call plug#begin('~/.vim/plugged')
+
+
+" General
+Plug 'sheerun/vim-polyglot'			" Collection of language packs for Vim
+Plug 'neoclide/coc.nvim', {'branch': 'release'} " IntelliSense like features for VIM
+Plug 'dense-analysis/ale'           " Easily lint/fix messy code
+
+" HTML
+Plug 'valloric/MatchTagAlways'			" Highlights matching HTML tags.
+
+" Javascript
+Plug 'moll/vim-node'				" Node tools
+
+" Clojure
+Plug 'eraserhd/parinfer-rust', {'do':
+        \  'cargo build --release'}		" Makes using lisp easier
+Plug 'tpope/vim-fireplace'			" Clojure REPL support in Vim
+
+
+
+" Delimiters
+Plug 'tpope/vim-surround'          		" Easily change surroundings (parenthesis, brackets, etc)
+
+" Comments
+Plug 'tpope/vim-commentary'         		" Easily comment/uncomment words, lines or group of lines
+
+
+" File manip
+Plug 'mattn/emmet-vim'				          " Easy workflow for html & CSS
+
+" Format/Indentation
+Plug 'sbdchd/neoformat'             		" Format code: standard.js, prettier etc.
+Plug 'junegunn/vim-easy-align'      		" Easy alignement
+
+" Git
+Plug 'airblade/vim-gitgutter'       		" Show GIT changes status in the gutter
+Plug 'jreybert/vimagit', {'on': 'Magit'} 	" Easier GIT workflow
+Plug 'tpope/vim-fugitive'          		" mainly for showing Git status in netrw
+
+" NETRW
+Plug 'tpope/vim-vinegar'              		" makes netrw better
+
+" File Finder
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+
+" Testing
+Plug 'janko-m/vim-test'             " Run tests from inside Neovim
+
+" better everything about text objects
+Plug 'wellle/targets.vim'
+
+" Incremental search
+Plug 'haya14busa/incsearch.vim'
+
+" Snippets
+Plug 'Shougo/neosnippet.vim'        " Snippets support
+Plug 'Shougo/neosnippet-snippets'   " Snippets repository
+Plug 'Shougo/echodoc.vim'   
+
+" Other tools
+Plug 'bogado/file-line'                 " Open a file on arbitrary line: filename:line
+Plug 'AndrewRadev/switch.vim'           " Quickly switch between patterns
+Plug 'christoomey/vim-tmux-navigator'   " Navigate between Tmux and Vim splits
+Plug 'mtth/scratch.vim'                 " Create scratch buffer for quick notes and todo lists
+Plug 'terryma/vim-multiple-cursors'     " Multiple cursors like Sublime Text's
+Plug 'justinmk/vim-sneak'               " Jump to location specifies by 2 character
+Plug 'hauleth/sad.vim'                  " Quick change and replace!
+Plug 'matze/vim-move'                   " Easily move blocks of code, no cuting and pasting!!!
+Plug 'EinfachToll/DidYouMean'           " Ask for confirmation to open file if similar names exist
+Plug 'airblade/vim-rooter'              " Chage working directory to project root
+Plug 'tpope/vim-eunuch'                 " UNIX file shell command helpers
+Plug 'rizzatti/dash.vim',           {'on': ['Dash', 'DashKeywords', '<Plug>DashSearch']} " Easy documentation with Dash.app (OSX)
+Plug 'easymotion/vim-easymotion'        " Easily move aroudn your buffer
+Plug 'cometsong/CommentFrame.vim'       " Easily make pretty, bordered, comments
+
+" Thesm & UI
+Plug 'arcticicestudio/nord-vim', { 'as': 'nord' }     " Nord Vim theme
+Plug 'mhartington/oceanic-next'     " Oceanic Next theme
+Plug 'trevordmiller/nova-vim'       " Nova theme
+Plug 'junegunn/seoul256.vim'        " Seoul256 Theme
+Plug 'sonph/onehalf'
+Plug 'challenger-deep-theme/vim', { 'as': 'challenger-deep' } " Challenger Deep Theme
+
+
+" Status line
+Plug 'itchyny/lightline.vim'
+
+call plug#end()
 
 " elzr/vim-json
 " ==================================
@@ -56,16 +292,6 @@ let g:vim_json_syntax_conceal = 0
 " posva/vim-vue
 " ==================================
 let g:vue_disable_pre_processors = 1
-
-" slashmili/alchemist.vim
-" ==================================
-let g:alchemist_tag_disable = 1 "Use Universal ctags instead
-let g:alchemist_mappings_disable = 1
-
-" ditmammoth/doorboy.vim
-" ==================================
-" Easy jump closings without leaving home row or insert mode
-inoremap ii <esc>la
 
 " mattn/emmet-vim
 " ==================================
@@ -80,19 +306,6 @@ autocmd FileType html,css,scss,vue,jsx,javascript,javascript.jsx,gtpl
 " ==================================
 xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
-
-" Yggdroot/indentLine
-" ==================================
-let g:indentLine_setColors = 0
-let g:indentLine_char = '┆'
-let g:indentLine_color_gui = '#65737e'
-
-" AndrewRadev/splitjoin.vim
-" ==================================
-let g:splitjoin_split_mapping = ''
-let g:splitjoin_join_mapping = ''
-nmap <localleader>j :SplitjoinSplit<CR>
-nmap <localleader>k :SplitjoinJoin<CR>
 
 " airblade/vim-gitgutter
 " ==================================
@@ -109,15 +322,6 @@ nnoremap <leader>gP :! git push<CR>
 " ==================================
 nnoremap <Leader>gb :Gblame<CR>  " git blame
 
-" scrooloose/nerdtree
-" ==================================
-" map <leader>n :NERDTreeToggle<cr>
-" map <leader>b :NERDTreeFind<cr>
-" let g:NERDTreeShowHidden = 1
-" let g:NERDTreeAutoDeleteBuffer = 1
-" let g:NERDTreeCascadeOpenSingleChildDir = 1
-" let g:NERDTreeQuitOnOpen = 1
-
 " netrw 
 " ==================================
 map <leader>n :Explore<cr>
@@ -129,131 +333,15 @@ let g:netrw_browse_split = 0
 let g:netrw_altv = 1
 let g:netrw_winsize = 10
 
-" lotabout/skim
-" ==================================
-" nnoremap <C-s> :<C-u>SK --color=selected:238,current_match:214<cr>
-
-" AndrewRadev/switch.vim
-" ==================================
-let g:switch_mapping = ""
-noremap <leader>s :Switch<cr>
-
-" christoomey/vim-tmux-navigator
-" ==================================
-let g:tmux_navigator_no_mappings = 1
-noremap <silent> <C-h> :TmuxNavigateLeft<cr>
-noremap <silent> <C-j> :TmuxNavigateDown<cr>
-noremap <silent> <C-k> :TmuxNavigateUp<cr>
-noremap <silent> <C-l> :TmuxNavigateRight<cr>
-noremap <silent> <C-p> :TmuxNavigatePrevious<cr>
-
-" hauleth/sad.vim
-" ==================================
-nmap <leader>c <Plug>(sad-change-forward)
-vmap <leader>c <Plug>(sad-change-forward)
-nmap <leader>C <Plug>(sad-change-backward)
-vmap <leader>C <Plug>(sad-change-backward)
-
-" matze/vim-move
-" ==================================
-" Using a hack here, this rare signs are equal as pressing <ALT-j> and <ALT-k>
-" Don't know why alt key is not working without this weird mappings
-nmap ¶ <Plug>MoveLineDown
-vmap ¶ <Plug>MoveBlockDown
-nmap § <Plug>MoveLineUp
-vmap § <Plug>MoveBlockUp
-
 " rizzatti/dash.vim
 " ==================================
 nmap <silent> <C-d> <Plug>DashSearch
-
-" airblade/vim-rooter
-" ==================================
-nnoremap <localleader>cd :Rooter<cr>
-let g:rooter_manual_only = 1
-let g:rooter_patterns = ['Gemfile', 'mix.exs', 'package.json', '*.yml', '*.yaml', '.git/', 'node_modules/', '.hg/', '.gitignore']
-let g:rooter_change_directory_for_non_project_files = ''
-
-" deoplete
-" ==================================
-let g:deoplete#enable_at_startup = 1
-call deoplete#custom#option('keyword_patterns', {'clojure': '[\w!$%&*+/:<=>?@\^_~\-\.#]*'})
-set completeopt-=preview
 
 " float-preview
 " =================================
 let g:float_preview#docked = 0
 let g:float_preview#max_width = 80
 let g:float_preview#max_height = 40
-
-" carlitux/deoplete-ternjs
-" ==================================
-let g:tern_request_timeout = 1
-let g:tern_show_signature_in_pum = 1
-let g:deoplete#sources#ternjs#timeout = 1
-let g:deoplete#sources#ternjs#tern_bin = '/usr/local/bin/tern'
-" let g:deoplete#sources#ternjs#types = 1
-" let g:deoplete#sources#ternjs#docs = 1
-let g:deoplete#sources#ternjs#filetypes = [
-  \ 'javascript',
-  \ 'vue',
-  \ 'jsx',
-  \ 'javascript.jsx'
-\ ]
-
-" zchee/deoplete-go
-" ==================================
-let g:deoplete#sources#go#gocode_binary = $GOPATH . '/bin/gocode'
-
-" racer-rust/vim-racer
-" ==================================
-let g:racer_cmd = '~/.cargo/bin/racer'
-let g:racer_experimental_completer = 1
-
-" wellle/tmux-complete.vim
-" ==================================
-let g:tmuxcomplete#trigger = ''
-
-" Shougo/neosnippet
-" ==================================
-imap <C-k> <Plug>(neosnippet_expand_or_jump)
-smap <C-k> <Plug>(neosnippet_expand_or_jump)
-xmap <C-k> <Plug>(neosnippet_expand_target)
-
-" Shougo/echodoc.vim
-" ==================================
-let g:echodoc#enable_at_startup = 1
-
-" vim-airline/vim-airline
-" ==================================
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#fnamemod = ':t'
-let g:airline#extensions#tabline#buffer_nr_format = '%s '
-let g:airline#extensions#tabline#buffer_nr_show = 1
-let g:airline_powerline_fonts = 1
-let g:airline_enable_branch = 1
-let g:airline_branch_prefix = '⎇ '
-let g:airline_skip_empty_sections = 1
-" let g:airline_theme='oceanicnext'
-let g:airline#extensions#ale#enabled = 1
-
-" itchyny/lightline.vim
-" ===================================
-let g:lightline = {
-      \ 'colorscheme': 'seoul256',
-      \ }
-
-
-" itmammoth/doorboy.vim
-" ===================================
-let g:doorboy_nomap_quotations = {
-  \ 'clojure': ["'"]
-  \ }
-
-" luochen1990/rainbow
-" ===================================
-let g:rainbow_active = 1 " adds color to my ()
-
 
 " zah/nim.vim
 " ===================================
@@ -275,26 +363,12 @@ let g:ale_linters = {
       \ 'clojure': ['clj-kondo', 'joker']
       \}
 
-" vim-clap 
-" ===================================
-
-let g:clap_provider_grep_delay = 50
-let g:clap_provider_grep_opts = '-H --no-heading --vimgrep --smart-case --hidden -g "!.git/"'
-
-
-nnoremap <space>* :Clap grep ++query=<cword><cr>
-nnoremap <leader>fg :Clap grep<cr>
-nnoremap <leader>ff :Clap files --hidden<cr>
-nnoremap <leader>fb :Clap buffers<cr>
-nnoremap <leader>fw :Clap windows<cr>
-nnoremap <leader>fr :Clap history<cr>
-nnoremap <leader>fh :Clap command_history<cr>
-nnoremap <leader>fj :Clap jumps<cr>
-nnoremap <leader>fl :Clap blines<cr>
-nnoremap <leader>fL :Clap lines<cr>
-nnoremap <leader>ft :Clap filetypes<cr>
-nnoremap <leader>fm :Clap marks<cr>
-
+" hauleth/sad.vim
+" ==================================
+nmap <leader>c <Plug>(sad-change-forward)
+vmap <leader>c <Plug>(sad-change-forward)
+nmap <leader>C <Plug>(sad-change-backward)
+vmap <leader>C <Plug>(sad-change-backward)
 
 " FZF/Ripgrep Stuff 
 " ===================================
@@ -309,37 +383,200 @@ nnoremap <leader>fm :Clap marks<cr>
 " --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
 " --color: Search color options
 command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1, <bang>0)
-nnoremap <leader>Nn :Find <CR>
+nnoremap <leader>Nn :Find<CR> 
 
-" -------------------------------------------------------------------------------------------
-"  FUNCTIONS
-" -------------------------------------------------------------------------------------------
 
-call ConfigInc('functions.vim')
 
-"----------------------------------------------------------------------------------------------
-" KEYBINDINGS
-"----------------------------------------------------------------------------------------------
 
-call ConfigInc('keybindings.vim')
+"------------------------------------------------------------------------------"
+"                                   Functions                                  "
+"------------------------------------------------------------------------------"
 
-"----------------------------------------------------------------------------------------------
-" THEMES / COLORS / UI
-"----------------------------------------------------------------------------------------------
 
-" If colorscheme = onehalfdark
-" colorscheme onehalfdark
-" highlight CursorLineNr guifg=#fac863
+" Strip trailing whitespace
+function! StripWhitespace ()
+    let save_cursor = getpos(".")
+    let old_query = getreg('/')
+    :%s/\s\+$//e
+    call setpos('.', save_cursor)
+    call setreg('/', old_query)
+endfunction
+noremap <leader>ss :call StripWhitespace()<CR>
 
-" If colorscheme = Nord
-" colorscheme nord
-" highlight CursorLineNr guifg=#5E81AC
 
-" If colorscheme = nova
-" colorscheme nova
-" highlight CursorLineNr guifg=#f2c38f
+" Add semicolon to at the end of a line
+function! AddSemicolon()
+    execute "normal! mqA;\<esc>`q"
+endfunction
 
-" If colorscheme = Seoul256
-let g:seoul256_background = 233
-set background=dark
-colorscheme seoul256
+nmap <leader>as :call AddSemicolon()<cr>
+
+" Select all file to clipboard
+function! CopyAll()
+    execute "normal! %y<cr>"
+endfunction
+
+nmap <leader>y :call CopyAll()<cr>
+
+
+
+"------------------------------------------------------------------------------"
+"                                   Keybinds                                   "
+"------------------------------------------------------------------------------"
+
+" Navigation
+noremap H ^
+noremap L g_
+noremap J 5j
+noremap K 5k
+
+" Make cursor move by visual lines instead of file lines (when wrapping) unless count is prepended
+noremap <expr> j v:count ? 'j' : 'gj'
+noremap <expr> k v:count ? 'k' : 'gk'
+
+" Go to definition (using ctags)
+nnoremap <leader>z <C-]>
+
+" Buffer Navigation
+nnoremap <leader>. :bn!<cr>
+nnoremap <leader>, :bp!<cr>
+nnoremap <leader>d :bd<cr>
+nnoremap <leader>- :enew<cr>
+
+" upper/lower word
+nnoremap <leader>u mQviwU`Q
+nnoremap <leader>l mQviwu`Q
+
+" upper/lower first char of word
+nnoremap <leader>U mQgewvU`Q
+nnoremap <leader>L mQgewvu`Q
+
+" Easy save & quit
+nnoremap <leader>w :w<cr>
+nnoremap <leader>q :q<cr>
+nnoremap <leader>x :wq<cr>
+
+" Make :Q and :W work like :q and :w
+command! W :w
+command! Q :q
+command! Qa :qa
+
+" Start an external command with a single bang
+nnoremap ! :!
+
+" Make Y consistent with C and D
+nnoremap Y y$
+
+" Don't add single character removal to the default registry
+noremap x "_x
+vmap x "_d
+
+" Remove line/selection without adding it to the default registry
+nmap X "_dd
+vmap X "_d
+
+" When changing text, don't add it to default registry
+nnoremap c "_c
+vnoremap c "_c
+nnoremap C "_C
+vnoremap C "_C
+
+" Insert blank line up/down cursor position in normal mode
+nnoremap <leader><cr> o<esc>
+nnoremap <leader><bs> O<esc>
+
+" NO ARROW KEYS COME ON!!!
+noremap <Left>  :echo "no! use h"<cr>
+noremap <Right> :echo "no! use l"<cr>
+noremap <Up>    :echo "no! use k"<cr>
+noremap <Down>  :echo "no! use j"<cr>
+imap <Left> <nop>
+imap <Right> <nop>
+imap <Up> <nop>
+imap <Down> <nop>
+
+" Navigation in command line
+cnoremap <C-j> <Left>
+cnoremap <C-k> <Right>
+cnoremap <C-h> <Home>
+cnoremap <C-l> <End>
+
+" Change the Current working dir to where the current file is located
+nnoremap <silent> <Leader>cd :cd %:p:h<CR>:pwd<CR>
+
+" No Ex mode
+nnoremap Q <nop>
+
+" Make 'dot' work as expected in visual mode
+vnoremap . :norm.<cr>
+xnoremap . :norm.<cr>
+
+" Clear the search buffer when hitting ESC
+map <silent> <esc> :nohlsearch<cr>
+
+" Select pasted text to work with it or select all if not pasted text
+nnoremap <leader>v `[v`]
+
+" Keep block selected after indenting
+xnoremap > >gv|
+xnoremap < <gv
+
+" Use <Tab> for indenting in visual mode
+vnoremap <Tab> >gv|
+vnoremap <S-Tab> <gv
+
+" Use '<' and '>' for indenting in normal mode
+nnoremap > >>_
+nnoremap < <<_
+
+" easy switch
+nnoremap <tab> %
+
+" ESC from insert mode
+imap jk <Esc>
+imap kj <Esc>
+
+" Join lines and restore cursor location
+nnoremap <Leader>j mjJ`j
+
+" Switch between the last two files
+noremap <leader>m <c-^>
+
+" Reload & easy edit Neovim configuration
+" nnoremap <leader>r :source ~/.config/nvim/init.vim<cr>
+" nnoremap <leader>e :e ~/.config/nvim/init.vim<cr>
+
+" Enter normal mode in terminal buffer and change buffers
+tnoremap <Esc> <C-\><C-n>
+tnoremap <leader>. <c-\><c-n>:bn<cr>
+tnoremap <leader>, <c-\><c-n>:bp<cr>
+
+" Easy exit terminal buffer
+tmap <leader>d <c-\><c-n>:bd!<cr>
+
+" Cope, super helpful, do ':help cope' if unsure
+nnoremap <localleader>cc :botright cope<cr>
+nnoremap <localleader>n :cn<cr>
+nnoremap <localleader>p :cp<cr>
+
+
+" Mapping incsearch bindings
+map /  <Plug>(incsearch-forward)
+map ?  <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
+
+
+
+
+"------------------------------------------------------------------------------"
+"                             Themes / Colors / UI                             "
+"------------------------------------------------------------------------------"
+
+colorscheme challenger_deep
+
+if has('nvim') || has('termguicolors')
+  set termguicolors
+endif
+
+let g:lightline = { 'colorscheme': 'challenger_deep'}
+

@@ -44,8 +44,8 @@ set mouse=n                                     " Use basic mouse for changing w
 set clipboard+=unnamedplus                      " Yank and paste with the system clipboard
 set pumheight=10                                " Completion window max height
 set numberwidth=2                               " Keep line number gutter cozy
-set list                                        " Show hidden characters
-set listchars=tab:▸\ ,trail:·,nbsp:␣            " Display tabs and trailing spaces
+" set list                                        " Show hidden characters
+" set listchars=tab:▸\ ,trail:·,nbsp:␣            " Display tabs and trailing spaces
 set listchars+=extends:»                        " show a » when a line goes off the right edge of the screen
 set listchars+=precedes:«                       " show a « when a line goes off the left edge of the screenk
 set conceallevel=2
