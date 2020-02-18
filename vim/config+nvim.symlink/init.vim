@@ -213,6 +213,7 @@ Plug 'tpope/vim-fireplace'			" Clojure REPL support in Vim
 
 " Tools to fix my crap code
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'dense-analysis/ale'
 
 
 " Delimiters
@@ -633,6 +634,12 @@ command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 
 " Add `:OR` command for organize imports of the current buffer.
 command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+
+" ALE linter settings
+let g:ale_linters = {
+      \ 'javascript': ['eslint'],
+      \ 'clojure': ['clj-kondo'],
+      \}
 
 
 "------------------------------------------------------------------------------"
