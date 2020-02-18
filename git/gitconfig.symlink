@@ -16,7 +16,7 @@
         branch = auto
         ui = true
 [core]
-        excludesfile = ~/.gitignore
+	excludesfile = /Users/evan/.gitignore
         editor = nvim
 [apply]
         whitespace = nowarn
@@ -35,9 +35,16 @@
 [user]
 	signingkey = EAA5E48B24E47C4D
 	name = Evan Riley
+	email = me@evanriley.me
 [commit]
 	gpgsign = true
 [gpg]
 	program = gpg
 [credential]
 	helper = osxkeychain
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true

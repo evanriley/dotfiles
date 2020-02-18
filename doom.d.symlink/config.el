@@ -1,44 +1,81 @@
-;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+(add-to-list 'default-frame-alist
+             '(ns-transparent-titlebar . t))
+(add-to-list 'default-frame-alist
+             '(ns-appearance . dark))
 
-;; Place your private configuration here! Remember, you do not need to run 'doom
-;; refresh' after modifying this file!
 
-
-;; These are used for a number of things, particularly for GPG configuration,
-;; some email clients, file templates and snippets.
 (setq user-full-name "Evan Riley"
       user-mail-address "me@evanriley.me")
 
-;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
-;; are the three important ones:
-;;
-;; + `doom-font'
-;; + `doom-variable-pitch-font'
-;; + `doom-big-font' -- used for `doom-big-font-mode'
-;;
-;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
-;; font string. You generally only need these two:
-(setq doom-font (font-spec :family "Fira Code" :size 14))
+(setq doom-font (font-spec :family "Fira Code" :size 14)
+      doom-big-font (font-spec :family "Fira Code" :size 30)
+      doom-variable-pitch-font (font-spec :family "Avenir Next" :size 12))
 
-;; There are two ways to load a theme. Both assume the theme is installed and
-;; available. You can either set `doom-theme' or manually load a theme with the
-;; `load-theme' function. These are the defaults.
+(setq web-mode-markup-indent-offset 2
+      web-mode-code-indent-offset 2
+      web-mode-css-indent-offset 2
+      js-indent-level 2
+      typescript-indent-level 2
+      prettier-js-args '("--single-quote"))
+
+
+(map! :ne "M-/" #'comment-or-uncomment-region)
+
 (setq doom-theme 'doom-challenger-deep)
 
-;; If you intend to use org, it is recommended you change this!
 (setq org-directory "~/Desktop/org/")
 
-;; If you want to change the style of line numbers, change this to `relative' or
-;; `nil' to disable it:
 (setq display-line-numbers-type t)
 
+(after! web-mode
+  (add-to-list 'auto-mode-alist '("\\.njk\\'" . web-mode)))
 
-;; setting various settings
+(add-hook 'js2-mode-hook 'prettier-js-mode)
+(add-hook 'web-mode-hook 'prettier-js-mode)
+
 (setq
  projectile-project-search-path '("~/Code")
  mac-command-modifier 'meta
- +magit-hub-features t)
-
+ +magit-hub-features t
+ dired-dwim-target t)
 
 ;; If only you could set all the annoyances in your life to nil
 (setq +pretty-code-enabled-modes nil)
+
+
+(setq
+ mue4e-headers-skip-duplicates  t
+ mu4e-view-show-images t
+ mu4e-view-show-addresses t
+ mu4e-compose-format-flowed nil
+ mu4e-date-format "%y/%m/%d"
+ mu4e-headers-date-format "%Y/%m/%d"
+ mu4e-change-filenames-when-moving t
+ mu4e-attachments-dir "~/Downloads"
+
+ mu4e-maildir       "~/Maildir"   ;; top-level Maildir
+ ;; note that these folders below must start with /
+ ;; the paths are relative to maildir root
+ mu4e-refile-folder "/Archive"
+ mu4e-sent-folder   "/Sent"
+ mu4e-drafts-folder "/Drafts"
+ mu4e-trash-folder  "/Trash")
+
+;; this setting allows to re-sync and re-index mail
+;; by pressing U
+(setq mu4e-get-mail-command  "mbsync -a")
+
+
+;; Allow me to use shift+tab like a normal person
+(global-set-key (kbd "<backtab>") 'un-indent-by-removing-4-spaces)
+(defun un-indent-by-removing-4-spaces ()
+  "remove 4 spaces from beginning of of line"
+  (interactive)
+  (save-excursion
+    (save-match-data
+      (beginning-of-line)
+      ;; get rid of tabs at beginning of line
+      (when (looking-at "^\\s-+")
+        (untabify (match-beginning 0) (match-end 0)))
+      (when (looking-at "^    ")
+        (replace-match "")))))

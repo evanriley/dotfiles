@@ -57,3 +57,6 @@
 (package! jazz-theme)
 (package! nord-theme)
 (package! zenburn-theme)
+(package! indium)
+(package! vue-mode)
+(package! prettier-js)
