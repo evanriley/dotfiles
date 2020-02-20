@@ -270,6 +270,7 @@ Plug 'airblade/vim-rooter'              " Chage working directory to project roo
 Plug 'tpope/vim-eunuch'                 " UNIX file shell command helpers
 Plug 'rizzatti/dash.vim',           {'on': ['Dash', 'DashKeywords', '<Plug>DashSearch']} " Easy documentation with Dash.app (OSX)
 Plug 'easymotion/vim-easymotion'        " Easily move aroudn your buffer
+Plug 'jiangmiao/auto-pairs'             " Auto-close brackets
 
 " Thesm & UI
 Plug 'arcticicestudio/nord-vim', { 'as': 'nord' }     " Nord Vim theme
