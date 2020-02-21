@@ -9,7 +9,7 @@ Run this:
 ```sh
 git clone https://github.com/evanriley/dotfiles.git ~/.dotfiles
 or
-git clone https://git.sr.ht/~evanriley/dotfiles ~/.dotfiles
+git clone https://git.evanriley.dev/evan/dotfiles ~/.dotfiles
 cd ~/.dotfiles
 script/bootstrap
 ```
