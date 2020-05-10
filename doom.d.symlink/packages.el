@@ -60,3 +60,4 @@
 (package! indium)
 (package! vue-mode)
 (package! prettier-js)
+(package! typescript-mode)

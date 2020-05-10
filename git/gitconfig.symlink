@@ -33,13 +33,13 @@
         # Setting to git 2.0 default to suppress warning message
         default = simple
 [user]
-	signingkey = EAA5E48B24E47C4D
+	signingkey = D6AE30D374563474
 	name = Evan Riley
 	email = me@evanriley.me
 [commit]
 	gpgsign = true
 [gpg]
-	program = gpg
+	program = gpg2
 [credential]
 	helper = osxkeychain
 [difftool "sourcetree"]

@@ -4,6 +4,9 @@ export ZSH=$HOME/.dotfiles
 # your project folder that we can `c [tab]` to
 export PROJECTS=~/Code
 
+# oh gpg, you confusing beast
+export GPG_TTY=$(tty)
+
 # Stash your environment variables in ~/.localrc. This means they'll stay out
 # of your main dotfiles repository (which may be public, like this one), but
 # you'll have access to them in your scripts.
@@ -51,11 +54,10 @@ bindkey "^[[B" down-line-or-beginning-search # Down
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# nvm setup
-#export NVM_DIR="$HOME/.nvm"
-#[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-#[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-#export PATH="/usr/local/opt/ruby/bin:$PATH"
+# nvm 
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}"  ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh"  ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
 
 # --files: List files that would be searched but do not search
 # --no-ignore: Do not respect .gitignore, etc...
@@ -64,5 +66,20 @@ bindkey "^[[B" down-line-or-beginning-search # Down
 # --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
 export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow --glob "!.git/*"'
 
+# asdf
+. $HOME/.asdf/asdf.sh
 
+# hullo? locale? why you no work?
+export LC_CTYPE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+
+# make sure clip.exe exist on wsl
+export PATH="$PATH:/c/Windows/System32:/c/Windows\SysWOW64"
+
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="/home/e/.sdkman"
+[[ -s "/home/e/.sdkman/bin/sdkman-init.sh" ]] && source "/home/e/.sdkman/bin/sdkman-init.sh"
 

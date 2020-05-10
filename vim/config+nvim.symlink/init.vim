@@ -271,8 +271,9 @@ Plug 'tpope/vim-eunuch'                 " UNIX file shell command helpers
 Plug 'rizzatti/dash.vim',           {'on': ['Dash', 'DashKeywords', '<Plug>DashSearch']} " Easy documentation with Dash.app (OSX)
 Plug 'easymotion/vim-easymotion'        " Easily move aroudn your buffer
 Plug 'jiangmiao/auto-pairs'             " Auto-close brackets
+Plug 'mattn/emmet-vim'                  " abbreviation expander
 
-" Thesm & UI
+" Themes & UI
 Plug 'arcticicestudio/nord-vim', { 'as': 'nord' }     " Nord Vim theme
 Plug 'mhartington/oceanic-next'     " Oceanic Next theme
 Plug 'trevordmiller/nova-vim'       " Nova theme

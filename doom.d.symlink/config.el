@@ -7,9 +7,9 @@
 (setq user-full-name "Evan Riley"
       user-mail-address "me@evanriley.me")
 
+
 (setq doom-font (font-spec :family "Fira Code" :size 14)
-      doom-big-font (font-spec :family "Fira Code" :size 30)
-      doom-variable-pitch-font (font-spec :family "Avenir Next" :size 12))
+      doom-big-font (font-spec :family "Fira Code" :size 30))
 
 (setq web-mode-markup-indent-offset 2
       web-mode-code-indent-offset 2
@@ -29,6 +29,8 @@
 
 (after! web-mode
   (add-to-list 'auto-mode-alist '("\\.njk\\'" . web-mode)))
+
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
 
 (add-hook 'js2-mode-hook 'prettier-js-mode)
 (add-hook 'web-mode-hook 'prettier-js-mode)

@@ -40,3 +40,12 @@ alias myip="curl http://ipecho.net/plain; echo"
 
 ## copy public ssh key
 alias pubkey='pbcopy < ~/.ssh/id_rsa.pub'
+alias wslkey='clip.exe < ~/.ssh/id_rsa.pub'
+
+# quickly start an emacs session on windows
+alias eme='
+export DISPLAY=:0.0
+export LIBGL_ALWAYS_INDIRECT=1
+setxkbmap -layout us
+setsid emacs
+'
