@@ -31,6 +31,12 @@
         "elmTestPath": "elm-test", // optional
         "elmAnalyseTrigger": "change" // optional
       }
+    },
+    "rust": {
+      "command": "rust-analyzer",
+      "filetypes": ["rust"],
+      "rootPatterns": ["Cargo.toml"]
     }
-  }
+  },
+  "coc.preferences.formatOnSaveFileTypes": ["css", "markdown", "javascript", "typescript"]
 }

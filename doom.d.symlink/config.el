@@ -16,7 +16,7 @@
       web-mode-css-indent-offset 2
       js-indent-level 2
       typescript-indent-level 2
-      prettier-js-args '("--single-quote"))
+      prettier-js-args '("--single-quote" "--no-semi" "--trailing-comma" "all" "--arrow-parens" "always"))
 
 
 (map! :ne "M-/" #'comment-or-uncomment-region)
@@ -34,6 +34,9 @@
 
 (add-hook 'js2-mode-hook 'prettier-js-mode)
 (add-hook 'web-mode-hook 'prettier-js-mode)
+
+
+
 
 (setq
  projectile-project-search-path '("~/Code")

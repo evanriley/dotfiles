@@ -61,3 +61,4 @@
 (package! vue-mode)
 (package! prettier-js)
 (package! typescript-mode)
+(package! evil-escape :disable t)

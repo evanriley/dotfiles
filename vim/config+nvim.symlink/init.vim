@@ -271,7 +271,7 @@ Plug 'tpope/vim-eunuch'                 " UNIX file shell command helpers
 Plug 'rizzatti/dash.vim',           {'on': ['Dash', 'DashKeywords', '<Plug>DashSearch']} " Easy documentation with Dash.app (OSX)
 Plug 'easymotion/vim-easymotion'        " Easily move aroudn your buffer
 Plug 'jiangmiao/auto-pairs'             " Auto-close brackets
-Plug 'mattn/emmet-vim'                  " abbreviation expander
+" Plug 'Yggdroot/LeaderF'
 
 " Themes & UI
 Plug 'arcticicestudio/nord-vim', { 'as': 'nord' }     " Nord Vim theme
@@ -326,14 +326,50 @@ nnoremap <Leader>gb :Gblame<CR>  " git blame
 
 " netrw 
 " ==================================
-map <leader>n :Explore<cr>
-map <leader>sn :Sexplore<cr>
-map <leader>vn :Vexplore<cr>
-let g:netrw_banner = 0
-let g:netrw_liststyle = 3
-let g:netrw_browse_split = 0
-let g:netrw_altv = 1
-let g:netrw_winsize = 10
+" map <leader>n :Explore<cr>
+" map <leader>sn :Sexplore<cr>
+" map <leader>vn :Vexplore<cr>
+" let g:netrw_liststyle = 3
+" let g:netrw_browse_split = 0
+" let g:netrw_altv = 1
+" let g:netrw_winsize = 10
+
+" LeaderF 
+" ==================================
+" LeaderF, more like LeaderN
+" let g:Lf_HideHelp = 1
+" let g:Lf_UseCache = 0
+" let g:Lf_UseVersionControlTool = 0
+" let g:Lif_IgnoreCurrentBufferName = 1
+" 
+" let g:LF_WindowPosition = 'popup'
+" let g:Lf_PreviewInPopup = 1
+" let g:Lf_StlSeperator = { 'left': "\ue0b0", 'right': "\ue0b2", 'font': "DejaVu Sans Mono for Powerline" }
+" let g:Lf_PreviewResult = {'Function': 0, 'BufTag': 0}
+" 
+" let g:Lf_ShortcutF = "<leader>nn"
+" noremap <leader>nb :<C-U><C-R>=prinf("Leaderf buffer %s", "")<CR><CR>
+" noremap <leader>nm :<C-U><C-R>=printf("Leaderf mru %s", "")<CR><CR>
+" noremap <leader>nt :<C-U><C-R>=printf("Leaderf bufTag %s", "")<CR><CR>
+" noremap <leader>nl :<C-U><C-R>=printf("Leaderf line %s", "")<CR><CR>
+" 
+" 
+" noremap <C-B> :<C-U><C-R>=printf(" eaderf! rg --current-buffer -e %s ", expand("<cword>"))<CR>
+" noremap <C-F> :<C-U><C-R>=printf("Leaderf! rg -e %s ", expand("<cword>"))<CR>
+" 
+" xnoremap gf :<C-U><C-R>=printf("Leaderf! rg -F -e %s ", leaderf#Rg#visual())<CR>
+" noremap go :<C-U>Leaderf! rg --recall<CR>
+" 
+" let g:Lf_GtagsAutoGenerate = 0
+" let g:Lf_Gtagslabel = 'native-pygments'
+" 
+" noremap <leader>nr :<C-U><C-R>=printf("Leaderf! gtags -r %s --auto-jump", expand("<cword>"))<CR><CR>
+" noremap <leader>nd :<C-U><C-R>=printf("Leaderf! gtags -d %s --auto-jump", expand("<cword>"))<CR><CR>
+" noremap <leader>no :<C-U><C-R>=printf("Leaderf! gtags --recall %s", "")<CR><CR>
+" noremap <leader>nf :<C-U><C-R>=printf("Leaderf gtags --next %s", "")<CR><CR>
+" noremap <leader>np :<C-U><C-R>=printf("Leaderf gtags --previous %s", "")<CR><CR>
+
+
 
 " rizzatti/dash.vim
 " ==================================
@@ -359,12 +395,6 @@ nn <M-g> :call JumpToDef()<cr>
 ino <M-g> <esc>:call JumpToDef()<cr>i
 
 
-" w0rp/ale
-" ===================================
-let g:ale_linters = {
-      \ 'clojure': ['clj-kondo', 'joker']
-      \}
-
 " hauleth/sad.vim
 " ==================================
 nmap <leader>c <Plug>(sad-change-forward)
@@ -385,9 +415,7 @@ vmap <leader>C <Plug>(sad-change-backward)
 " --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
 " --color: Search color options
 command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1, <bang>0)
-nnoremap <leader>Nn :Find<CR> 
-
-
+nnoremap <leader>n :Find<CR> 
 
 
 "------------------------------------------------------------------------------"
@@ -618,7 +646,7 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 nmap <leader>rn <Plug>(coc-rename)
 
 " Formatting selected code.
-xmap <leader>f  <Plug>(coc-format-selected)
+vmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
 
 " Use <TAB> for selections ranges.
@@ -637,11 +665,29 @@ command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 " Add `:OR` command for organize imports of the current buffer.
 command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
+" Format with prettier on save
+command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
+
 " ALE linter settings
 let g:ale_linters = {
       \ 'javascript': ['eslint'],
+      \ 'typescript': ['tsserver', 'eslint'],
+      \ 'vue': ['eslint'],
+      \ 'clojure': ['clj-kondo'],
+      \ 'rust': ['rust-analyzer']
+      \}
+
+let g:ale_fixers = {
+      \ 'javascript': ['eslint'],
+      \ 'typescript': ['tsserver', 'eslint'],
       \ 'clojure': ['clj-kondo'],
       \}
+
+let g:ale_fix_on_save = 1
+
+" Emmet-vim settings
+" redefine trigger key
+let g:user_emmet_leader_key=','
 
 
 "------------------------------------------------------------------------------"
