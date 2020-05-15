@@ -209,7 +209,8 @@ Plug 'moll/vim-node'				" Node tools
 " Clojure
 Plug 'eraserhd/parinfer-rust', {'do':
         \  'cargo build --release'}		" Makes using lisp easier
-Plug 'tpope/vim-fireplace'			" Clojure REPL support in Vim
+" Plug 'tpope/vim-fireplace', {'for': 'clojure'}
+Plug 'liquidz/vim-iced', {'for': 'clojure'}
 
 " Tools to fix my crap code
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
@@ -383,7 +384,7 @@ vmap <leader>C <Plug>(sad-change-backward)
 " --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
 " --color: Search color options
 command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1, <bang>0)
-nnoremap <leader>Nn :Find<CR> 
+nnoremap <C-p> :GFiles<CR> 
 
 
 
@@ -635,11 +636,25 @@ command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 " Add `:OR` command for organize imports of the current buffer.
 command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
+" Add :Prettier to format code 
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+
+
 " ALE linter settings
 let g:ale_linters = {
       \ 'javascript': ['eslint'],
       \ 'clojure': ['clj-kondo'],
+      \ 'rust': ['rls'],
       \}
+
+" Coc settings
+let g:coc_global_extensions = ['coc-tsserver', 'coc-rls', 'coc-eslint', 
+                            \  'coc-prettier', 'coc-json', 'coc-css',
+                            \  'coc-marketplace',]
+
+
+" Vim-Iced settings
+let g:iced_enable_default_key_mappings = v:true
 
 
 "------------------------------------------------------------------------------"

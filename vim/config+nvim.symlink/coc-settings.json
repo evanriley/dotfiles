@@ -1,8 +1,10 @@
 {
   "suggest.snippetIndicator": "🍦",
+  "coc.preferences.formatOnSaveFiletypes": ["css", "markdown", "javascript", "jsx", "typescript", "tsx"],
    "languageserver": {
     "clojure-lsp": {
-      "command": "clojure-lsp",
+      "command": "bash",
+      "args": ["-c", "cd /Users/case/dev/lsp/ && lein run"],
       "filetypes": ["clojure"],
       "rootPatterns": ["project.clj"],
       "additionalSchemes": ["jar", "zipfile"],
