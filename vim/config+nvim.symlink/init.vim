@@ -273,6 +273,8 @@ Plug 'rizzatti/dash.vim',           {'on': ['Dash', 'DashKeywords', '<Plug>DashS
 Plug 'easymotion/vim-easymotion'        " Easily move aroudn your buffer
 Plug 'jiangmiao/auto-pairs'             " Auto-close brackets
 Plug 'voldikss/vim-floaterm'            " Floating terminal window
+Plug 'justinmk/vim-sneak'               " Jump to any location with two chars
+
 
 " Themes & UI
 Plug 'arcticicestudio/nord-vim', { 'as': 'nord' }     " Nord Vim theme
@@ -670,11 +672,11 @@ let g:floaterm_keymap_toggle = '<Leader>T'
 "                             Themes / Colors / UI                             "
 "------------------------------------------------------------------------------"
 
-colorscheme challenger_deep
+let g:seoul256_background = 233
+colo seoul256
 
 if has('nvim') || has('termguicolors')
   set termguicolors
 endif
 
-let g:lightline = { 'colorscheme': 'challenger_deep'}
-
+let g:lightline = { 'colorscheme': 'seoul256' }
