@@ -272,8 +272,9 @@ Plug 'tpope/vim-eunuch'                 " UNIX file shell command helpers
 Plug 'rizzatti/dash.vim',           {'on': ['Dash', 'DashKeywords', '<Plug>DashSearch']} " Easy documentation with Dash.app (OSX)
 Plug 'easymotion/vim-easymotion'        " Easily move aroudn your buffer
 Plug 'jiangmiao/auto-pairs'             " Auto-close brackets
+Plug 'voldikss/vim-floaterm'            " Floating terminal window
 
-" Thesm & UI
+" Themes & UI
 Plug 'arcticicestudio/nord-vim', { 'as': 'nord' }     " Nord Vim theme
 Plug 'mhartington/oceanic-next'     " Oceanic Next theme
 Plug 'trevordmiller/nova-vim'       " Nova theme
@@ -384,7 +385,7 @@ vmap <leader>C <Plug>(sad-change-backward)
 " --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
 " --color: Search color options
 command! -bang -nargs=* Find call fzf#vim#grep('rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color "always" '.shellescape(<q-args>), 1, <bang>0)
-nnoremap <C-p> :GFiles<CR> 
+nnoremap <C-p> :FZF<CR> 
 
 
 
@@ -655,6 +656,14 @@ let g:coc_global_extensions = ['coc-tsserver', 'coc-rls', 'coc-eslint',
 
 " Vim-Iced settings
 let g:iced_enable_default_key_mappings = v:true
+
+" Vim-floaterm settings
+let g:floaterm_keymap_new    = '<Leader>t'
+let g:floaterm_keymap_prev   = '<Leader><'
+let g:floaterm_keymap_next   = '<Leader>>'
+let g:floaterm_keymap_toggle = '<Leader>T'
+
+
 
 
 "------------------------------------------------------------------------------"
