@@ -283,6 +283,7 @@ Plug 'trevordmiller/nova-vim'       " Nova theme
 Plug 'junegunn/seoul256.vim'        " Seoul256 Theme
 Plug 'sonph/onehalf'
 Plug 'challenger-deep-theme/vim', { 'as': 'challenger-deep' } " Challenger Deep Theme
+Plug 'ayu-theme/ayu-vim'
 
 
 " Status line
@@ -672,11 +673,15 @@ let g:floaterm_keymap_toggle = '<Leader>T'
 "                             Themes / Colors / UI                             "
 "------------------------------------------------------------------------------"
 
-let g:seoul256_background = 233
-colo seoul256
+" let g:seoul256_background = 233
+" colo seoul256
+
+let ayucolor="dark" 
+colorscheme ayu
+
 
 if has('nvim') || has('termguicolors')
   set termguicolors
 endif
 
-let g:lightline = { 'colorscheme': 'seoul256' }
+let g:lightline = { 'colorscheme': 'ayu' }
