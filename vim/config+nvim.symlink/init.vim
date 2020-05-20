@@ -273,7 +273,6 @@ Plug 'rizzatti/dash.vim',           {'on': ['Dash', 'DashKeywords', '<Plug>DashS
 Plug 'easymotion/vim-easymotion'        " Easily move aroudn your buffer
 Plug 'jiangmiao/auto-pairs'             " Auto-close brackets
 Plug 'voldikss/vim-floaterm'            " Floating terminal window
-Plug 'justinmk/vim-sneak'               " Jump to any location with two chars
 
 
 " Themes & UI
