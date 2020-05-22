@@ -212,6 +212,7 @@ Plug 'eraserhd/parinfer-rust', {'do':
 " Plug 'tpope/vim-fireplace', {'for': 'clojure'}
 Plug 'liquidz/vim-iced', {'for': 'clojure'}
 
+
 " Tools to fix my crap code
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'dense-analysis/ale'
