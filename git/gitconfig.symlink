@@ -33,7 +33,7 @@
         # Setting to git 2.0 default to suppress warning message
         default = simple
 [user]
-	signingkey = EAA5E48B24E47C4D
+	signingkey = F6A6590FE65016D1
 	name = Evan Riley
 	email = me@evanriley.me
 [commit]
