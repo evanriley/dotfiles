@@ -2,25 +2,12 @@
 #
 # Install neovim dependencies
 
-if test $(which nvim)
+if ! command -v nvim -v &> /dev/null
 then
-  if [[ ! $(pip3 show neovim) ]]
-  then
-    echo "Installing Python neovim client"
-    pip3 install neovim
-  else
-    echo "Upgrading Python neovim client"
-    pip3 install --upgrade neovim
-  fi
-
-  # if [[ `gem list -i neovim` = 'false' ]]
-  # then
-  #   echo "Installing Ruby neovim client"
-  #    gem install neovim
-  # else
-  #   echo "Updating Ruby neovim client"
-  #   gem update neovim
-  # fi
+  echo "Installing Neovim"
+  brew install neovim
+else
+  echo "Neovim already installed"
 fi
 
 # Check for vim-plug
