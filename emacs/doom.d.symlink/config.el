@@ -6,10 +6,12 @@
 
 (global-auto-revert-mode t)
 
+
 (add-hook 'org-mode-hook #'auto-fill-mode)
 
 (add-hook! 'org-mode-hook (company-mode -1))
 (add-hook! 'org-capture-mode-hook (company-mode -1))
+
 
 (setq
  doom-font (font-spec :family "Source Code Pro" :size 14)
@@ -53,12 +55,17 @@
                            (:name "Big Outcomes"
                                   :tag "bo")))
 
+
+
 (add-hook!
   js2-mode 'prettier-js-mode
   (add-hook 'before-save-hook #'refmt-before-save nil t))
 
+
 (map! :ne "M-/" #'comment-or-uncomment-region)
 (map! :ne "SPC / r" #'deadgrep)
+
+
 
 (after! org
   (set-face-attribute 'org-link nil
@@ -101,83 +108,22 @@
                       :weight 'bold)
   (setq org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕")))
 
+
+
 (after! web-mode
   (add-to-list 'auto-mode-alist '("\\.njk\\'" . web-mode)))
 
 (setq +magit-hub-features t)
 
 (setq user-full-name "Evan Riley"
-      user-mail-address "me@evanriley.me")
-
-(setq doom-font (font-spec :family "Source Code Pro" :size 14))
-
-(set-popup-rule! "^\\*Org Agenda" :side 'bottom :size 0.90 :select t :ttl nil)
-(set-popup-rule! "^CAPTURE.*\\.org$" :side 'bottom :size 0.90 :select t :ttl nil)
-(set-popup-rule! "^\\*org-brain" :side 'right :size 1.00 :select t :ttl nil)
+      user-mail-address "evanriley@hey.com")
 
 
 (setq org-directory "~/Code/org/")
 (setq org-roam-directory "~/Code/org/notes")
 
-(setq org-journal-enable-agenda-integration t)
+
+(setq org-directory "~/Code/org/")
+(setq org-roam-directory "~/Code/org/notes")
 
 (setq display-line-numbers-type t)
-
-(setq
- mu4e-headers-skip-duplicates t
- mu4e-view-show-images t
- mu4e-view-show-addresses t
- mu4e-compose-format-flowed nil
- mu4e-date-format "%y/%m/%d"
- mu4e-headers-date-format "%Y/%m/%d"
- mu4e-change-filenames-when-moving t
- mu4e-attachment-dir "~/Downloads/"
- mu4e-maildir "~/Maildir"
- mu4e-refile-folder "/Archive"
- mu4e-sent-folder "/Sent"
- mu4e-drafts-folder "/Drafts"
- mu4e-trash-folder "/Trash")
-
-(setq
- mu4e-get-mail-command "mbsync -a")
-
-(setq
-   message-send-mail-function   'smtpmail-send-it
-   smtpmail-stream-type 'ssl
-   smtpmail-default-smtp-server "smtp.fastmail.com"
-   smtpmail-smtp-server         "smtp.fastmail.com"
-   smtpmail-smtp-service 465)
-(after! mu4e
-  (setq! mu4e-maildir (expand-file-name "~/Maildir") ; the rest of the mu4e folders are RELATIVE to this one
-         mu4e-get-mail-command "mbsync -a"
-         mu4e-index-update-in-background t
-         mu4e-use-fancy-chars t
-         mu4e-view-show-addresses t
-         mu4e-view-show-images t
-         mu4e-compose-format-flowed t
-         ;mu4e-compose-in-new-frame t
-         mu4e-change-filenames-when-moving t ;; http://pragmaticemacs.com/emacs/fixing-duplicate-uid-errors-when-using-mbsync-and-mu4e/
-         ;; Message Formatting and sending
-         message-send-mail-function 'smtpmail-send-it
-         message-citation-line-format "On %a %d %b %Y at %R, %f wrote:\n"
-         message-citation-line-function 'message-insert-formatted-citation-line
-         message-kill-buffer-on-exit t
-
-         ;; Org mu4e
-         org-mu4e-convert-to-html t))
-
-(set-email-account! "me@evanriley.me"
-                    '((user-mail-address      . "me@evanriley.me")
-                      (user-full-name         . "Evan Riley")
-                      (smtpmail-smtp-server   . "smtp.fastmail.com")
-                      (smtpmail-smtp-service  . 465)
-                      (smtpmail-stream-type   . ssl)
-                      (smtpmail-debug-info    . t)
-                      (mu4e-drafts-folder     . "/Drafts")
-                      (mu4e-refile-folder     . "/Archive")
-                      (mu4e-sent-folder       . "/Sent")
-                      (mu4e-trash-folder      . "/Trash")
-                      (mu4e-update-interval   . 1800))
-                      ;(mu4e-sent-messages-behavior . 'delete)
-
-                    nil)

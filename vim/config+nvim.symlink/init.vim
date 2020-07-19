@@ -209,8 +209,8 @@ Plug 'moll/vim-node'				" Node tools
 " Clojure
 Plug 'eraserhd/parinfer-rust', {'do':
         \  'cargo build --release'}		" Makes using lisp easier
-" Plug 'tpope/vim-fireplace', {'for': 'clojure'}
-Plug 'liquidz/vim-iced', {'for': 'clojure'}
+Plug 'tpope/vim-fireplace', {'for': 'clojure'}
+" Plug 'liquidz/vim-iced', {'for': 'clojure'}
 
 
 " Tools to fix my crap code
@@ -274,6 +274,9 @@ Plug 'rizzatti/dash.vim',           {'on': ['Dash', 'DashKeywords', '<Plug>DashS
 Plug 'easymotion/vim-easymotion'        " Easily move aroudn your buffer
 Plug 'jiangmiao/auto-pairs'             " Auto-close brackets
 Plug 'voldikss/vim-floaterm'            " Floating terminal window
+Plug 'guns/vim-sexp'
+Plug 'tpope/vim-sexp-mappings-for-regular-people'
+Plug 'tpope/vim-repeat'
 
 
 " Themes & UI
