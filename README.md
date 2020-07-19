@@ -7,9 +7,7 @@ Your dotfiles are how you personalize your system. These are mine.
 Run this:
 
 ```sh
-git clone https://github.com/evanriley/dotfiles.git ~/.dotfiles
-or
-git clone https://git.evanriley.dev/evan/dotfiles ~/.dotfiles
+git clone git@github.com:evanriley/dotfiles.git
 cd ~/.dotfiles
 script/bootstrap
 ```
