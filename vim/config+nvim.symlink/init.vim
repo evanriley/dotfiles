@@ -660,9 +660,6 @@ let g:coc_global_extensions = ['coc-tsserver', 'coc-rls', 'coc-eslint',
                             \  'coc-marketplace',]
 
 
-" Vim-Iced settings
-let g:iced_enable_default_key_mappings = v:true
-
 " Vim-floaterm settings
 let g:floaterm_keymap_new    = '<Leader>t'
 let g:floaterm_keymap_prev   = '<Leader><'
