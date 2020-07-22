@@ -208,9 +208,10 @@ Plug 'moll/vim-node'				" Node tools
 
 " Clojure
 Plug 'eraserhd/parinfer-rust', {'do':
-        \  'cargo build --release'}		" Makes using lisp easier
-Plug 'tpope/vim-fireplace', {'for': 'clojure'}
+        \  'cargo build --release'}
+" Plug 'tpope/vim-fireplace', {'for': 'clojure'}
 " Plug 'liquidz/vim-iced', {'for': 'clojure'}
+Plug 'Olical/conjure', {'tag': 'v4.1.0'}
 
 
 " Tools to fix my crap code
@@ -277,7 +278,7 @@ Plug 'voldikss/vim-floaterm'            " Floating terminal window
 Plug 'guns/vim-sexp'
 Plug 'tpope/vim-sexp-mappings-for-regular-people'
 Plug 'tpope/vim-repeat'
-
+Plug 'luochen1990/rainbow'
 
 " Themes & UI
 Plug 'arcticicestudio/nord-vim', { 'as': 'nord' }     " Nord Vim theme
@@ -370,6 +371,10 @@ ino <M-g> <esc>:call JumpToDef()<cr>i
 let g:ale_linters = {
       \ 'clojure': ['clj-kondo', 'joker']
       \}
+
+" luochen1990/rainbow
+" ===================================
+let g:rainbow_active = 1
 
 " hauleth/sad.vim
 " ==================================
