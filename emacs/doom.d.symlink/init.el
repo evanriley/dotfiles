@@ -22,7 +22,11 @@
        company           ; the ultimate code completion backend
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       ivy               ; a search engine for love and life
+       (ivy
+        +fuzzy
+        +prescient
+        +childframe)               ; a search engine for love and life ;
+
 
        :ui
        ;;deft              ; notational velocity for Emacs
@@ -108,8 +112,7 @@
        ;;agda              ; types of types of types of types...
        (cc
         +lsp)                ; C/C++/Obj-C madness
-       (clojure
-        +lsp)           ; java with a lisp
+       clojure             ; java with a lisp
        ;;common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c

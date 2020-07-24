@@ -212,6 +212,7 @@ Plug 'eraserhd/parinfer-rust', {'do':
 " Plug 'tpope/vim-fireplace', {'for': 'clojure'}
 " Plug 'liquidz/vim-iced', {'for': 'clojure'}
 Plug 'Olical/conjure', {'tag': 'v4.1.0'}
+Plug 'bakpakin/fennel.vim'  " Mostly for conjure, will probably rarely write fennel
 
 
 " Tools to fix my crap code
@@ -288,6 +289,7 @@ Plug 'junegunn/seoul256.vim'        " Seoul256 Theme
 Plug 'sonph/onehalf'
 Plug 'challenger-deep-theme/vim', { 'as': 'challenger-deep' } " Challenger Deep Theme
 Plug 'ayu-theme/ayu-vim'
+Plug 'cocopon/iceberg.vim'
 
 
 " Status line
@@ -680,12 +682,15 @@ let g:floaterm_keymap_toggle = '<Leader>T'
 " let g:seoul256_background = 233
 " colo seoul256
 
-let ayucolor="dark" 
-colorscheme ayu
+" let ayucolor="dark" 
+" colorscheme ayu
 
+" colorscheme iceberg
+
+colorscheme challenger_deep
 
 if has('nvim') || has('termguicolors')
   set termguicolors
 endif
 
-let g:lightline = { 'colorscheme': 'ayu' }
+let g:lightline = { 'colorscheme': 'challenger_deep' }

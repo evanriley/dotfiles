@@ -51,3 +51,4 @@
 (package! prettier-js)
 (package! org-fancy-priorities)
 (package! org-super-agenda)
+(package! seoul256-theme)

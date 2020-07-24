@@ -118,6 +118,8 @@
 (setq user-full-name "Evan Riley"
       user-mail-address "evanriley@hey.com")
 
+(setq org-roam-graph-executable "/usr/local/bin/dot")
+
 
 (setq org-directory "~/Code/org/")
 (setq org-roam-directory "~/Code/org/notes")
