@@ -4,6 +4,8 @@
 (add-to-list 'default-frame-alist
              '(ns-appearance . dark))
 
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
 (global-auto-revert-mode t)
 
 
@@ -14,9 +16,10 @@
 
 
 (setq
- doom-font (font-spec :family "Source Code Pro" :size 14)
- doom-big-font (font-spec :family "Source Code Pro" :size 36)
- doom-theme 'doom-challenger-deep
+ doom-font (font-spec :family "Iosevka" :size 14)
+ doom-big-font (font-spec :family "Iosevka" :size 36)
+ ;;doom-theme 'doom-challenger-deep
+ doom-theme 'doom-nord
  web-mode-markup-indent-offset 2
  web-mode-code-indent-offset 2
  web-mode-css-indent-offset 2
