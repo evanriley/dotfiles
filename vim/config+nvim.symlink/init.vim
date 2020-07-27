@@ -309,7 +309,7 @@ let g:vue_disable_pre_processors = 1
 " ==================================
 let g:user_emmet_mode='a'
 let g:user_emmet_install_global = 0
-autocmd FileType html,css,scss,vue,jsx,javascript,javascript.jsx,gtpl
+autocmd FileType html,css,scss,vue,jsx,ts,tsx,typescript,typescriptreact,javascript,javascript.jsx,gtpl
             \ EmmetInstall
             \ | imap <buffer> <C-Return> <Plug>(emmet-expand-abbr)
 
