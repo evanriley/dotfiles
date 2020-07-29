@@ -245,6 +245,7 @@ Plug 'tpope/vim-vinegar'              		" makes netrw better
 " File Finder
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'BurntSushi/ripgrep'
 
 " Testing
 Plug 'janko-m/vim-test'             " Run tests from inside Neovim
@@ -260,6 +261,9 @@ Plug 'Shougo/neosnippet.vim'        " Snippets support
 Plug 'Shougo/neosnippet-snippets'   " Snippets repository
 Plug 'Shougo/echodoc.vim'   
 
+" Neuron
+Plug 'ihsanturk/neuron.vim'         " Note taking
+
 " Other tools
 Plug 'bogado/file-line'                 " Open a file on arbitrary line: filename:line
 Plug 'AndrewRadev/switch.vim'           " Quickly switch between patterns
@@ -274,7 +278,6 @@ Plug 'airblade/vim-rooter'              " Chage working directory to project roo
 Plug 'tpope/vim-eunuch'                 " UNIX file shell command helpers
 Plug 'rizzatti/dash.vim',           {'on': ['Dash', 'DashKeywords', '<Plug>DashSearch']} " Easy documentation with Dash.app (OSX)
 Plug 'easymotion/vim-easymotion'        " Easily move aroudn your buffer
-Plug 'jiangmiao/auto-pairs'             " Auto-close brackets
 Plug 'voldikss/vim-floaterm'            " Floating terminal window
 Plug 'guns/vim-sexp'
 Plug 'tpope/vim-sexp-mappings-for-regular-people'

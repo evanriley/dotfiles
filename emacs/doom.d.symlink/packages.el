@@ -52,3 +52,4 @@
 (package! org-fancy-priorities)
 (package! org-super-agenda)
 (package! seoul256-theme)
+(package! org-roam-server)

@@ -122,13 +122,19 @@
       user-mail-address "evanriley@hey.com")
 
 (setq org-roam-graph-executable "/usr/local/bin/dot")
-
-
+(setq org-directory "~/Code/org/")
+(setq org-roam-directory "~/Code/org/notes")
 (setq org-directory "~/Code/org/")
 (setq org-roam-directory "~/Code/org/notes")
 
-
-(setq org-directory "~/Code/org/")
-(setq org-roam-directory "~/Code/org/notes")
+(setq org-roam-server-host "127.0.0.1"
+        org-roam-server-port 8080
+        org-roam-server-export-inline-images t
+        org-roam-server-authenticate nil
+        org-roam-server-network-poll t
+        org-roam-server-network-arrows nil
+        org-roam-server-network-label-truncate t
+        org-roam-server-network-label-truncate-length 60
+        org-roam-server-network-label-wrap-length 20)
 
 (setq display-line-numbers-type t)
