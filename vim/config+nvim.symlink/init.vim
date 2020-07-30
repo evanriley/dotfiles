@@ -283,6 +283,7 @@ Plug 'guns/vim-sexp'
 Plug 'tpope/vim-sexp-mappings-for-regular-people'
 Plug 'tpope/vim-repeat'
 Plug 'luochen1990/rainbow'
+Plug 'jiangmiao/auto-pairs'             " Auto close brackets, parens, and quotes
 
 " Themes & UI
 Plug 'arcticicestudio/nord-vim', { 'as': 'nord' }     " Nord Vim theme
