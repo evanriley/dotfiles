@@ -1,4 +1,4 @@
-#!/usr/local/bin/fish
+#!/usr/local/bin/zsh
 #
 # This lets you quickly jump into a project directory.
 #

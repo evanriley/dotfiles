@@ -214,6 +214,8 @@ Plug 'eraserhd/parinfer-rust', {'do':
 Plug 'Olical/conjure', {'tag': 'v4.1.0'}
 Plug 'bakpakin/fennel.vim'  " Mostly for conjure, will probably rarely write fennel
 
+" Rust
+Plug 'rust-lang/rust.vim'
 
 " Tools to fix my crap code
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
@@ -661,11 +663,11 @@ command! -nargs=0 Prettier :CocCommand prettier.formatFile
 let g:ale_linters = {
       \ 'javascript': ['eslint'],
       \ 'clojure': ['clj-kondo'],
-      \ 'rust': ['rls'],
+      \ 'rust': ['rust-analyzer'],
       \}
 
 " Coc settings
-let g:coc_global_extensions = ['coc-tsserver', 'coc-rls', 'coc-eslint', 
+let g:coc_global_extensions = ['coc-tsserver', 'coc-rust-analyzer', 'coc-eslint', 
                             \  'coc-prettier', 'coc-json', 'coc-css',
                             \  'coc-marketplace',]
 
