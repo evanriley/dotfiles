@@ -138,3 +138,5 @@
         org-roam-server-network-label-wrap-length 20)
 
 (setq display-line-numbers-type t)
+
+(setq rustic-lsp-server 'rust-analyzer)
