@@ -53,3 +53,4 @@
 (package! org-super-agenda)
 (package! seoul256-theme)
 (package! org-roam-server)
+(package! srcery-theme)
