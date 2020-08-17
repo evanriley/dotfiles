@@ -60,7 +60,7 @@ bindkey "^[[B" down-line-or-beginning-search # Down
 # --hidden: Search hidden files and folders
 # --follow: Follow symlinks
 # --g: Additional conditions for search (in this case ignore everything in the .git/ folder)
-export FZF_DEFAULT_COMMAND='rg --files --no-ignore --hidden --follow -g "!{.git,node_modules,target}/*"'
+export FZF_DEFAULT_COMMAND='rg --files --hidden --follow -g "!{.git,node_modules,target,.clj-kondo,.lsp}/*"'
 
 export GPG_TTY=`tty`
 if [ -e /Users/evan/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/evan/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
