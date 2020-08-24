@@ -297,6 +297,8 @@ Plug 'challenger-deep-theme/vim', { 'as': 'challenger-deep' } " Challenger Deep 
 Plug 'ayu-theme/ayu-vim'
 Plug 'cocopon/iceberg.vim'
 Plug 'srcery-colors/srcery-vim'
+Plug 'co1ncidence/mountaineer'
+
 
 " Status line
 Plug 'itchyny/lightline.vim'
@@ -697,8 +699,10 @@ let g:floaterm_keymap_toggle = '<Leader>T'
 
 colorscheme srcery
 
+colorscheme mountaineer
+
 if has('nvim') || has('termguicolors')
   set termguicolors
 endif
 
-let g:lightline = { 'colorscheme': 'srcery' }
+let g:lightline = { 'colorscheme': 'mountaineer' }
