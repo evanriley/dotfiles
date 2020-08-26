@@ -64,3 +64,6 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --follow -g "!{.git,node_modules
 
 export GPG_TTY=`tty`
 if [ -e /Users/evan/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/evan/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+
+# opam configuration
+test -r /Users/evan/.opam/opam-init/init.zsh && . /Users/evan/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true

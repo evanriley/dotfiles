@@ -695,14 +695,12 @@ let g:floaterm_keymap_toggle = '<Leader>T'
 
 " colorscheme iceberg
 
-" colorscheme challenger_deep
+colorscheme challenger_deep
 
-colorscheme srcery
-
-colorscheme mountaineer
+" colorscheme srcery
 
 if has('nvim') || has('termguicolors')
   set termguicolors
 endif
 
-let g:lightline = { 'colorscheme': 'mountaineer' }
+let g:lightline = { 'colorscheme': 'challenger_deep' }
