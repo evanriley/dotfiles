@@ -49,8 +49,6 @@ zle -N down-line-or-beginning-search
 bindkey "^[[A" up-line-or-beginning-search # Up
 bindkey "^[[B" down-line-or-beginning-search # Down
 
-# asdf to manage languages
-. $HOME/.asdf/asdf.sh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
@@ -67,3 +65,7 @@ if [ -e /Users/evan/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/evan/.nix
 
 # opam configuration
 test -r /Users/evan/.opam/opam-init/init.zsh && . /Users/evan/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+
+
+#for homebrew
+export PATH=/opt/homebrew/bin:$PATH

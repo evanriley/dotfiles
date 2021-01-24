@@ -39,7 +39,7 @@
 [commit]
 	gpgsign = true
 [gpg]
-	program = gpg
+	program = /usr/local/MacGPG2/bin/gpg2
 [credential]
 	helper = osxkeychain
 [difftool "sourcetree"]
