@@ -8,8 +8,7 @@
 
 (global-auto-revert-mode t)
 
-
-(add-hook 'org-mode-hook #'auto-fill-mode)
+(add-hook 'org-mode #'auto-fill-mode)
 
 (add-hook! 'org-mode-hook (company-mode -1))
 (add-hook! 'org-capture-mode-hook (company-mode -1))
@@ -56,8 +55,6 @@
                                   :deadline future)
                            (:name "Big Outcomes"
                                   :tag "bo")))
-
-
 
 (add-hook!
   js2-mode 'prettier-js-mode
@@ -117,9 +114,6 @@
 
 (setq +magit-hub-features t)
 
-(setq user-full-name "Evan Riley"
-      user-mail-address "evanriley@hey.com")
-
 (setq org-roam-graph-executable "/usr/local/bin/dot")
 (setq org-directory "~/Code/org/")
 (setq org-roam-directory "~/Code/org/notes")
@@ -139,3 +133,6 @@
 (setq display-line-numbers-type t)
 
 (setq rustic-lsp-server 'rust-analyzer)
+
+(setq user-full-name "Evan Riley"
+      user-mail-address "evanriley@hey.com")
