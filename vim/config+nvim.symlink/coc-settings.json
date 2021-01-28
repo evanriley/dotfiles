@@ -1,6 +1,7 @@
 {
   "suggest.snippetIndicator": "🍦",
-  "coc.preferences.formatOnSaveFiletypes": ["css", "markdown", "javascript", "jsx", "typescript", "tsx"],
+  "coc.preferences.formatOnSaveFiletypes": ["css", "markdown", "javascript",
+    "jsx", "typescript", "tsx", "svelte"],
    "languageserver": {
     "clojure-lsp": {
       "command": "bash",

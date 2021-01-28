@@ -4,7 +4,6 @@
 (add-to-list 'default-frame-alist
              '(ns-appearance . dark))
 
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 (global-auto-revert-mode t)
 
