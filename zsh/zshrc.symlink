@@ -66,6 +66,9 @@ if [ -e /Users/evan/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/evan/.nix
 # opam configuration
 test -r /Users/evan/.opam/opam-init/init.zsh && . /Users/evan/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 
+#for chruby
+source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
+source /opt/homebrew/opt/chruby/share/chruby/auto.sh
 
 #for homebrew
 export PATH=/opt/homebrew/bin:$PATH
