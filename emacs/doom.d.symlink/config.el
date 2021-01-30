@@ -13,8 +13,10 @@
 (add-hook! 'org-capture-mode-hook (company-mode -1))
 
 (setq
- doom-font (font-spec :family "Iosevka" :size 14)
- doom-big-font (font-spec :family "Iosevka" :size 36)
+ doom-font (font-spec :family "JetBrains Mono" :size 16)
+ doom-big-font (font-spec :family "JetBrains Mono" :size 36)
+ doom-variable-pitch-font (font-spec :fammily "Overpass" :size 16)
+ doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light)
  doom-theme 'doom-challenger-deep
  ;;doom-theme 'doom-nord
  web-mode-markup-indent-offset 2
@@ -42,22 +44,25 @@
                           "* [ ] %?\n%i" :prepend t :kill-buffer t))
  +org-capture-todo-file "tasks.org"
  org-super-agenda-groups '((:name "Today"
-                                  :time-grid t
-                                  :scheduled today)
+                            :time-grid t
+                            :scheduled today)
                            (:name "Due today"
-                                  :deadline today)
+                            :deadline today)
                            (:name "Important"
-                                  :priority "A")
+                            :priority "A")
                            (:name "Overdue"
-                                  :deadline past)
+                            :deadline past)
                            (:name "Due soon"
-                                  :deadline future)
+                            :deadline future)
                            (:name "Big Outcomes"
-                                  :tag "bo")))
+                            :tag "bo")))
+
+(setq doom-fallback-buffer-name "► Doom"
+      +doom-dashboard-name "► Doom" )
 
 (add-hook!
-  js2-mode 'prettier-js-mode
-  (add-hook 'before-save-hook #'refmt-before-save nil t))
+ js2-mode 'prettier-js-mode
+ (add-hook 'before-save-hook #'refmt-before-save nil t))
 
 
 (map! :ne "M-/" #'comment-or-uncomment-region)
