@@ -62,7 +62,7 @@ set listchars=tab:▸\ ,trail:·,nbsp:␣            " Display tabs and trailing
 set listchars+=extends:»                        " show a » when a line goes off the right edge of the screen
 set listchars+=precedes:«                       " show a « when a line goes off the left edge of the screenk
 set conceallevel=2
-set colorcolumn=81                              " Color the colum 81
+set colorcolumn=121                              " Color the colum 121
 
 " Files
 set autowrite                                   " Autosave before :next, :make, etc.
