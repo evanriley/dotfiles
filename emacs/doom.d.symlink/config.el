@@ -17,7 +17,7 @@
  doom-big-font (font-spec :family "JetBrains Mono" :size 36)
  doom-variable-pitch-font (font-spec :fammily "Overpass" :size 16)
  doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light)
- doom-theme 'doom-challenger-deep
+ doom-theme 'doom-spacegrey
  ;;doom-theme 'doom-nord
  web-mode-markup-indent-offset 2
  web-mode-code-indent-offset 2
