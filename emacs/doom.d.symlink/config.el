@@ -4,6 +4,31 @@
 (add-to-list 'default-frame-alist
              '(ns-appearance . dark))
 
+(setq evil-vsplit-window-right t
+      evil-split-window-below t)
+
+(defadvice! prompt-for-buffer (&rest _)
+  :after '(evil-window-split evil-window-vsplit)
+  (+ivy/switch-buffer))
+
+(setq +ivy-buffer-preview t)
+
+
+(map! :map evil-window-map
+      "SPC" #'rotate-layout
+      ;; Navigation
+      "<left>"     #'evil-window-left
+      "<down>"     #'evil-window-down
+      "<up>"       #'evil-window-up
+      "<right>"    #'evil-window-right
+      ;; Swapping windows
+      "C-<left>"       #'+evil/window-move-left
+      "C-<down>"       #'+evil/window-move-down
+      "C-<up>"         #'+evil/window-move-up
+      "C-<right>"      #'+evil/window-move-right)
+
+(setq user-full-name "Evan Riley"
+      user-mail-address "evanriley@hey.com")
 
 (global-auto-revert-mode t)
 
@@ -12,13 +37,15 @@
 (add-hook! 'org-mode-hook (company-mode -1))
 (add-hook! 'org-capture-mode-hook (company-mode -1))
 
+
 (setq
  doom-font (font-spec :family "JetBrains Mono" :size 16)
  doom-big-font (font-spec :family "JetBrains Mono" :size 36)
  doom-variable-pitch-font (font-spec :fammily "Overpass" :size 16)
  doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light)
- doom-theme 'doom-spacegrey
+ ;;doom-theme 'doom-spacegrey
  ;;doom-theme 'doom-nord
+ doom-theme 'doom-wilmersdorf
  web-mode-markup-indent-offset 2
  web-mode-code-indent-offset 2
  web-mode-css-indent-offset 2
@@ -111,6 +138,20 @@
                       :weight 'bold)
   (setq org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕")))
 
+(setq-default
+ delete-by-moving-to-trash t
+ window-combination-resize t
+ x-stretch-cursor t)
+
+(setq
+ undo-limit 80000000
+ evil-want-fine-undo t
+ auto-save-default t)
+
+(display-time-mode 1)
+
+(setq password-cache-expiry nil)
+
 
 
 (after! web-mode
@@ -118,25 +159,12 @@
 
 (setq +magit-hub-features t)
 
-(setq org-roam-graph-executable "/usr/local/bin/dot")
 (setq org-directory "~/Code/org/")
 (setq org-roam-directory "~/Code/org/notes")
 (setq org-directory "~/Code/org/")
 (setq org-roam-directory "~/Code/org/notes")
-
-(setq org-roam-server-host "127.0.0.1"
-        org-roam-server-port 8080
-        org-roam-server-export-inline-images t
-        org-roam-server-authenticate nil
-        org-roam-server-network-poll t
-        org-roam-server-network-arrows nil
-        org-roam-server-network-label-truncate t
-        org-roam-server-network-label-truncate-length 60
-        org-roam-server-network-label-wrap-length 20)
 
 (setq display-line-numbers-type t)
+(setq yas-triggers-in-field t)
 
 (setq rustic-lsp-server 'rust-analyzer)
-
-(setq user-full-name "Evan Riley"
-      user-mail-address "evanriley@hey.com")

@@ -54,4 +54,33 @@
 (package! org-super-agenda)
 (package! seoul256-theme)
 (package! org-roam-server)
+(use-package org-roam-server
+  :after (org-roam server)
+  :config
+  (setq org-roam-server-host "127.0.0.1"
+        org-roam-server-port 8078
+        org-roam-server-export-inline-images t
+        org-roam-server-authenticate nil
+        org-roam-server-network-label-truncate t
+        org-roam-server-network-label-truncate-length 60
+        org-roam-server-network-label-wrap-length 20)
+  (defun org-roam-server-open ()
+    "Ensure the server is active, then open the roam graph."
+    (interactive)
+    (org-roam-server-mode 1)
+    (browse-url-xdg-open (format "http://localhost:%d" org-roam-server-port))))
 (package! srcery-theme)
+(package! ayu-theme)
+(package! rotate)
+(unpin! org-mode)
+(package! org-super-agenda)
+(package! doct
+  :recipe (:host github :repo "progfolio/doct"))
+(package! org-pretty-table-mode
+  :recipe (:host github :repo "Fuco1/org-pretty-table"))
+(package! org-appear
+  :recipe (:host github :repo "awth13/org-appear"))
+(package! org-pretty-tags)
+(package! ox-gfm)
+(use-package! ox-gfm
+  :after org)

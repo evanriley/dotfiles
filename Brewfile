@@ -4,7 +4,6 @@ tap "railwaycat/emacsmacport"
 # Standard brew install
 brew "neovim"
 brew "mas"
-brew "emacs-mac"
 brew "gpg2"
 brew "starship"
 brew "coreutils"
@@ -26,6 +25,7 @@ cask "iterm2"
 cask "discord"
 cask "slack"
 cask "bitwarden"
+cask "emacs-mac"
 
 # mas installs
 mas "NextDNS", id: 1464122853

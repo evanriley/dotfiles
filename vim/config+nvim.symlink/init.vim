@@ -207,8 +207,8 @@ Plug 'valloric/MatchTagAlways'			" Highlights matching HTML tags.
 Plug 'moll/vim-node'				" Node tools
 
 " Clojure
-Plug 'eraserhd/parinfer-rust', {'do':
-        \  'cargo build --release'}
+" Plug 'eraserhd/parinfer-rust', {'do':
+"        \  'cargo build --release'}
 " Plug 'tpope/vim-fireplace', {'for': 'clojure'}
 " Plug 'liquidz/vim-iced', {'for': 'clojure'}
 Plug 'Olical/conjure', {'tag': 'v4.1.0'}
