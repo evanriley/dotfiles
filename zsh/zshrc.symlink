@@ -68,3 +68,6 @@ test -r /Users/evan/.opam/opam-init/init.zsh && . /Users/evan/.opam/opam-init/in
 
 #for homebrew
 export PATH=/opt/homebrew/bin:$PATH
+
+
+eval "$(starship init zsh)"

@@ -298,6 +298,7 @@ Plug 'ayu-theme/ayu-vim'
 Plug 'cocopon/iceberg.vim'
 Plug 'srcery-colors/srcery-vim'
 Plug 'co1ncidence/mountaineer'
+Plug 'chriskempson/base16-vim'
 
 
 " Status line
@@ -689,18 +690,16 @@ let g:floaterm_keymap_toggle = '<Leader>T'
 
 " let g:seoul256_background = 233
 " colo seoul256
-
 " let ayucolor="dark" 
 " colorscheme ayu
-
 " colorscheme iceberg
+" colorscheme challenger_deep
 
-colorscheme challenger_deep
+colorscheme base16-ocean
 
-" colorscheme srcery
 
 if has('nvim') || has('termguicolors')
   set termguicolors
 endif
 
-let g:lightline = { 'colorscheme': 'challenger_deep' }
+let g:lightline = { 'colorscheme': 'one' }
