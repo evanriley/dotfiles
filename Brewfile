@@ -34,6 +34,7 @@ cask "rectangle"
 cask "hey"
 cask "iina"
 cask "cloudapp"
+cask "gpg-suite-no-mail"
 
 # mas installs
 mas "NextDNS", id: 1464122853
