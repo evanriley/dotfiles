@@ -20,6 +20,7 @@ brew "node"
 brew "python"
 brew "rbenv"
 brew "cmake"
+brew "pngpaste"
 
 # cask installs
 cask "google-chrome"
@@ -30,8 +31,9 @@ cask "slack"
 cask "bitwarden"
 cask "emacs-mac"
 cask "rectangle"
+cask "hey"
 
 # mas installs
 mas "NextDNS", id: 1464122853
 mas "Sorted³ - Calendar Notes Tasks", id: 1306893526
-# mas "Xcode", id: 497799835
+mas "Xcode", id: 497799835
