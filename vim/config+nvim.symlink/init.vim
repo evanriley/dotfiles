@@ -10,7 +10,8 @@ set encoding=utf-8
 set nocompatible
 
 " Python 3 is needed for some plugins to work
-let g:python3_host_prog = '/usr/local/bin/python3'
+" let g:python3_host_prog = '/usr/local/bin/python3'
+let g:python3_host_prog = '/opt/homebrew/bin/python3'
 
 set termguicolors
 " I like block & always blinking cursor
@@ -207,8 +208,8 @@ Plug 'valloric/MatchTagAlways'			" Highlights matching HTML tags.
 Plug 'moll/vim-node'				" Node tools
 
 " Clojure
-" Plug 'eraserhd/parinfer-rust', {'do':
-"        \  'cargo build --release'}
+Plug 'eraserhd/parinfer-rust', {'do':
+        \  'cargo build --release'}
 " Plug 'tpope/vim-fireplace', {'for': 'clojure'}
 " Plug 'liquidz/vim-iced', {'for': 'clojure'}
 Plug 'Olical/conjure', {'tag': 'v4.1.0'}

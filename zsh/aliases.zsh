@@ -28,7 +28,18 @@ alias mkdir='mkdir -pv'
 alias wget='wget -c'
 
 ## honestly this isn't something that should be used...##
-alias gac="git add . && git commit -a -m "
+alias gac='git add . && git commit -a -m '
+alias gl='git pull --prune'
+alias glog="git log --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative"
+alias gp='git push origin HEAD'
+alias gd='git diff --color | sed "s/^\([^-+ ]*\)[-+ ]/\\1/" | less -r'
+alias gc='git commit'
+alias gca='git commit -a'
+alias gco='git checkout'
+alias gcb='git copy-branch-name'
+alias gb='git branch'
+alias gs='git status -sb'
+alias ge='git-edit-new'
 
 #make then enter the dir#
 alias mkcd='foo(){ mkdir -p "$1"; cd "$1" }; foo '
@@ -38,3 +49,10 @@ alias myip="curl http://ipecho.net/plain; echo"
 
 ## copy public ssh key
 alias pubkey='pbcopy < ~/.ssh/id_rsa.pub'
+
+## more util commands
+alias ls='exa'
+alias l='exa -l'
+alias ll='exa -l | less'
+alias la='exa -la'
+alias cat='bat'

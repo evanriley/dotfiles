@@ -2,7 +2,8 @@ tap "homebrew/cask"
 tap "railwaycat/emacsmacport"
 
 # Standard brew install
-brew "neovim"
+brew "luajit", args: ["HEAD"]
+brew "neovim", args: ["HEAD"]
 brew "mas"
 brew "gpg2"
 brew "starship"
@@ -17,6 +18,8 @@ brew "lsd"
 brew "xsv"
 brew "node"
 brew "python"
+brew "rbenv"
+brew "cmake"
 
 # cask installs
 cask "google-chrome"
@@ -26,6 +29,7 @@ cask "discord"
 cask "slack"
 cask "bitwarden"
 cask "emacs-mac"
+cask "rectangle"
 
 # mas installs
 mas "NextDNS", id: 1464122853
