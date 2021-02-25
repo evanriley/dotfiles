@@ -4,6 +4,9 @@ export ZSH=$HOME/.dotfiles
 # your project folder that we can `c [tab]` to
 export PROJECTS=~/Code
 
+#for homebrew
+export PATH=/opt/homebrew/bin:$PATH
+
 # Stash your environment variables in ~/.localrc. This means they'll stay out
 # of your main dotfiles repository (which may be public, like this one), but
 # you'll have access to them in your scripts.
@@ -61,13 +64,12 @@ bindkey "^[[B" down-line-or-beginning-search # Down
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow -g "!{.git,node_modules,target,.clj-kondo,.lsp}/*"'
 
 export GPG_TTY=`tty`
-if [ -e /Users/evan/.nix-profile/etc/profile.d/nix.sh ]; then . /Users/evan/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+
 
 # opam configuration
 test -r /Users/evan/.opam/opam-init/init.zsh && . /Users/evan/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
 
-#for homebrew
-export PATH=/opt/homebrew/bin:$PATH
-
-
 eval "$(starship init zsh)"
+
+# rbenv
+eval "$(rbenv init -)"

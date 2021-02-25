@@ -601,6 +601,30 @@
         "options": {
           "full_name": "rectangle"
         }
+      },
+      "hey": {
+        "version": "1.1.0",
+        "options": {
+          "full_name": "hey"
+        }
+      },
+      "iina": {
+        "version": "1.2.0,129",
+        "options": {
+          "full_name": "iina"
+        }
+      },
+      "cloudapp": {
+        "version": "6.4.5,2213",
+        "options": {
+          "full_name": "cloudapp"
+        }
+      },
+      "gpg-suite-pinentry": {
+        "version": "2020.2,100",
+        "options": {
+          "full_name": "gpg-suite-pinentry"
+        }
       }
     },
     "mas": {
@@ -620,7 +644,7 @@
       "big_sur": {
         "HOMEBREW_VERSION": "3.0.2",
         "HOMEBREW_PREFIX": "/opt/homebrew",
-        "Homebrew/homebrew-core": "0b35273df43117c3497449f88e1b16086926fe99",
+        "Homebrew/homebrew-core": "5624084e43ed16237234698ffa6a713933dfb891",
         "CLT": "12.4.0.0.1.1610135815",
         "Xcode": "12.4",
         "macOS": "11.2.1"
