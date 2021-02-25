@@ -34,7 +34,6 @@ cask "rectangle"
 cask "hey"
 cask "iina"
 cask "cloudapp"
-cask "gpg-suite-pinentry"
 
 # mas installs
 mas "NextDNS", id: 1464122853
