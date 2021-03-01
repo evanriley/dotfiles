@@ -4,6 +4,7 @@ tap "railwaycat/emacsmacport"
 # Standard brew install
 brew "automake"
 brew "pkg-config"
+brew "tree-sitter"
 brew "luajit", args: ["HEAD"]
 brew "neovim", args: ["HEAD"]
 brew "mas"
