@@ -199,21 +199,21 @@ call plug#begin('~/.vim/plugged')
 
 
 " General
-Plug 'sheerun/vim-polyglot'			" Collection of language packs for Vim
+Plug 'sheerun/vim-polyglot'         " Collection of language packs for Vim
 
 " HTML
-Plug 'valloric/MatchTagAlways'			" Highlights matching HTML tags.
+Plug 'valloric/MatchTagAlways'      " Highlights matching HTML tags.
 
 " Javascript
-Plug 'moll/vim-node'				" Node tools
+Plug 'moll/vim-node'                " Node tools
 
 " Clojure
 Plug 'eraserhd/parinfer-rust', {'do':
         \  'cargo build --release'}
 " Plug 'tpope/vim-fireplace', {'for': 'clojure'}
-" Plug 'liquidz/vim-iced', {'for': 'clojure'}
-Plug 'Olical/conjure', {'tag': 'v4.1.0'}
-Plug 'bakpakin/fennel.vim'  " Mostly for conjure, will probably rarely write fennel
+Plug 'liquidz/vim-iced', {'for': 'clojure'}
+" Plug 'Olical/conjure', {'tag': 'v4.1.0'}
+" Plug 'bakpakin/fennel.vim'
 
 " Rust
 Plug 'rust-lang/rust.vim'
@@ -224,26 +224,26 @@ Plug 'dense-analysis/ale'
 
 
 " Delimiters
-Plug 'tpope/vim-surround'          		" Easily change surroundings (parenthesis, brackets, etc)
+Plug 'tpope/vim-surround'          " Easily change surroundings (parenthesis, brackets, etc)
 
 " Comments
-Plug 'tpope/vim-commentary'         		" Easily comment/uncomment words, lines or group of lines
+Plug 'tpope/vim-commentary'         " Easily comment/uncomment words, lines or group of lines
 
 
 " File manip
-Plug 'mattn/emmet-vim'				          " Easy workflow for html & CSS
+Plug 'mattn/emmet-vim'          " Easy workflow for html & CSS
 
 " Format/Indentation
-Plug 'sbdchd/neoformat'             		" Format code: standard.js, prettier etc.
-Plug 'junegunn/vim-easy-align'      		" Easy alignement
+Plug 'sbdchd/neoformat'             " Format code: standard.js, prettier etc.
+Plug 'junegunn/vim-easy-align'      " Easy alignement
 
 " Git
-Plug 'airblade/vim-gitgutter'       		" Show GIT changes status in the gutter
+Plug 'airblade/vim-gitgutter'       " Show GIT changes status in the gutter
 Plug 'jreybert/vimagit', {'on': 'Magit'} 	" Easier GIT workflow
-Plug 'tpope/vim-fugitive'          		" mainly for showing Git status in netrw
+Plug 'tpope/vim-fugitive'          " mainly for showing Git status in netrw
 
 " NETRW
-Plug 'tpope/vim-vinegar'              		" makes netrw better
+Plug 'tpope/vim-vinegar'              " makes netrw better
 
 " File Finder
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -682,6 +682,8 @@ let g:floaterm_keymap_prev   = '<Leader><'
 let g:floaterm_keymap_next   = '<Leader>>'
 let g:floaterm_keymap_toggle = '<Leader>T'
 
+" Vim-iced
+let g:iced_enable_default_key_mappings = v:true
 
 
 
