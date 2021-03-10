@@ -43,6 +43,7 @@
  doom-big-font (font-spec :family "JetBrains Mono" :size 36)
  doom-variable-pitch-font (font-spec :fammily "Overpass" :size 16)
  doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light)
+ ;;doom-theme 'doom-oceanic-next
  ;;doom-theme 'doom-spacegrey
  ;;doom-theme 'doom-nord
  doom-theme 'doom-wilmersdorf
@@ -85,7 +86,7 @@
                             :tag "bo")))
 
 (setq doom-fallback-buffer-name "► Doom"
-      +doom-dashboard-name "► Doom" )
+      +doom-dashboard-name "► Doom")
 
 (add-hook!
  js2-mode 'prettier-js-mode

@@ -64,7 +64,8 @@
        ;;lispy             ; vim for lisp, for people who don't like vim
        multiple-cursors  ; editing in many places at once
        ;;objed             ; text object editing for the innocent
-       parinfer          ; turn lisp into python, sort of
+       (parinfer          ; turn lisp into python, sort of
+        +rust)
        rotate-text       ; cycle region at point between text candidates
        snippets          ; my elves. They type so I don't have to
        ;;word-wrap         ; soft wrapping with language-aware indent
@@ -101,7 +102,7 @@
        (magit +forge)             ; a git porcelain for Emacs
        make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
-       pdf               ; pdf enhancements
+       ;;pdf               ; pdf enhancements
        ;;prodigy           ; FIXME managing external services & code builders
        rgb               ; creating color strings
        ;;taskrunner        ; taskrunner for all your projects
@@ -116,7 +117,8 @@
        :lang
        ;;agda              ; types of types of types of types...
        ;;cc                ; C/C++/Obj-C madness
-       clojure           ; java with a lisp
+       (clojure           ; java with a lisp
+        +lsp)
        ;;common-lisp       ; if you've seen one lisp, you've seen them all
        ;;coq               ; proofs-as-programs
        ;;crystal           ; ruby at the speed of c

@@ -1,4 +1,3 @@
-
 "------------------------------------------------------------------------------"
 "                                   Settings                                   "
 "------------------------------------------------------------------------------"
@@ -63,7 +62,7 @@ set listchars=tab:▸\ ,trail:·,nbsp:␣            " Display tabs and trailing
 set listchars+=extends:»                        " show a » when a line goes off the right edge of the screen
 set listchars+=precedes:«                       " show a « when a line goes off the left edge of the screenk
 set conceallevel=2
-set colorcolumn=121                              " Color the colum 121
+"set colorcolumn=121                              " Color the colum 121
 
 " Files
 set autowrite                                   " Autosave before :next, :make, etc.
@@ -211,9 +210,10 @@ Plug 'moll/vim-node'                " Node tools
 Plug 'eraserhd/parinfer-rust', {'do':
         \  'cargo build --release'}
 " Plug 'tpope/vim-fireplace', {'for': 'clojure'}
-Plug 'liquidz/vim-iced', {'for': 'clojure'}
-" Plug 'Olical/conjure', {'tag': 'v4.1.0'}
-" Plug 'bakpakin/fennel.vim'
+" Plug 'liquidz/vim-iced', {'for': 'clojure'}
+" Plug 'liquidz/vim-iced-coc-source', {'for': 'clojure'}
+Plug 'Olical/conjure', {'tag': 'v4.15.0'}
+Plug 'bakpakin/fennel.vim'
 
 " Rust
 Plug 'rust-lang/rust.vim'
@@ -262,10 +262,7 @@ Plug 'haya14busa/incsearch.vim'
 " Snippets
 Plug 'Shougo/neosnippet.vim'        " Snippets support
 Plug 'Shougo/neosnippet-snippets'   " Snippets repository
-Plug 'Shougo/echodoc.vim'   
-
-" Neuron
-Plug 'ihsanturk/neuron.vim'         " Note taking
+Plug 'Shougo/echodoc.vim'
 
 " Other tools
 Plug 'bogado/file-line'                 " Open a file on arbitrary line: filename:line
@@ -343,7 +340,7 @@ nnoremap <leader>gP :! git push<CR>
 " ==================================
 nnoremap <Leader>gb :Gblame<CR>  " git blame
 
-" netrw 
+" netrw
 " ==================================
 map <leader>n :Explore<cr>
 map <leader>sn :Sexplore<cr>
@@ -395,19 +392,9 @@ vmap <leader>c <Plug>(sad-change-forward)
 nmap <leader>C <Plug>(sad-change-backward)
 vmap <leader>C <Plug>(sad-change-backward)
 
-" FZF/Ripgrep Stuff 
+" FZF/Ripgrep Stuff
 " ===================================
-" --column: Show column number
-" --line-number: Show line number
-" --no-heading: Do not show file headings in results
-" --fixed-strings: Search term as a literal string
-" --ignore-case: Case insensitive search
-" --no-ignore: Do not respect .gitignore, etc...
-" --hidden: Search hidden files and folders
-" --follow: Follow symlinks
-" --glob: Additional conditions for search (in this case ignore everything in the .git/ folder)
-" --color: Search color options
-nnoremap <C-p> :FZF<CR> 
+nnoremap <C-p> :FZF<CR>
 
 
 
@@ -508,16 +495,6 @@ vnoremap C "_C
 " Insert blank line up/down cursor position in normal mode
 nnoremap <leader><cr> o<esc>
 nnoremap <leader><bs> O<esc>
-
-" NO ARROW KEYS COME ON!!!
-noremap <Left>  :echo "no! use h"<cr>
-noremap <Right> :echo "no! use l"<cr>
-noremap <Up>    :echo "no! use k"<cr>
-noremap <Down>  :echo "no! use j"<cr>
-imap <Left> <nop>
-imap <Right> <nop>
-imap <Up> <nop>
-imap <Down> <nop>
 
 " Navigation in command line
 cnoremap <C-j> <Left>
@@ -659,7 +636,7 @@ command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 " Add `:OR` command for organize imports of the current buffer.
 command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
-" Add :Prettier to format code 
+" Add :Prettier to format code
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
 
 
@@ -671,20 +648,16 @@ let g:ale_linters = {
       \}
 
 " Coc settings
-let g:coc_global_extensions = ['coc-tsserver', 'coc-rust-analyzer', 'coc-eslint', 
+let g:coc_global_extensions = ['coc-tsserver', 'coc-rust-analyzer', 'coc-eslint',
                             \  'coc-prettier', 'coc-json', 'coc-css',
                             \  'coc-marketplace',]
 
 
 " Vim-floaterm settings
-let g:floaterm_keymap_new    = '<Leader>t'
+let g:floaterm_keymap_new    = '<Leader>T'
 let g:floaterm_keymap_prev   = '<Leader><'
 let g:floaterm_keymap_next   = '<Leader>>'
-let g:floaterm_keymap_toggle = '<Leader>T'
-
-" Vim-iced
-let g:iced_enable_default_key_mappings = v:true
-
+let g:floaterm_keymap_toggle = '<Leader>t'
 
 
 "------------------------------------------------------------------------------"
@@ -693,7 +666,7 @@ let g:iced_enable_default_key_mappings = v:true
 
 " let g:seoul256_background = 233
 " colo seoul256
-" let ayucolor="dark" 
+" let ayucolor="dark"
 " colorscheme ayu
 " colorscheme iceberg
 " colorscheme challenger_deep

@@ -1,5 +1,6 @@
 {
   "suggest.snippetIndicator": "🍦",
+  "coc.source.enable.iced.enable": true,
   "coc.preferences.formatOnSaveFiletypes": ["css", "markdown", "javascript",
     "jsx", "typescript", "tsx", "svelte"],
    "languageserver": {
