@@ -2,7 +2,7 @@
   "entries": {
     "tap": {
       "homebrew/cask": {
-        "revision": "1bedbb70c0c4e1bf854b9bcbecab43b5144fc479"
+        "revision": "70c3d4ad1038802504ff47595426ad534582dfb6"
       },
       "railwaycat/emacsmacport": {
         "revision": "010c911c12d6c60f476d5b0365db817afdb8defd"
@@ -611,7 +611,7 @@
         }
       },
       "tree-sitter": {
-        "version": "0.19.2",
+        "version": "0.19.3",
         "bottle": {
           "rebuild": 0,
           "cellar": ":any",
@@ -619,20 +619,20 @@
           "root_url": "https://homebrew.bintray.com/bottles",
           "files": {
             "arm64_big_sur": {
-              "url": "https://homebrew.bintray.com/bottles/tree-sitter-0.19.2.arm64_big_sur.bottle.tar.gz",
-              "sha256": "055dfe2d440576c7177bafd528d884c183544c2a5186c16cb7b4e63a7da18584"
+              "url": "https://homebrew.bintray.com/bottles/tree-sitter-0.19.3.arm64_big_sur.bottle.tar.gz",
+              "sha256": "5a1a7bf5733fc672995798e0f10a65949b4e87b2630619fb7b1df6c0178f1fb1"
             },
             "big_sur": {
-              "url": "https://homebrew.bintray.com/bottles/tree-sitter-0.19.2.big_sur.bottle.tar.gz",
-              "sha256": "18bc149f4224ab603dff7f457a5d3068f662cbb678a2bbc713634d494108450e"
+              "url": "https://homebrew.bintray.com/bottles/tree-sitter-0.19.3.big_sur.bottle.tar.gz",
+              "sha256": "f32fec8c786b23a34b039af879962807cb2537c3c0383a03c77a3b70ffb6ee22"
             },
             "catalina": {
-              "url": "https://homebrew.bintray.com/bottles/tree-sitter-0.19.2.catalina.bottle.tar.gz",
-              "sha256": "11081a31f78b048f0e4948f387e443c4291ffe7284777e3b256b1eab0e3809a6"
+              "url": "https://homebrew.bintray.com/bottles/tree-sitter-0.19.3.catalina.bottle.tar.gz",
+              "sha256": "c1fb5dbc938b5aacd0fcddd07a675b1da6e4204597c387c3a8a043a3c8d435f1"
             },
             "mojave": {
-              "url": "https://homebrew.bintray.com/bottles/tree-sitter-0.19.2.mojave.bottle.tar.gz",
-              "sha256": "20e1c07267613367063207e39c97254a0075a8bbd2bd9363a5b40fe450305c39"
+              "url": "https://homebrew.bintray.com/bottles/tree-sitter-0.19.3.mojave.bottle.tar.gz",
+              "sha256": "7c0cea83530cf82d68707fe833844d1f57b09136170d05246992b437a06ed0e1"
             }
           }
         }
@@ -682,7 +682,7 @@
         }
       },
       "rectangle": {
-        "version": "0.43,48",
+        "version": "0.44,49",
         "options": {
           "full_name": "rectangle"
         }
@@ -739,9 +739,9 @@
   "system": {
     "macos": {
       "big_sur": {
-        "HOMEBREW_VERSION": "3.0.4",
+        "HOMEBREW_VERSION": "3.0.5",
         "HOMEBREW_PREFIX": "/opt/homebrew",
-        "Homebrew/homebrew-core": "33b08cdb7e11336f9f7093350e287ebd9c82bee1",
+        "Homebrew/homebrew-core": "057f06173a56b311aafc3acc462fc1f731541390",
         "CLT": "12.4.0.0.1.1610135815",
         "Xcode": "12.4",
         "macOS": "11.2.1"
