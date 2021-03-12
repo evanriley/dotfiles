@@ -2,7 +2,7 @@
   "entries": {
     "tap": {
       "homebrew/cask": {
-        "revision": "70c3d4ad1038802504ff47595426ad534582dfb6"
+        "revision": "9254be30499072e6f1762e2aa6768d74aaf892fc"
       },
       "railwaycat/emacsmacport": {
         "revision": "010c911c12d6c60f476d5b0365db817afdb8defd"
@@ -741,7 +741,7 @@
       "big_sur": {
         "HOMEBREW_VERSION": "3.0.5",
         "HOMEBREW_PREFIX": "/opt/homebrew",
-        "Homebrew/homebrew-core": "057f06173a56b311aafc3acc462fc1f731541390",
+        "Homebrew/homebrew-core": "77474e6293025aeea3a7e25e86883967eaa02675",
         "CLT": "12.4.0.0.1.1610135815",
         "Xcode": "12.4",
         "macOS": "11.2.1"
