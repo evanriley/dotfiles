@@ -654,10 +654,10 @@ let g:coc_global_extensions = ['coc-tsserver', 'coc-rust-analyzer', 'coc-eslint'
 
 
 " Vim-floaterm settings
-let g:floaterm_keymap_new    = '<Leader>T'
+let g:floaterm_keymap_new    = '<Leader>oT'
 let g:floaterm_keymap_prev   = '<Leader><'
 let g:floaterm_keymap_next   = '<Leader>>'
-let g:floaterm_keymap_toggle = '<Leader>t'
+let g:floaterm_keymap_toggle = '<Leader>ot'
 
 
 "------------------------------------------------------------------------------"
