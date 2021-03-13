@@ -73,7 +73,6 @@
 (package! ayu-theme)
 (package! rotate)
 (unpin! org-mode)
-(package! org-super-agenda)
 (package! doct
   :recipe (:host github :repo "progfolio/doct"))
 (package! org-pretty-table-mode
