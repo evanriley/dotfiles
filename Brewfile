@@ -24,6 +24,7 @@ brew 'python'
 brew 'rbenv'
 brew 'cmake'
 brew 'pngpaste'
+brew 'bat'
 
 # cask installs
 cask 'google-chrome'
@@ -45,3 +46,4 @@ cask 'mactex'
 mas 'NextDNS', id: 1_464_122_853
 mas 'Sorted³ - Calendar Notes Tasks', id: 1_306_893_526
 mas 'Xcode', id: 497_799_835
+mas 'Tailscale', id: 1475387142
