@@ -76,3 +76,6 @@ eval "$(starship init zsh)"
 
 # rbenv
 eval "$(rbenv init -)"
+
+# adsf
+. $HOME/.asdf/asdf.sh
