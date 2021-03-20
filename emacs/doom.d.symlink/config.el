@@ -12,11 +12,7 @@
       make-backup-files t)
 
 ;; Set a nice looking splash image
-(let ((alternatives '("doomguy.png")))
-  ;; ((alternatives ( <some other stuff>)))
-  (setq fancy-splash-image
-        (concat doom-private-dir "misc/splash-images/"
-                (nth (random (length alternatives)) alternatives))))
+(setq fancy-splash-image (concat doom-private-dir "misc/splash-images/doom-emacs-color.png"))
 
 ;; Set fonts
 (setq
@@ -96,9 +92,6 @@
       "C-<down>"       #'+evil/window-move-down
       "C-<up>"         #'+evil/window-move-up
       "C-<right>"      #'+evil/window-move-right))
-
-;; Start Emacs Fullscreened
-(add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 ;; Default Directories for Org and Org-Roam
 (setq
