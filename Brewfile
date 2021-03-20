@@ -1,3 +1,4 @@
+# Brew taps
 tap 'homebrew/cask'
 tap 'railwaycat/emacsmacport'
 
@@ -21,6 +22,7 @@ brew 'lsd'
 brew 'xsv'
 brew 'node'
 brew 'python'
+brew 'python3'
 brew 'rbenv'
 brew 'cmake'
 brew 'pngpaste'
@@ -47,4 +49,4 @@ cask 'alacritty'
 mas 'NextDNS', id: 1_464_122_853
 mas 'Sorted³ - Calendar Notes Tasks', id: 1_306_893_526
 mas 'Xcode', id: 497_799_835
-mas 'Tailscale', id: 1475387142
+mas 'Tailscale', id: 1_475_387_142
