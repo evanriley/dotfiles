@@ -1,6 +1,7 @@
 # Brew taps
 tap 'homebrew/cask'
 tap 'railwaycat/emacsmacport'
+tap 'borkdude/brew'
 
 # Standard brew install
 brew 'automake'
@@ -25,7 +26,7 @@ brew 'python'
 brew 'python3'
 brew 'clojure'
 brew 'leiningen'
-brew 'borkdude/brew/clj-kondo'
+brew 'clj-kondo'
 brew 'rbenv'
 brew 'cmake'
 brew 'pngpaste'
