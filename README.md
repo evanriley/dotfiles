@@ -2,6 +2,8 @@
 
 Your dotfiles are how you personalize your system. These are mine.
 
+Fork from [holman](https://github.com/holman/dotfiles) a very long time ago
+
 ## install
 
 Run this:
