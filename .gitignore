@@ -17,3 +17,4 @@ weechat/weechat.symlink/weeget
 weechat/weechat.symlink/xfer
 weechat/weechat.symlink/irc.conf
 weechat/weechat.symlink/jabber.conf
+Brewfile.lock.json

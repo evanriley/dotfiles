@@ -41,6 +41,7 @@ cask 'cloudapp'
 cask 'visual-studio-code'
 cask 'adoptopenjdk'
 cask 'mactex'
+cask 'alacritty'
 
 # mas installs
 mas 'NextDNS', id: 1_464_122_853
