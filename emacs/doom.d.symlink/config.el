@@ -22,7 +22,8 @@
  doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light))
 
 ;; Set theme
-(setq doom-theme 'doom-wilmersdorf)
+;;(setq doom-theme 'doom-wilmersdorf)
+(setq doom-theme 'doom-acario-light)
 
 ;; Modeline Settings
 (defun doom-modeline-conditional-buffer-encoding ()
