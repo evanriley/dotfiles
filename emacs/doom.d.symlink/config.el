@@ -23,7 +23,13 @@
 
 ;; Set theme
 ;;(setq doom-theme 'doom-wilmersdorf)
-(setq doom-theme 'doom-acario-light)
+(setq doom-theme 'doom-city-lights)
+;;(setq doom-theme 'doom-acario-light)
+;;(setq doom-theme 'doom-tomorrow-day)
+;;(setq doom-theme 'doom-opera-light)
+;;(setq doom-theme 'doom-ayu-light)
+;;(setq doom-theme 'doom-horizon)
+;;(setq doom-theme 'doom-ayu-dark)
 
 ;; Modeline Settings
 (defun doom-modeline-conditional-buffer-encoding ()
@@ -80,7 +86,7 @@
 
 (setq +ivy-buffer-preview
 
-;; Use SPC w SPC for window rotation
+;; Use SPC w for window rotation
  (map! :map evil-window-map
       "SPC" #'rotate-layout
       ;; Navigation

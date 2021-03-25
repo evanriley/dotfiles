@@ -4,6 +4,7 @@ tap 'railwaycat/emacsmacport'
 tap 'borkdude/brew'
 
 # Standard brew install
+brew 'git'
 brew 'automake'
 brew 'pkg-config'
 brew 'tree-sitter'
