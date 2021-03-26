@@ -4,6 +4,9 @@ tap 'railwaycat/emacsmacport'
 tap 'borkdude/brew'
 
 # Standard brew install
+brew 'curl'
+brew 'openssl'
+brew 'readline'
 brew 'git'
 brew 'automake'
 brew 'pkg-config'
@@ -55,3 +58,4 @@ mas 'Sorted³ - Calendar Notes Tasks', id: 1_306_893_526
 mas 'Xcode', id: 497_799_835
 mas 'Tailscale', id: 1_475_387_142
 mas 'Bitwarden', id: 1_352_778_147
+mas 'Deliveries: a package tracker', id: 29_098_6013
