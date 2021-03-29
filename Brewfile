@@ -39,6 +39,7 @@ brew 'bat'
 # cask installs
 cask 'google-chrome'
 cask 'spotify'
+cask 'steam'
 cask 'iterm2'
 cask 'discord'
 cask 'slack'

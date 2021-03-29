@@ -50,3 +50,5 @@
 	trustExitCode = true
 [fsck]
 	zeroPaddedFilemode = ignore
+[init]
+	defaultBranch = main

@@ -6,6 +6,7 @@ export PROJECTS=~/Code
 
 #for homebrew
 export PATH=/opt/homebrew/bin:$PATH
+export PATH=/opt/homebrew/sbin:$PATH
 
 # Stash your environment variables in ~/.localrc. This means they'll stay out
 # of your main dotfiles repository (which may be public, like this one), but
@@ -75,7 +76,16 @@ test -r /Users/evan/.opam/opam-init/init.zsh && . /Users/evan/.opam/opam-init/in
 eval "$(starship init zsh)"
 
 # rbenv
+export RBENV_ROOT=/opt/homebrew/opt/rbenv
+export PATH=$RBENV_ROOT/bin:$PATH
 eval "$(rbenv init -)"
+
+# openssl
+export PATH="/opt/homebrew/opt/openssl@1.1/bin$PATH"
+export LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/openssl@1.1/include"
+export PKG_CONFIG_PATH="/opt/homebrew/opt/openssl@1.1/lib/pkgconfig"
+export RUBY_CONFIGURE_OPTS="--with-openssl-dir=/opt/homebrew/opt/openssl@1.1"
 
 # adsf
 . $HOME/.asdf/asdf.sh
