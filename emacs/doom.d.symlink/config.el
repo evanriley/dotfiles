@@ -13,25 +13,26 @@
 
 ;; Set a nice looking splash image
 ;;(setq fancy-splash-image (concat doom-private-dir "misc/splash-images/doom-emacs-color.png"))
+
 ;; Simple ascii emacs banner
 (defun doom-dashboard-draw-ascii-emacs-banner-fn ()
-   (let* ((banner
-           '(",---.,-.-.,---.,---.,---."
-             "|---'| | |,---||    `---."
-             "`---'` ' '`---^`---'`---'"))
-          (longest-line (apply #'max (mapcar #'length banner))))
-     (put-text-property
-      (point)
-      (dolist (line banner (point))
-        (insert (+doom-dashboard--center
-                 +doom-dashboard--width
-                 (concat
-                  line (make-string (max 0 (- longest-line (length line)))
-                                    32)))
-                "\n"))
-      'face 'doom-dashboard-banner))
+  (let* ((banner
+          '(",---.,-.-.,---.,---.,---."
+            "|---'| | |,---||    `---."
+            "`---'` ' '`---^`---'`---'"))
+         (longest-line (apply #'max (mapcar #'length banner))))
+    (put-text-property
+     (point)
+     (dolist (line banner (point))
+       (insert (+doom-dashboard--center
+                +doom-dashboard--width
+                (concat
+                 line (make-string (max 0 (- longest-line (length line)))
+                                   32)))
+               "\n"))
+     'face 'doom-dashboard-banner)))
 
- (setq +doom-dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-emacs-banner-fn))
+(setq +doom-dashboard-ascii-banner-fn #'doom-dashboard-draw-ascii-emacs-banner-fn)
 
 ;; Set fonts
 (setq
