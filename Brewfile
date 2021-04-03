@@ -2,6 +2,8 @@
 tap 'homebrew/cask'
 tap 'railwaycat/emacsmacport'
 tap 'borkdude/brew'
+tap 'heroku/brew'
+brew tap AdoptOpenJDK/openjdk
 
 # Standard brew install
 brew 'curl'
@@ -35,6 +37,7 @@ brew 'rbenv'
 brew 'cmake'
 brew 'pngpaste'
 brew 'bat'
+brew 'heroku'
 
 # cask installs
 cask 'google-chrome'
