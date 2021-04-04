@@ -3,7 +3,7 @@ tap 'homebrew/cask'
 tap 'railwaycat/emacsmacport'
 tap 'borkdude/brew'
 tap 'heroku/brew'
-brew tap AdoptOpenJDK/openjdk
+tap 'AdoptOpenJDK/openjdk'
 
 # Standard brew install
 brew 'curl'
