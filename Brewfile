@@ -41,6 +41,7 @@ brew 'heroku'
 
 # cask installs
 cask 'google-chrome'
+cask 'google-drive'
 cask 'spotify'
 cask 'steam'
 cask 'iterm2'
@@ -59,7 +60,7 @@ cask 'alacritty'
 # mas installs
 mas 'NextDNS', id: 1_464_122_853
 mas 'Sorted³ - Calendar Notes Tasks', id: 1_306_893_526
-mas 'Xcode', id: 497_799_835
 mas 'Tailscale', id: 1_475_387_142
 mas 'Bitwarden', id: 1_352_778_147
 mas 'Deliveries: a package tracker', id: 29_098_6013
+mas 'Spark – Email App by Readdle', id: 1176895641
