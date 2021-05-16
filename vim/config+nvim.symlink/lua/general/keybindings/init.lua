@@ -4,6 +4,9 @@ local wk = require('which-key')
 -- and call leader mapper
 Map('n', '<Space>', '<Nop>')
 Api.nvim_set_var('mapleader', ' ')
+Map('n', ',', '<Nop>')
+Api.nvim_set_var('maplocalleader', ',')
+
 
 -------------------------------------------------
 
@@ -236,7 +239,6 @@ wk.register({
 			s = { ':Dashboard<CR>', 'Open start screen' },
 			c = { ':DashboardChangeColorscheme<CR>', 'Change colorscheme' },
 			e = { ':NvimTreeToggle<CR>', 'Toggle Tree Explorer' },
-			m = { ':MinimapToggle<CR>', 'Toggle Minimap' },
 			S = { ':SymbolsOutline<CR>', 'Toggle Symbols view' },
 			t = { ':ToggleTerm<CR>', 'Toggle terminal' },
 		},
@@ -255,7 +257,7 @@ wk.register({
 	},
 })
 
--- If LSP is enabled
+-- LSP
 wk.register({
 	['<leader>'] = {
 		l = {
@@ -276,7 +278,7 @@ wk.register({
 	},
 })
 
--- If Git is enabled
+-- Git 
 wk.register({
 	['<leader>'] = {
 		g = {

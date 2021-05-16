@@ -97,6 +97,20 @@ return packer.startup(function()
 	-- missing `:LspInstall` for `nvim-lspconfig`.
 	use('kabouzeid/nvim-lspinstall')
 
+-- Language Specific --
+
+-- Clojure --
+    -- Parinfer-rust
+    use({
+        'eraserhd/parinfer-rust',
+        run = 'cargo build --release'
+    }) 
+    -- Conjure 
+    use({
+        'Olical/conjure',
+        tag = 'v4.19.0'
+    })
+
 -- File Stuff --
 
 	-- Write & Read files without permissions (i.e in /etc)a without having to use `sudo nvim`

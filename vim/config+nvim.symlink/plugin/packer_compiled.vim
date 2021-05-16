@@ -14,7 +14,7 @@ try
 lua << END
   local time
   local profile_info
-  local should_profile = false
+  local should_profile = true
   if should_profile then
     local hrtime = vim.loop.hrtime
     profile_info = {}
@@ -78,6 +78,10 @@ _G.packer_plugins = {
   ["ayu-vim"] = {
     loaded = true,
     path = "/Users/evan/.local/share/nvim/site/pack/packer/start/ayu-vim"
+  },
+  conjure = {
+    loaded = true,
+    path = "/Users/evan/.local/share/nvim/site/pack/packer/start/conjure"
   },
   ["dashboard-nvim"] = {
     loaded = true,
@@ -174,6 +178,10 @@ _G.packer_plugins = {
   ["packer.nvim"] = {
     loaded = true,
     path = "/Users/evan/.local/share/nvim/site/pack/packer/start/packer.nvim"
+  },
+  ["parinfer-rust"] = {
+    loaded = true,
+    path = "/Users/evan/.local/share/nvim/site/pack/packer/start/parinfer-rust"
   },
   ["pears.nvim"] = {
     loaded = true,
