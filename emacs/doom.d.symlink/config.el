@@ -145,6 +145,9 @@
 ;; Magit Settings
 (setq +magit-hub-features t)
 
+;; General LSP Settings
+(setq lsp-ui-sideline-enable nil)
+
 ;; LANG SPECIFIC SETTINGS
 
 ;; CC
