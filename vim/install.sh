@@ -19,6 +19,6 @@ then
 fi
 
 echo "Installing vim plugins"
-nvim +PlugUpgrade +PlugInstall +PlugUpdate +PlugClean! +qa
+nvim +PackerUpdate +PackerInstall +PackerUpdate +PackerClean! +qa
 
 exit 0

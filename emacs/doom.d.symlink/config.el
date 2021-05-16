@@ -11,6 +11,9 @@
 (setq auto-save-default t
       make-backup-files t)
 
+;; Path settings that sometimes decide not to work
+(add-to-list 'exec-path "/opt/homebrew/bin/lein")
+
 ;; Set a nice looking splash image
 ;;(setq fancy-splash-image (concat doom-private-dir "misc/splash-images/doom-emacs-color.png"))
 
@@ -141,3 +144,14 @@
 
 ;; Magit Settings
 (setq +magit-hub-features t)
+
+;; LANG SPECIFIC SETTINGS
+
+;; CC
+;; Use clangd as lsp server
+(setq lsp-clients-clangd-args '("-j=3"
+                                "--background-index"
+                                "--clang-tidy"
+                                "--completion-style=detailed"
+                                "--header-insertion=never"))
+(after! lsp-clangd (set-lsp-priority! 'clangd 2))
