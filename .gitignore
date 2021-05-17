@@ -19,3 +19,5 @@ weechat/weechat.symlink/irc.conf
 weechat/weechat.symlink/jabber.conf
 Brewfile.lock.json
 tags.lock
+
+vim/config+nvim.symlink/plugin/packer_compiled.vim
