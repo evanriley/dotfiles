@@ -51,13 +51,14 @@
 
 ;; Set theme
 ;;(setq doom-theme 'doom-wilmersdorf)
-(setq doom-theme 'doom-city-lights)
+;;(setq doom-theme 'doom-city-lights)
 ;;(setq doom-theme 'doom-acario-light)
 ;;(setq doom-theme 'doom-tomorrow-day)
 ;;(setq doom-theme 'doom-opera-light)
-;;(setq doom-theme 'doom-ayu-light)
 ;;(setq doom-theme 'doom-horizon)
-;;(setq doom-theme 'doom-ayu-dark)
+;;(setq doom-theme 'doom-challenger-deep)
+(setq doom-theme 'doom-gruvbox)
+
 
 ;; Modeline Settings
 (defun doom-modeline-conditional-buffer-encoding ()
@@ -70,7 +71,7 @@
 (add-hook 'after-change-major-mode-hook #'doom-modeline-conditional-buffer-encoding)
 
 ;; Relative line numbers
-(setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type 't)
 
 ;; Buffer names
 (setq doom-fallback-buffer-name "► Doom"
@@ -158,3 +159,13 @@
                                 "--completion-style=detailed"
                                 "--header-insertion=never"))
 (after! lsp-clangd (set-lsp-priority! 'clangd 2))
+
+;; IRC Settings -- Because apparently it's still the 90s or something
+(after! circe
+  (set-irc-server! "irc.libera.chat"
+    `(:tls t
+      :port 6697
+      :nick "chi"
+      :sasl-username ,(+pass-get-user "libera.chat")
+      :sasl-password ,(lambda (&rest _) (+pass-get-secret "libera.chat"))
+      :channels (:after-auth "#emacs" "#vim" "#neovim" "#lobsters" "#clojure" "#macosx" "#nixos" "#security"))))
