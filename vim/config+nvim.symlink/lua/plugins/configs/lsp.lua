@@ -190,6 +190,7 @@ end
 -- https://github.com/kabouzeid/nvim-lspinstall#advanced-configuration-recommended
 local function setup_servers()
 	-- Provide the missing :LspInstall
+    require'lspconfig'.clojure_lsp.setup{}
 	require('lspinstall').setup()
 	local servers = require('lspinstall').installed_servers()
 	for _, server in pairs(servers) do
