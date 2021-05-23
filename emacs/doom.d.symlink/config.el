@@ -147,7 +147,11 @@
 (setq +magit-hub-features t)
 
 ;; General LSP Settings
-(setq lsp-ui-sideline-enable nil)
+(after! lsp-ui
+  (setq lsp-ui-sideline-enable nil)
+  (setq lsp-ui-doc-show-with-cursor nil)
+  (setq lsp-ui-doc-show-with-mouse t))
+
 
 ;; LANG SPECIFIC SETTINGS
 
