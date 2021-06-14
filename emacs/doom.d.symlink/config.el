@@ -50,15 +50,15 @@
  doom-serif-font (font-spec :family "IBM Plex Mono" :weight 'light))
 
 ;; Set theme
-;;(setq doom-theme 'doom-wilmersdorf)
-;;(setq doom-theme 'doom-city-lights)
-;;(setq doom-theme 'doom-acario-light)
-;;(setq doom-theme 'doom-tomorrow-day)
-;;(setq doom-theme 'doom-opera-light)
-;;(setq doom-theme 'doom-horizon)
-;;(setq doom-theme 'doom-challenger-deep)
-(setq doom-theme 'doom-gruvbox)
-
+(setq doom-theme 'doom-wilmersdorf)
+;; (setq doom-theme 'doom-city-lights)
+;; (setq doom-theme 'doom-acario-light)
+;; (setq doom-theme 'doom-tomorrow-day)
+;; (setq doom-theme 'doom-opera-light)
+;; (setq doom-theme 'doom-horizon)
+;; (setq doom-theme 'doom-challenger-deep)
+;; (setq doom-theme 'doom-gruvbox)
+(setq doom-theme 'doom-xcode)
 
 ;; Modeline Settings
 (defun doom-modeline-conditional-buffer-encoding ()

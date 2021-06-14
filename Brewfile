@@ -41,6 +41,7 @@ brew 'heroku'
 
 # cask installs
 cask 'google-chrome'
+cask 'firefox'
 cask 'google-drive'
 cask 'spotify'
 cask 'steam'
@@ -57,6 +58,7 @@ cask 'adoptopenjdk8'
 cask 'adoptopenjdk16'
 cask 'mactex'
 cask 'alacritty'
+cask 'obs'
 
 # mas installs
 mas 'NextDNS', id: 1_464_122_853
