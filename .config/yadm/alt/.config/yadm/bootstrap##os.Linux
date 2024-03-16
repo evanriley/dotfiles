@@ -520,10 +520,12 @@ if [[ "$system_type" = "Linux" ]]; then
     lazygit
     emacs
     1password
+    tailscale
   )
 
 
   sudo dnf copr enable -y atim/lazygit | tee -a "$LOG" || { printf "%s - Failed to enable necessary copr repos\n" "${ERROR}"; exit 1; }
+  sudo dnf config-manager --add-repo https://pkgs.tailscale.com/stable/fedora/tailscale.repo
 
   for package in "${packages[@]}"; do
     install_package "$package" 2>&1 | tee -a "$LOG"
