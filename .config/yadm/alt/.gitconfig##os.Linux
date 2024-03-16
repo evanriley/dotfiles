@@ -65,7 +65,7 @@
   default = tracking
 [user]
   name = Evan Riley
-  email = evan@evanriley.net
+  email = git@evanriley.dev
   signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO2YujIPUDxQV13gJ5Ygg2C39kguFxbsE2QzDlFGN9Du
 [gpg]
   format = ssh
