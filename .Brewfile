@@ -3,6 +3,7 @@ tap 'homebrew/cask'
 tap 'AdoptOpenJDK/openjdk'
 tap 'koekeishiya/formulae'
 tap 'homebrew/cask-fonts'
+tap 'd12frosted/emacs-plus'
 
 # Standard brew install
 brew 'curl'
@@ -29,6 +30,7 @@ brew 'koekeishiya/formulae/skhd'
 brew 'direnv'
 brew 'tmux'
 brew 'starship'
+brew 'emacs-plus', args: ["with-ctags", "with-dbus", "with-mailutils", "with-xwidgets", "with-imagemagick", "with-native-comp"]
 
 # cask installs
 cask '1password'
@@ -47,6 +49,7 @@ cask 'yubico-authenticator'
 # mac app stores
 mas 'Tailscale', id: 1475387142
 mas 'NextDNS', id: 1464122853
+mas 'NepTunes', id: 1006739057
 
 # font stuff
 cask 'font-juliamono'
