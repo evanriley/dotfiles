@@ -30,6 +30,16 @@ brew 'koekeishiya/formulae/skhd'
 brew 'direnv'
 brew 'tmux'
 brew 'starship'
+brew 'editorconfig'
+brew 'clang-format'
+brew 'glslang'
+brew 'pandoc'
+brew 'graphviz'
+brew 'shellcheck'
+brew 'stylelint'
+brew 'zig'
+brew 'zls'
+brew 'git-delta'
 brew 'emacs-plus', args: ["with-ctags", "with-dbus", "with-mailutils", "with-xwidgets", "with-imagemagick", "with-native-comp"]
 
 # cask installs
@@ -55,3 +65,4 @@ mas 'NepTunes', id: 1006739057
 cask 'font-juliamono'
 cask 'font-jetbrains-mono-nerd-font'
 cask 'font-0xproto-nerd-font'
+cask 'font-ibm-plex-mono'

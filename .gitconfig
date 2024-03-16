@@ -22,6 +22,7 @@
   ca = commit -a
   cam = commit -a -m
   cm = commit -m
+  gone = "!f() { git fetch --all --prune; git branch -vv | awk '/: gone]/{print $1}' | xargs git branch -D; }; f"
   rb = rebase
   rba = rebase --abort
   rbc = rebase --continue
@@ -38,23 +39,26 @@
   spu = stash push
   spua = stash push --all
   rs = restore --staged
-[color]
-  diff = auto
-  status = auto
-  branch = auto
-  ui = true
 [core]
   excludesfile = /Users/evan/.gitignore
   filemode = false
   trustctime = false
-    autocrlf = false
-    safecrlf = false
+  autocrlf = false
+  safecrlf = false
+  pager = delta
 [apply]
   whitespace = fix
+[interactive]
+  diffFilter = delta --color-only
+[delta]
+  navigate = true
+  light = false
+[merge]
+  conflictstyle = diff3
+[diff]
+  colorMoved = default
 [mergetool]
   keepBackup = false
-[difftool]
-  prompt = false
 [help]
   autocorrect = 1
 [push]
@@ -84,6 +88,7 @@
   prune = true
 [branch]
   autosetupRebase = always
+	sort = -comitterdate
 [github]
   user = evanriley
 [submodule]
@@ -95,3 +100,7 @@
 [credential "https://gist.github.com"]
 	helper = !/opt/homebrew/bin/gh auth git-credential
 
+[rerere]
+	enabled = true
+[column]
+	ui = auto

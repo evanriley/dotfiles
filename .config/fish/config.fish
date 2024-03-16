@@ -10,6 +10,7 @@ zoxide init fish | source
 
 # Aliases
 alias vim 'nvim'
+alias e  'run-emacs'
 
 ## get rid of command not found
 alias cd.. 'cd ..'
