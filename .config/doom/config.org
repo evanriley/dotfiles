@@ -340,11 +340,10 @@ By default changes made via a customization are added to =init.el=. I would rath
 *** Theme
 #+begin_src emacs-lisp :tangle packages.el
 (unpin! doom-themes)
-
 #+end_src
 
 #+begin_src emacs-lisp
-(setq doom-theme 'doom-oksolar-dark)
+(setq doom-theme 'doom-badger)
 #+end_src
 
 *** Line Numbers

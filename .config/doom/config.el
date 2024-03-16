@@ -38,7 +38,7 @@
       doom-unicode-font (font-spec :family "JuliaMono")
       doom-serif-font (font-spec :family "IBM Plex Mono" :size 22 :weight 'light))
 
-(setq doom-theme 'doom-oksolar-dark)
+(setq doom-theme 'doom-badger)
 
 (setq display-line-numbers-type 'relative)
 
