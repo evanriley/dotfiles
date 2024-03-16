@@ -1,0 +1,19 @@
+#!/bin/zsh
+#
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title Run Emacs
+# @raycast.mode silent
+#
+# Optional parameters:
+# @raycast.packageName Emacs
+# @raycast.icon /Users/evan/bin/img/Emacs.icns
+# @raycast.iconDark /Users/evan/bin/img/Emacs.icns
+
+if [[ $1 = "-t" ]]; then
+  # Terminal mode
+  /opt/homebrew/bin/emacsclient -t $@
+else
+  # GUI mode
+  /opt/homebrew/bin/emacsclient -c -n $@
+fi
