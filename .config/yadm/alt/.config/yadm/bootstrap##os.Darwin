@@ -82,7 +82,7 @@ fi
 if [[ -x $(command -v cargo) ]]; then
   # Install favorite rust tools through cargo. First install binstall, then install tools through binstall
   cargo install cargo-binstall
-  cargo binstall --no-confirm fd-find exa bat zoxide starship nu rm-improved rtx-cli coreutils du-dust zellij mprocs ripgrep gitui bob-nvim eza
+  cargo binstall --no-confirm fd-find exa bat zoxide starship nu rm-improved mise coreutils du-dust zellij mprocs ripgrep gitui bob-nvim eza
 else
   # Rustup will be installed.
   echo "Error, we've somehow reached this point without cargo installed?"
