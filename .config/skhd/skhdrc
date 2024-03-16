@@ -137,5 +137,5 @@ ctrl + alt - s : yabai -m space --layout $(yabai -m query --spaces --space | jq 
 
 
 # restart yabai
-ctrl + alt + cmd -r : launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"
+ctrl + alt + cmd -r : yabai --restart-service
 
