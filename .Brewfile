@@ -4,6 +4,7 @@ tap 'AdoptOpenJDK/openjdk'
 tap 'koekeishiya/formulae'
 tap 'homebrew/cask-fonts'
 tap 'd12frosted/emacs-plus'
+tap 'jesseduffield/lazygit'
 
 # Standard brew install
 brew 'curl'
@@ -41,6 +42,7 @@ brew 'zig'
 brew 'zls'
 brew 'git-delta'
 brew 'borkdude/brew/clj-kondo'
+brew 'jesseduffield/lazygit/lazygit'
 brew 'emacs-plus', args: ["with-ctags", "with-dbus", "with-mailutils", "with-xwidgets", "with-imagemagick", "with-native-comp"]
 
 # cask installs
