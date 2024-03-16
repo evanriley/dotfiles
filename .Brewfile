@@ -51,3 +51,4 @@ mas 'NextDNS', id: 1464122853
 # font stuff
 cask 'font-juliamono'
 cask 'font-jetbrains-mono-nerd-font'
+cask 'font-0xproto-nerd-font'

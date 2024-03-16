@@ -44,7 +44,7 @@ yabai -m rule --add app="^Brave" space=web
 yabai -m rule --add app="^Orion" space=web
 yabai -m rule --add app="^Spotify" space=media
 yabai -m rule --add app="^Music" space=media
-yabai -m rule --add app="^Discord" space=social grid=1:1:0:0:1:1 manage=off
+yabai -m rule --add app="^Discord" space=social grid=1:1:0:0:1:1
 yabai -m rule --add app="^Slack" space=social
 yabai -m rule --add app="^System Preferences" manage=off
 yabai -m rule --add app="^Simulator" manage=off
@@ -52,6 +52,10 @@ yabai -m rule --add app="^IINA" manage=off
 
 # signals
 # yabai -m signal --add event=window_destroyed active=yes action="yabai -m query --windows --window &> /dev/null || yabai -m window --focus mouse &> /dev/null || yabai -m window --focus \$(yabai -m query --windows --space | jq .[0].id) &> /dev/null"
+
+# run this everytime a window is created
+yabai -m signal --add event=window_created action="~/.config/yabai/three-columns.sh"
+yabai -m signal --add event=window_destroyed action="~/.config/yabai/three-columns.sh"
 
 echo "yabai config loaded"
 
