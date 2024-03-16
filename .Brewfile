@@ -40,6 +40,7 @@ brew 'stylelint'
 brew 'zig'
 brew 'zls'
 brew 'git-delta'
+brew 'borkdude/brew/clj-kondo'
 brew 'emacs-plus', args: ["with-ctags", "with-dbus", "with-mailutils", "with-xwidgets", "with-imagemagick", "with-native-comp"]
 
 # cask installs
