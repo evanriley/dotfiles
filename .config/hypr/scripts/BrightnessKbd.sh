@@ -1,5 +1,4 @@
 #!/bin/bash
-## /* ---- 💫 https://github.com/JaKooLit 💫 ---- */  ##
 # Script for keyboard backlights (if supported) using brightnessctl
 
 iDIR="$HOME/.config/swaync/icons"
@@ -12,7 +11,7 @@ get_kbd_backlight() {
 # Get icons
 get_icon() {
 	current=$(get_kbd_backlight | sed 's/%//')
-	if   [ "$current" -le "20" ]; then
+	if [ "$current" -le "20" ]; then
 		icon="$iDIR/brightness-20.png"
 	elif [ "$current" -le "40" ]; then
 		icon="$iDIR/brightness-40.png"
@@ -36,16 +35,16 @@ change_kbd_backlight() {
 
 # Execute accordingly
 case "$1" in
-	"--get")
-		get_kbd_backlight
-		;;
-	"--inc")
-		change_kbd_backlight "+30%"
-		;;
-	"--dec")
-		change_kbd_backlight "30%-"
-		;;
-	*)
-		get_kbd_backlight
-		;;
+"--get")
+	get_kbd_backlight
+	;;
+"--inc")
+	change_kbd_backlight "+30%"
+	;;
+"--dec")
+	change_kbd_backlight "30%-"
+	;;
+*)
+	get_kbd_backlight
+	;;
 esac

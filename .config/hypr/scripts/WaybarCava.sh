@@ -1,5 +1,4 @@
 #!/bin/bash
-## /* ---- 💫 https://github.com/JaKooLit 💫 ---- */  ##
 
 # Not my own work. This was added through Github PR. Credit to original author
 
@@ -12,7 +11,7 @@ bar_length=${#bar}
 
 # Create dictionary to replace char with bar
 for ((i = 0; i < bar_length; i++)); do
-    dict+=";s/$i/${bar:$i:1}/g"
+	dict+=";s/$i/${bar:$i:1}/g"
 done
 
 # Create cava config
