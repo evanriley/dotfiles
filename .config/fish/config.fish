@@ -9,9 +9,6 @@ direnv hook fish | source
 zoxide init fish | source
 
 # Aliases
-# Use this to manage dotfiles
-alias config '/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-
 alias vim 'nvim'
 
 ## get rid of command not found
