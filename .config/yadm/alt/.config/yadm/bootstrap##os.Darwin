@@ -1,0 +1,235 @@
+#!/bin/sh
+
+# Install Homebrew (if not available) then install Brewfile
+
+system_type=$(uname -s)
+
+if [ "$system_type" = "Darwin" ]; then
+
+  # install homebrew if it's missing
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "Installing homebrew"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  fi
+
+  # If '.Brewfile' is found, install everything in the file
+  if [ -f "$HOME/.Brewfile" ]; then
+    echo "Updating homebrew bundle"
+    brew bundle --global
+  fi
+
+fi
+
+# Update iterm2 to use '.config/iterm2' as the preference folder
+
+if [ -d "$HOME/.config/iterm2" ]; then
+  echo "Setting iTerm preference folder"
+  defaults write com.googlecode.iterm2 PrefsCustomFolder "$HOME/.config/iterm2"
+fi
+
+# Check if Rosetta is installed
+
+if [ "$(uname -m)" = "arm64" ]
+  then
+  # checks if Rosetta is already installed
+  if ! pkgutil --pkg-info=com.apple.pkg.RosettaUpdateAuto > /dev/null 2>&1
+  then
+    echo "Installing Rosetta"
+    # Installs Rosetta2
+    softwareupdate --install-rosetta --agree-to-license
+  else
+    echo "Rosetta is installed"
+  fi
+fi
+
+# Set fish as the shell
+if [ $SHELL != "/opt/homebrew/bin/fish" ]; then
+  shell_path="$(command -v fish)"
+  echo "Changing your shell to fish"
+  sudo sh -c "echo $shell_path >> /etc/shells"
+  chsh -s $shell_path
+else
+  echo "shell is already fish"
+fi
+
+# Install tmux plugin manager
+if [ -d "$HOME/.tmux/plugins/tpm" ]; then
+  echo "tpm already exist"
+else
+  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+fi
+
+# Make sure asdf exist
+
+if [ -d "$HOME/.asdf" ]; then
+  echo "asdf already installed"
+else
+  git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
+fi
+
+# Install Rustup & Install Rust
+if [[ -x $(command -v rustup) ]]; then
+  # Rustup is already installed, check for updates.
+  echo "Rustup is already installed"
+  rustup update
+else
+  # Rustup will be installed.
+  /bin/bash -c "(curl https://sh.rustup.rs -sSf | sh -s -- -y --profile default --default-toolchain nightly)"
+  source $HOME/.cargo/env
+fi
+
+# Oxidize my terminal tools
+if [[ -x $(command -v cargo) ]]; then
+  # Install favorite rust tools through cargo. First install binstall, then install tools through binstall
+  cargo install cargo-binstall
+  cargo binstall --no-confirm fd-find exa bat zoxide starship nu rm-improved rtx-cli coreutils du-dust zellij mprocs ripgrep gitui bob-nvim eza
+else
+  # Rustup will be installed.
+  echo "Error, we've somehow reached this point without cargo installed?"
+  exit 1
+fi
+
+# Fix some awful macOS defaults
+# Close any open System Preferences panes, to prevent them from overriding
+# settings we’re about to change
+osascript -e 'tell application "System Preferences" to quit'
+
+# Ask for the administrator password upfront
+sudo -v
+
+# Keep-alive: update existing `sudo` time stamp until `.macos` has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
+###############################################################################
+# General UI/UX                                                               #
+###############################################################################
+
+# Set computer name (as done via System Preferences → Sharing)
+sudo scutil --set ComputerName "zeus"
+sudo scutil --set HostName "zeus"
+sudo scutil --set LocalHostName "zeus"
+sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "zeus"
+
+# Automatically quit printer app once the print jobs complete
+defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+
+# Disable the “Are you sure you want to open this application?” dialog
+defaults write com.apple.LaunchServices LSQuarantine -bool false
+
+# Show battery percentage next to the battery menu bar icon
+defaults write ~/Library/Preferences/ByHost/com.apple.controlcenter.plist BatteryShowPercentage -bool true
+
+# Disable automatic capitalization as it’s annoying when typing code
+defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
+
+# Disable smart dashes as they’re annoying when typing code
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+
+# Disable automatic period substitution as it’s annoying when typing code
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+
+# Disable smart quotes as they’re annoying when typing code
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+
+# Disable auto-correct
+defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+
+###############################################################################
+# Trackpad, mouse, keyboard, Bluetooth accessories, and input                 #
+###############################################################################
+
+# Trackpad: enable tap to click for this user and for the login screen
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
+
+# Disable press-and-hold for keys in favor of key repeat
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
+# Set a blazingly fast keyboard repeat rate
+defaults write NSGlobalDomain KeyRepeat -int 2
+defaults write NSGlobalDomain InitialKeyRepeat -int 10
+
+###############################################################################
+# Finder                                                                      #
+###############################################################################
+
+# Finder: disable window animations and Get Info animations
+defaults write com.apple.finder DisableAllAnimations -bool true
+
+# Set Desktop as the default location for new Finder windows
+# For other paths, use `PfLo` and `file:///full/path/here/`
+defaults write com.apple.finder NewWindowTarget -string "PfLo" && \
+defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}"
+
+# Show icons for hard drives, servers, and removable media on the desktop
+defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
+defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
+defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+
+# Finder: show hidden files by default
+defaults write com.apple.finder AppleShowAllFiles -bool true
+
+# Finder: show all filename extensions
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+
+# When performing a search, search the current folder by default
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+
+###############################################################################
+# Dock, Dashboard, and hot corners                                            #
+###############################################################################
+
+# Don’t animate opening applications from the Dock
+defaults write com.apple.dock launchanim -bool false
+
+# Remove the auto-hiding Dock delay
+defaults write com.apple.dock autohide-delay -float 0
+# Remove the animation when hiding/showing the Dock
+defaults write com.apple.dock autohide-time-modifier -float 0
+
+# Automatically hide and show the Dock
+defaults write com.apple.dock autohide -bool true
+
+###############################################################################
+# Mail                                                                        #
+###############################################################################
+
+# Disable send and reply animations in Mail.app
+defaults write com.apple.mail DisableReplyAnimations -bool true
+defaults write com.apple.mail DisableSendAnimations -bool true
+
+# Copy email addresses as `foo@example.com` instead of `Foo Bar <foo@example.com>` in Mail.app
+defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
+
+# Disable inline attachments (just show the icons)
+defaults write com.apple.mail DisableInlineAttachmentViewing -bool true
+
+# Disable automatic spell checking
+defaults write com.apple.mail SpellCheckingBehavior -string "NoSpellCheckingEnabled"
+
+###############################################################################
+# Photos                                                                      #
+###############################################################################
+
+# Prevent Photos from opening automatically when devices are plugged in
+defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
+
+###############################################################################
+# Kill affected applications                                                  #
+###############################################################################
+
+for app in "Activity Monitor" \
+  "Calendar" \
+  "Dock" \
+  "Finder" \
+  "Mail" \
+  "Messages" \
+  "Safari" \
+  "SystemUIServer" \
+  "Terminal" \
+  killall "${app}" &> /dev/null
+done
+echo "Done. Note that some of these changes require a logout/restart to take effect."
