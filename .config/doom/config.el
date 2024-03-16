@@ -28,6 +28,9 @@
 
 (global-subword-mode 1)                           ; Iterate through CamelCase words
 
+(after! persp-mode
+  (setq persp-emacsclient-init-frame-behaviour-override "main"))
+
 (setq-default custom-file (expand-file-name ".custom.el" doom-private-dir))
 (when (file-exists-p custom-file)
   (load custom-file))
@@ -38,7 +41,10 @@
       doom-unicode-font (font-spec :family "JuliaMono")
       doom-serif-font (font-spec :family "IBM Plex Mono" :size 22 :weight 'light))
 
-(setq doom-theme 'doom-badger)
+;;(setq doom-theme 'doom-badger)
+(setq doom-theme 'doom-earl-grey)
+
+(add-to-list 'default-frame-alist '(undecorated-round . t))
 
 (setq display-line-numbers-type 'relative)
 

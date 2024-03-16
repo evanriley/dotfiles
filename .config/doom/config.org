@@ -21,10 +21,12 @@ Feel free to look around and steal what you may find interesting, copying this f
     - [[#contact-info][Contact Info]]
     - [[#authinfogpg][Authinfo.gpg]]
     - [[#somewhat-sensible-defaults][(Somewhat) Sensible Defaults]]
+    - [[#emacsclient][Emacsclient]]
     - [[#customizations][Customizations]]
   - [[#visual-settings][Visual Settings]]
     - [[#font][Font]]
     - [[#theme][Theme]]
+    - [[#remove-titlebar][Remove titlebar]]
     - [[#line-numbers][Line Numbers]]
     - [[#dashboard][Dashboard]]
   - [[#company][Company]]
@@ -318,6 +320,14 @@ Store authinfo in my home directory.
 (global-subword-mode 1)                           ; Iterate through CamelCase words
 #+end_src
 
+*** Emacsclient
+
+When opening a new emacsclient, prefer to just reuse currently open workspaces instead of creating a new one.
+#+begin_src emacs-lisp
+(after! persp-mode
+  (setq persp-emacsclient-init-frame-behaviour-override "main"))
+#+end_src
+
 *** Customizations
 By default changes made via a customization are added to =init.el=. I would rather have these in a seperate file.
 #+begin_src emacs-lisp
@@ -342,7 +352,13 @@ By default changes made via a customization are added to =init.el=. I would rath
 #+end_src
 
 #+begin_src emacs-lisp
-(setq doom-theme 'doom-badger)
+;;(setq doom-theme 'doom-badger)
+(setq doom-theme 'doom-earl-grey)
+#+end_src
+
+*** Remove titlebar
+#+begin_src emacs-lisp
+(add-to-list 'default-frame-alist '(undecorated-round . t))
 #+end_src
 
 *** Line Numbers
