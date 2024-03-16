@@ -1,0 +1,106 @@
+# Local/private config goes in the include
+[include]
+  path = ~/.gitconfig.local
+[hub]
+  protocol = https
+[alias]
+  co = checkout
+  lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+  a = add
+  aa = add --all
+  d = diff
+  dc = diff --cached
+  pl = pull
+  pu = push
+  puf = push --force
+  s = status
+  co = checkout
+  cob = checkout -b
+  com = checkout main
+  amend = commit --amend --no-edit
+  c = commit
+  ca = commit -a
+  cam = commit -a -m
+  cm = commit -m
+  gone = "!f() { git fetch --all --prune; git branch -vv | awk '/: gone]/{print $1}' | xargs git branch -D; }; f"
+  rb = rebase
+  rba = rebase --abort
+  rbc = rebase --continue
+  rbi = rebase --interactive
+  rbs = rebase --skip
+  r = reset HEAD
+  r1 = reset HEAD^
+  r2 = reset HEAD^^
+  rhard = reset --hard
+  rhard1 = reset HEAD^ --hard
+  rhard2 = reset HEAD^^ --hard
+  sd = stash drop
+  spo = stash pop
+  spu = stash push
+  spua = stash push --all
+  rs = restore --staged
+[core]
+  excludesfile = /Users/evan/.gitignore
+  filemode = false
+  trustctime = false
+  autocrlf = false
+  safecrlf = false
+  pager = delta
+[apply]
+  whitespace = fix
+[interactive]
+  diffFilter = delta --color-only
+[delta]
+  navigate = true
+  light = false
+[merge]
+  conflictstyle = diff3
+[diff]
+  colorMoved = default
+[mergetool]
+  keepBackup = false
+[help]
+  autocorrect = 1
+[push]
+  default = tracking
+[user]
+  name = Evan Riley
+  email = evan@evanriley.net
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO2YujIPUDxQV13gJ5Ygg2C39kguFxbsE2QzDlFGN9Du
+[gpg]
+  format = ssh
+[gpg "ssh"]
+  program = "/opt/1Password/op-ssh-sign"
+[commit]
+  gpgsign = true
+[difftool "nvimdiff"]
+  cmd = nvim -d $LOCAL $REMOTE
+[mergetool "nvimmerge"]
+  cmd = nvim -d $LOCAL $BASE $REMOTE $MERGED -c 'winc J | winc ='
+  trustExitCode = true
+[fsck]
+  zeroPaddedFilemode = ignore
+[init]
+  defaultBranch = main
+[pull]
+  rebase = true
+[fetch]
+  prune = true
+[branch]
+  autosetupRebase = always
+	sort = -comitterdate
+[github]
+  user = evanriley
+[submodule]
+  recurse = true
+[rebase]
+  autoStash = true
+[credential "https://github.com"]
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = !/opt/homebrew/bin/gh auth git-credential
+
+[rerere]
+	enabled = true
+[column]
+	ui = auto

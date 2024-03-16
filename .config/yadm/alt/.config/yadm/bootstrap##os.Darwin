@@ -22,23 +22,26 @@ fi
 
 # Update iterm2 to use '.config/iterm2' as the preference folder
 
-if [ -d "$HOME/.config/iterm2" ]; then
-  echo "Setting iTerm preference folder"
-  defaults write com.googlecode.iterm2 PrefsCustomFolder "$HOME/.config/iterm2"
+if [ "$system_type" = "Darwin" ]; then
+	if [ -d "$HOME/.config/iterm2" ]; then
+	  echo "Setting iTerm preference folder"
+	  defaults write com.googlecode.iterm2 PrefsCustomFolder "$HOME/.config/iterm2"
+	fi
 fi
-
 # Check if Rosetta is installed
 
-if [ "$(uname -m)" = "arm64" ]
-  then
-  # checks if Rosetta is already installed
-  if ! pkgutil --pkg-info=com.apple.pkg.RosettaUpdateAuto > /dev/null 2>&1
-  then
-    echo "Installing Rosetta"
-    # Installs Rosetta2
-    softwareupdate --install-rosetta --agree-to-license
-  else
-    echo "Rosetta is installed"
+if [ "$system_type" = "Darwin" ]; then
+  if [ "$(uname -m)" = "arm64" ]
+    then
+    # checks if Rosetta is already installed
+    if ! pkgutil --pkg-info=com.apple.pkg.RosettaUpdateAuto > /dev/null 2>&1
+    then
+      echo "Installing Rosetta"
+      # Installs Rosetta2
+      softwareupdate --install-rosetta --agree-to-license
+    else
+      echo "Rosetta is installed"
+    fi
   fi
 fi
 
