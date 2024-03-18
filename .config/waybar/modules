@@ -216,8 +216,8 @@
      
 "clock": {
     "interval": 1,
-    //"format": " {:%I:%M %p}", // AM PM format
-    "format": " {:%H:%M:%S}",
+    "format": " {:%I:%M %p}", // AM PM format
+    //"format": " {:%H:%M:%S}",
     "format-alt": " {:%H:%M   %Y, %d %B, %A}",
     "tooltip-format": "<tt><small>{calendar}</small></tt>",
     "calendar": {
@@ -502,8 +502,6 @@
     "interval" : 86400, // once every day
     "tooltip": true,
     "on-click": "pkill rofi || rofi -show drun -modi run,drun,filebrowser,window",
-    "on-click-middle": "~/.config/hypr/scripts/WallpaperSelect.sh",
-    "on-click-right": "~/.config/hypr/scripts/WaybarLayout.sh",
 },
 
 // This is a custom cava visualizer
