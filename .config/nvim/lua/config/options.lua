@@ -24,4 +24,5 @@ if vim.g.neovide then
   vim.g.neovide_cursor_animation_length = 0.13
   vim.g.neovide_cursor_animation_length = 0.07
   vim.g.neovide_cursor_trail_size = 0.03
+  vim.g.neovide_scroll_animation_length = 0.03
 end
