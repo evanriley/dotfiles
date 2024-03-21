@@ -43,6 +43,8 @@ brew 'zls'
 brew 'git-delta'
 brew 'borkdude/brew/clj-kondo'
 brew 'jesseduffield/lazygit/lazygit'
+brew 'commitizen'
+brew 'pre-commit'
 brew '1password-cli'
 brew 'emacs-plus', args: ["with-ctags", "with-dbus", "with-mailutils", "with-xwidgets", "with-imagemagick", "with-native-comp"]
 
