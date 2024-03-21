@@ -4,6 +4,8 @@
 yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 sudo yabai --load-sa
 
+column_layout="~/.config/yabai/three-columns.sh"
+
 # yabai config start
 yabai -m config layout bsp
 
@@ -54,8 +56,18 @@ yabai -m rule --add app="^Simulator" manage=off
 # yabai -m signal --add event=window_destroyed active=yes action="yabai -m query --windows --window &> /dev/null || yabai -m window --focus mouse &> /dev/null || yabai -m window --focus \$(yabai -m query --windows --space | jq .[0].id) &> /dev/null"
 
 # run this everytime a window is created
-yabai -m signal --add event=window_created action="~/.config/yabai/three-columns.sh"
-yabai -m signal --add event=window_destroyed action="~/.config/yabai/three-columns.sh"
+yabai -m signal --add event=window_created action="${column_layout}"
+yabai -m signal --add event=window_destroyed action="${column_layout}"
+yabai -m signal --add event=application_launched action="${column_layout}"
+yabai -m signal --add event=application_destroyed action="${column_layout}"
+yabai -m signal --add event=application_visible action="${column_layout}"
+yabai -m signal --add event=application_hidden action="${column_layout}"
+yabai -m signal --add event=window_moved action="${column_layout}"
+yabai -m signal --add event=window_minimized action="${column_layout}"
+yabai -m signal --add event=window_deminimized action="${column_layout}"
+yabai -m signal --add event=space_created action="${column_layout}"
+yabai -m signal --add event=space_destroyed action="${column_layout}"
+yabai -m signal --add event=space_changed action="${column_layout}"
 
 echo "yabai config loaded"
 
