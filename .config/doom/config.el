@@ -41,8 +41,8 @@
       doom-unicode-font (font-spec :family "Berkeley Mono")
       doom-serif-font (font-spec :family "Berkeley Mono" :size 22 :weight 'light))
 
-;;(setq doom-theme 'doom-badger)
-(setq doom-theme 'doom-earl-grey)
+(setq doom-theme 'kanagawa)
+;;(setq doom-theme 'doom-earl-grey)
 
 (add-to-list 'default-frame-alist '(undecorated-round . t))
 

@@ -351,9 +351,16 @@ By default changes made via a customization are added to =init.el=. I would rath
 (unpin! doom-themes)
 #+end_src
 
+Let's use kanagawa. I really like it everywhere.
+
+#+begin_src emacs-lisp :tangle packages.el
+(package! kanagawa-theme)
+#+end_src
+
+Set the theme
 #+begin_src emacs-lisp
-;;(setq doom-theme 'doom-badger)
-(setq doom-theme 'doom-earl-grey)
+(setq doom-theme 'kanagawa)
+;;(setq doom-theme 'doom-earl-grey)
 #+end_src
 
 *** Remove titlebar
