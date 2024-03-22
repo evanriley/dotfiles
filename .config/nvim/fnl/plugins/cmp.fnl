@@ -58,5 +58,5 @@
                           :sources cmp-srcs
                           :preselect cmp.PreselectMode.None
                           :experimental {
-                                         :ghost_text true}}
+                                         :ghost_text false}}
                 (: cmp.event :on :confirm_done (cmp_autopairs.on_confirm_done {:map_char {:tex ""}})))))}]
