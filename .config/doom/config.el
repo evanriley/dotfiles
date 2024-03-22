@@ -35,11 +35,11 @@
 (when (file-exists-p custom-file)
   (load custom-file))
 
-(setq doom-font (font-spec :family "0xProto Nerd Font" :size 17)
-      doom-big-font (font-spec :family "OxProto Nerd Font" :size 32)
-      doom-variable-pitch-font (font-spec :family "Overpass" :size 17)
-      doom-unicode-font (font-spec :family "JuliaMono")
-      doom-serif-font (font-spec :family "IBM Plex Mono" :size 22 :weight 'light))
+(setq doom-font (font-spec :family "Berkeley Mono" :size 17)
+      doom-big-font (font-spec :family "Berkeley Mono Variable" :size 32)
+      doom-variable-pitch-font (font-spec :family "Berkeley Mono Variable" :size 17)
+      doom-unicode-font (font-spec :family "Berkeley Mono")
+      doom-serif-font (font-spec :family "Berkeley Mono" :size 22 :weight 'light))
 
 ;;(setq doom-theme 'doom-badger)
 (setq doom-theme 'doom-earl-grey)
