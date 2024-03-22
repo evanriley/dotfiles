@@ -45,7 +45,8 @@
   trustctime = false
   autocrlf = false
   safecrlf = false
-  pager = delta
+[pager]
+  difftool = true
 [apply]
   whitespace = fix
 [interactive]
@@ -57,6 +58,7 @@
   conflictstyle = diff3
 [diff]
   colorMoved = default
+  tool = difftastic
 [mergetool]
   keepBackup = false
 [help]
@@ -73,8 +75,10 @@
   program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 [commit]
   gpgsign = true
-[difftool "nvimdiff"]
-  cmd = nvim -d $LOCAL $REMOTE
+[difftool]
+  prompt = false
+[difftool "difftastic"]
+  cmd = difft "$LOCAL" "$REMOTE"
 [mergetool "nvimmerge"]
   cmd = nvim -d $LOCAL $BASE $REMOTE $MERGED -c 'winc J | winc ='
   trustExitCode = true
