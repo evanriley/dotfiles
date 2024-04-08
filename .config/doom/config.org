@@ -3,27 +3,27 @@
 #+PROPERTY: header-args :tangle-mode
 
 * About
-
 [[emacs.sexy][Emacs]] has consumed me. It is the primary way I interact with a computer these days.
-
 I use [[https://github.com/doomemacs/doomemacs][Doom Emacs]] as a base for this literate configuraiton.
-
-Feel free to look around and steal what you may find interesting, copying this file as a whole though may leave you with a terrible experience...but I'm an idiot and dumb things happen in here.
-
+Feel free to look around and steal what you may find interesting. Copying this file as a whole though may leave you with a terrible experience, maybe only take parts.
 * Table of Contents :QUOTE:TOC_3:
 #+BEGIN_QUOTE
 - [[#about][About]]
 - [[#doom-modules][Doom Modules]]
 - [[#configuration][Configuration]]
   - [[#header][Header]]
-  - [[#global-constants][Global Constants]]
-    - [[#shell][Shell]]
-    - [[#contact-info][Contact Info]]
+  - [[#general-settings][General Settings]]
+    - [[#personal-info][Personal Info]]
     - [[#authinfogpg][Authinfo.gpg]]
     - [[#somewhat-sensible-defaults][(Somewhat) Sensible Defaults]]
+    - [[#better-garbage-collection][Better Garbage Collection]]
+    - [[#emacs-behavior][Emacs Behavior]]
+    - [[#stay-clean][Stay Clean]]
     - [[#emacsclient][Emacsclient]]
     - [[#customizations][Customizations]]
   - [[#visual-settings][Visual Settings]]
+    - [[#general-visual-settings][General Visual Settings]]
+    - [[#modeline][Modeline]]
     - [[#font][Font]]
     - [[#theme][Theme]]
     - [[#remove-titlebar][Remove titlebar]]
@@ -41,11 +41,9 @@ Feel free to look around and steal what you may find interesting, copying this f
 #+END_QUOTE
 
 * Doom Modules
-
-This file controls what doom modules are enabled. Doom does a lot of lazy loading so you can enable a considerable amount without fear of performance loss.
-
+This section controls what doom modules are enabled.
+Doom does a lot of lazy loading so you can enable a considerable amount without fear of performance loss.
 If this is changed remember to run =doom sync= or =doom/reload=.
-
 This section in particular will be tangled into the ~init.el~ file.
 
 #+begin_src emacs-lisp :tangle init.el
@@ -56,13 +54,16 @@ This section in particular will be tangled into the ~init.el~ file.
        ;;layout            ; auie,ctsrnm is the superior home row
 
        :completion
-       (company           ; the ultimate code completion backend
-        +childframe
-        +tng)
+       ;;(company           ; the ultimate code completion backend
+       ;; +childframe
+       ;; +tng)
        ;;helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
        ;;ivy               ; a search engine for love and life
        (vertico           ; the search engine of the future
+        +icons)
+       (corfu
+        +orderless
         +icons)
 
        :ui
@@ -113,10 +114,10 @@ This section in particular will be tangled into the ~init.el~ file.
        vc                ; version-control and Emacs, sitting in a tree
 
        :term
-       ;;eshell            ; the elisp shell that works everywhere
+       eshell            ; the elisp shell that works everywhere
        ;;shell             ; simple shell REPL for Emacs
        ;;term              ; basic terminal emulator for Emacs
-       vterm             ; the best terminal emulation in Emacs
+       ;;vterm             ; the best terminal emulation in Emacs
 
        :checkers
        (syntax              ; tasing you for every semicolon you forget
@@ -249,16 +250,16 @@ This section in particular will be tangled into the ~init.el~ file.
         +tree-sitter)
 
        :email
-       ;;(mu4e +org +gmail)
+       ;;(mu4e +org)
        ;;notmuch
        ;;(wanderlust +gmail)
 
        :app
        ;;calendar
-       ;;emms
+       emms
        everywhere        ; *leave* Emacs!? You must be joking
        ;;irc               ; how neckbeards socialize
-       ;;(rss +org)        ; emacs as an RSS reader
+       (rss +org)        ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
 
        :config
@@ -274,21 +275,12 @@ This section in particular will be tangled into the ~init.el~ file.
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 #+end_src
 
-** Global Constants
-*** Shell
-My primary shell is =fish= however, non-POSIX shells often inject unreadable (to emacs) output into child processes. We'll use zsh inside most of emacs.
-#+begin_src emacs-lisp
-(setq shell-file-name (executable-find "zsh"))
-#+end_src
-
-With that, I use =vterm= and would still like to use fish inside that.
-#+begin_src emacs-lisp
-(setq-default vterm-shell (executable-find "fish"))
-(setq-default explicit-shell-file-name (executable-find "fish"))
-#+end_src
-*** Contact Info
+** General Settings
+*** Personal Info
 #+begin_src emacs-lisp
 (setq user-full-name "Evan Riley"
+      user-real-login-name "Evan Riley"
+      user-login-name "evan"
       user-mail-address (rot13 "rina@rinaevyrl.arg"))
 #+end_src
 
@@ -300,7 +292,6 @@ Store authinfo in my home directory.
 #+end_src
 
 *** (Somewhat) Sensible Defaults
-
 #+begin_src emacs-lisp
 (setq-default
  delete-by-moving-to-trash t                      ; Delete files to trash
@@ -311,7 +302,7 @@ Store authinfo in my home directory.
       evil-want-fine-undo t                       ; By default while in insert all changes are one big blob. Be more granular
       auto-save-default t                         ; Nobody likes to loose work, I certainly don't
       password-cache-expiry nil                   ; I can trust my computers ... can't I?
-      ;; scroll-preserve-screen-position 'always     ; Don't have `point' jump around
+      scroll-preserve-screen-position 'always     ; Don't have `point' jump around
       scroll-margin 2                             ; It's nice to maintain a little margin
       display-time-default-load-average nil)      ; I don't think I've ever found this useful
 
@@ -320,6 +311,83 @@ Store authinfo in my home directory.
 (global-subword-mode 1)                           ; Iterate through CamelCase words
 #+end_src
 
+*** Better Garbage Collection
+Emacs sometimes freezes up a bit when doing some garbage collection, which is not super. So, in order to fix that:
+
+  - Set up a really high threshold (I have a lot of RAM to spare, so I don’t really care),
+  - Hook garbage collection thirty seconds after Emacs loses focus and every thirty seconds after that,
+  - Cancel garbage collection if Emacs gains focus back within this thirty seconds window.
+
+With a garbage collection threshold, Emacs should never garbage collect on its own, and Emacs is free to freeze up for a few seconds when it loses focus since I’m looking away.
+
+#+begin_src emacs-lisp
+(setq garbage-collection-messages t           ;; tell me when garbage collecting
+      gc-cons-threshold (* 8 1024 1024 1024)) ;; 8GiB of RAM
+
+(defmacro my/time (&rest body)
+  `(let ((time (current-time)))
+     ,@body
+     (float-time (time-since time))))
+
+(defun my/garbage-collect ()
+  "Garbage collect and tell the user how much time it took."
+  (message "Garbage collector ran for %.06fs"
+           (my/time (garbage-collect))))
+
+(defvar my/gc-timer nil
+  "Timer for garbage collection. See
+`my/garbage-collect-on-focus-lost'.")
+
+(defun my/garbage-collect-on-focus-lost ()
+  "Garbage collect when Emacs loses focus.
+
+Garbage collection is only triggered thirty seconds after losing
+focus, and only once."
+  (if (frame-focus-state)
+      (when (timerp my/gc-timer)
+       (cancel-timer my/gc-timer))
+    (setq my/gc-timer (run-with-idle-timer 30 nil #'my/garbage-collect))))
+
+(add-function :after after-focus-change-function #'my/garbage-collect-on-focus-lost)
+#+end_src
+
+*** Emacs Behavior
+I never want to keep trailing spaces in my files, which is why I’m doing this:
+#+begin_src emacs-lisp
+(add-hook 'before-save-hook #'whitespace-cleanup)
+#+end_src
+
+I don’t understand why some people add two spaces behind a full stop, I sure don’t. Let’s tell Emacs.
+#+begin_src emacs-lisp
+(setq-default sentence-end-double-space nil)
+#+end_src
+
+I don’t like tabs. They rarely look good, and if I need it I can almost always tell Emacs to use them through a .dir-locals.el file or through the config file of my code formatter. So by default, let’s disable them:
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+(add-hook 'prog-mode-hook (lambda () (setq indent-tabs-mode nil)))
+#+end_src
+*** Stay Clean
+As nice as Emacs is, it isn’t very polite or clean by default: open a file, and it will create backup files in the same directory. But then, when you open your directory with your favourite file manager and see almost all of your files duplicated with a ~ appended to the filename, it looks really uncomfortable! This is why I prefer to tell Emacs to keep its backup files to itself in a directory it only will access.
+#+begin_src emacs-lisp
+(setq backup-directory-alist `(("." . ,(expand-file-name ".tmp/backups/"
+                                                         user-emacs-directory))))
+#+end_src
+
+When using LSP with Typescript projects, my tsconfig.json or its equivalent would constantly get polluted with symlinks going through my home directory, creating some horror imports. This is because the server tries to import some files through the symlink of the backup of the file I want to import. By forbidding Emacs to create symlinks for backups, we should avoid this problem.
+#+begin_src emacs-lisp
+(setq backup-by-copying t)
+#+end_src
+
+If we delete a file, we want it moved to the trash, not simply deleted.
+#+begin_src emacs-lisp
+(setq delete-by-moving-to-trash t)
+#+end_src
+
+Finally, the scratch buffer always has some message at its beginning, I don’t want it!
+#+begin_src emacs-lisp
+(setq-default initial-scratch-message nil)
+#+end_src
 *** Emacsclient
 
 When opening a new emacsclient, prefer to just reuse currently open workspaces instead of creating a new one.
@@ -337,13 +405,55 @@ By default changes made via a customization are added to =init.el=. I would rath
 #+end_src
 
 ** Visual Settings
+*** General Visual Settings
+This section will activate the visible bell. What it does is I get a visual feedback each time I do something Emacs doesn’t agree with, like trying to go up a line when I’m already at the top of the buffer.
+#+begin_src emacs-lisp
+(setq visible-bell t)
+#+end_src
+
+It is nicer to see a cursor cover the actual space of a character.
+#+begin_src emacs-lisp
+(setq x-stretch-cursor t)
+#+end_src
+
+When text is ellipsed, I want the ellipsis marker to be a single character of three dots. Let’s make it so:
+#+begin_src emacs-lisp
+(with-eval-after-load 'mule-util
+ (setq truncate-string-ellipsis "…"))
+#+end_src
+
+With Emacs 29.0.50 onwards, a new frame parameter exists: alpha-background. Unlike alpha, this frame parameter only makes Emacs’ background transparent, excluding images and text.
+#+begin_src emacs-lisp
+(add-to-list 'default-frame-alist '(alpha-background . 0.9))
+#+end_src
+
+*** Modeline
+The following code is, as will several chunks of code in this config, borrowed from TEC’s configuration. It hides the encoding information of the file if the file itself is a regular UTF-8 file with \n line ending. Be aware the doom-modeline-buffer-encoding variable is usabel here only because I use the Doom modeline as seen below.
+#+begin_src emacs-lisp
+(defun modeline-contitional-buffer-encoding ()
+  "Hide \"LF UTF-8\" in modeline.
+It is expected of files to be encoded with LF UTF-8, so only show
+the encoding in the modeline if the encoding is worth notifying
+the user."
+  (setq-local doom-modeline-buffer-encoding
+              (unless (and (memq (plist-get (coding-system-plist buffer-file-coding-system) :category)
+                                 '(coding-category-undecided coding-category-utf-8))
+                           (not (memq (coding-system-eol-type buffer-file-coding-system) '(1 2))))
+                t)))
+
+#+end_src
+
+Now, let’s automate the call to this function in order to apply the modifications to the modeline each time we open a new file.
+#+begin_src emacs-lisp
+(add-hook 'after-change-major-mode-hook #'modeline-contitional-buffer-encoding)
+#+end_src
 *** Font
 #+begin_src emacs-lisp
-(setq doom-font (font-spec :family "Berkeley Mono" :size 17)
-      doom-big-font (font-spec :family "Berkeley Mono Variable" :size 32)
+(setq doom-font (font-spec :family "Berkeley Mono" :size 16)
+      doom-big-font (font-spec :family "Berkeley Mono Variable" :size 21)
       doom-variable-pitch-font (font-spec :family "Berkeley Mono Variable" :size 17)
       doom-unicode-font (font-spec :family "Berkeley Mono")
-      doom-serif-font (font-spec :family "Berkeley Mono" :size 22 :weight 'light))
+      doom-serif-font (font-spec :family "Berkeley Mono" :size 21))
 #+end_src
 
 *** Theme
@@ -952,7 +1062,7 @@ frame size or theme is changed.
 #+end_src
 
 ** Company
-Reduce prefix length and elay. This may cause performance issues.
+Reduce prefix length and delay. This may cause performance issues.
 #+begin_src emacs-lisp
 (after! company
   (setq company-idle-delay 0.2

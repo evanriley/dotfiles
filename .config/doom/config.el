@@ -1,11 +1,8 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-(setq shell-file-name (executable-find "zsh"))
-
-(setq-default vterm-shell (executable-find "fish"))
-(setq-default explicit-shell-file-name (executable-find "fish"))
-
 (setq user-full-name "Evan Riley"
+      user-real-login-name "Evan Riley"
+      user-login-name "evan"
       user-mail-address (rot13 "rina@rinaevyrl.arg"))
 
 (setq auth-sources '("~/.authinfo.gpg")
@@ -20,13 +17,58 @@
       evil-want-fine-undo t                       ; By default while in insert all changes are one big blob. Be more granular
       auto-save-default t                         ; Nobody likes to loose work, I certainly don't
       password-cache-expiry nil                   ; I can trust my computers ... can't I?
-      ;; scroll-preserve-screen-position 'always     ; Don't have `point' jump around
+      scroll-preserve-screen-position 'always     ; Don't have `point' jump around
       scroll-margin 2                             ; It's nice to maintain a little margin
       display-time-default-load-average nil)      ; I don't think I've ever found this useful
 
 (display-time-mode 1)                             ; Enable time in the mode-line
 
 (global-subword-mode 1)                           ; Iterate through CamelCase words
+
+(setq garbage-collection-messages t           ;; tell me when garbage collecting
+      gc-cons-threshold (* 8 1024 1024 1024)) ;; 8GiB of RAM
+
+(defmacro my/time (&rest body)
+  `(let ((time (current-time)))
+     ,@body
+     (float-time (time-since time))))
+
+(defun my/garbage-collect ()
+  "Garbage collect and tell the user how much time it took."
+  (message "Garbage collector ran for %.06fs"
+           (my/time (garbage-collect))))
+
+(defvar my/gc-timer nil
+  "Timer for garbage collection. See
+`my/garbage-collect-on-focus-lost'.")
+
+(defun my/garbage-collect-on-focus-lost ()
+  "Garbage collect when Emacs loses focus.
+
+Garbage collection is only triggered thirty seconds after losing
+focus, and only once."
+  (if (frame-focus-state)
+      (when (timerp my/gc-timer)
+       (cancel-timer my/gc-timer))
+    (setq my/gc-timer (run-with-idle-timer 30 nil #'my/garbage-collect))))
+
+(add-function :after after-focus-change-function #'my/garbage-collect-on-focus-lost)
+
+(add-hook 'before-save-hook #'whitespace-cleanup)
+
+(setq-default sentence-end-double-space nil)
+
+(setq-default indent-tabs-mode nil)
+(add-hook 'prog-mode-hook (lambda () (setq indent-tabs-mode nil)))
+
+(setq backup-directory-alist `(("." . ,(expand-file-name ".tmp/backups/"
+                                                         user-emacs-directory))))
+
+(setq backup-by-copying t)
+
+(setq delete-by-moving-to-trash t)
+
+(setq-default initial-scratch-message nil)
 
 (after! persp-mode
   (setq persp-emacsclient-init-frame-behaviour-override "main"))
@@ -35,11 +77,33 @@
 (when (file-exists-p custom-file)
   (load custom-file))
 
-(setq doom-font (font-spec :family "Berkeley Mono" :size 17)
-      doom-big-font (font-spec :family "Berkeley Mono Variable" :size 32)
+(setq visible-bell t)
+
+(setq x-stretch-cursor t)
+
+(with-eval-after-load 'mule-util
+ (setq truncate-string-ellipsis "…"))
+
+(add-to-list 'default-frame-alist '(alpha-background . 0.9))
+
+(defun modeline-contitional-buffer-encoding ()
+  "Hide \"LF UTF-8\" in modeline.
+It is expected of files to be encoded with LF UTF-8, so only show
+the encoding in the modeline if the encoding is worth notifying
+the user."
+  (setq-local doom-modeline-buffer-encoding
+              (unless (and (memq (plist-get (coding-system-plist buffer-file-coding-system) :category)
+                                 '(coding-category-undecided coding-category-utf-8))
+                           (not (memq (coding-system-eol-type buffer-file-coding-system) '(1 2))))
+                t)))
+
+(add-hook 'after-change-major-mode-hook #'modeline-contitional-buffer-encoding)
+
+(setq doom-font (font-spec :family "Berkeley Mono" :size 16)
+      doom-big-font (font-spec :family "Berkeley Mono Variable" :size 21)
       doom-variable-pitch-font (font-spec :family "Berkeley Mono Variable" :size 17)
       doom-unicode-font (font-spec :family "Berkeley Mono")
-      doom-serif-font (font-spec :family "Berkeley Mono" :size 22 :weight 'light))
+      doom-serif-font (font-spec :family "Berkeley Mono" :size 21))
 
 (setq doom-theme 'kanagawa)
 ;;(setq doom-theme 'doom-earl-grey)
