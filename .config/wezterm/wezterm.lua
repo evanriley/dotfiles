@@ -48,7 +48,4 @@ config.window_frame = {
 	font_size = 14,
 }
 
-config.window_background_opacity = 0.9
-config.text_background_opacity = 0.9
-
 return config
