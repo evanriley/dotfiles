@@ -11,7 +11,7 @@ vim.opt.breakindent = true -- Enable break indent
 vim.opt.undofile = true -- Save undo history
 vim.opt.ignorecase = true -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.smartcase = true -- ^^
-vim.opt.signcolumn = 'yes' -- Keep signcolumn on by default
+vim.opt.signcolumn = 'number' -- Makes signcolumn always one column with signs and linenumber
 vim.opt.updatetime = 250 -- Decrease update time
 vim.opt.timeoutlen = 300 -- Decrease mapped sequence wait time
 vim.opt.splitright = true -- Always open split to right
@@ -21,3 +21,8 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.opt.inccommand = 'split' -- Preview substitutions live
 vim.opt.cursorline = true -- Show which line your cursor is on
 vim.opt.scrolloff = 10 -- Miniumum number of screen lines to keep above and below the cursor.
+vim.opt.expandtab = true -- Tabs are space
+vim.opt.tabstop = 2 -- Tab/indent size
+vim.opt.shiftwidth = 2
+vim.opt.softtabstop = 2
+vim.opt.wrap = false -- Display long lines as-is
