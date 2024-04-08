@@ -8,6 +8,12 @@ return {
       require('mini.ai').setup { n_lines = 500 }
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       require('mini.surround').setup()
+      -- Better character jumps
+      require('mini.jump').setup()
+      -- Jump between visible lines with ease
+      require('mini.jump2d').setup {
+        dim = true,
+      }
       -- Simple and easy statusline.
       local statusline = require 'mini.statusline'
       -- set use_icons to true if you have a Nerd Font
