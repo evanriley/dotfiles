@@ -10,6 +10,9 @@ return {
       require('mini.surround').setup()
       -- Better character jumps
       require('mini.jump').setup()
+      -- Simpler git intergration
+      require('mini.diff').setup()
+      vim.keymap.set('n', '<leader>go', require('mini.diff').toggle_overlay)
       -- Jump between visible lines with ease
       require('mini.jump2d').setup {
         dim = true,
