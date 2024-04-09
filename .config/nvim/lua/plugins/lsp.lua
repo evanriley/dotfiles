@@ -58,6 +58,7 @@ return {
       local servers = {
         gopls = {},
         rust_analyzer = {},
+        elixirls = {},
         lua_ls = {
           settings = {
             Lua = {
