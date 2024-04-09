@@ -103,6 +103,7 @@ config.font = wezterm.font_with_fallback({
 config.font_size = 16
 
 config.use_fancy_tab_bar = false
+config.tab_max_width = 28
 config.tab_bar_at_bottom = true
 config.status_update_interval = 1000
 config.window_decorations = "RESIZE"
