@@ -37,9 +37,6 @@ return {
           end,
         },
         completion = { completeopt = 'menu,menuone,noinsert,noselect' },
-        experimental = {
-          ghost_text = true,
-        },
         mapping = cmp.mapping.preset.insert {
           ['<CR>'] = cmp.mapping(function(fallback)
             if cmp.visible() then
