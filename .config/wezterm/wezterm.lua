@@ -93,7 +93,7 @@ config.key_tables = {
 
 config.force_reverse_video_cursor = true
 
-config.color_scheme = "duskfox"
+config.color_scheme = "Kanagawa (Gogh)"
 
 config.font = wezterm.font_with_fallback({
 	"Berkeley Mono",
@@ -106,7 +106,6 @@ config.use_fancy_tab_bar = false
 config.tab_bar_at_bottom = true
 config.status_update_interval = 1000
 config.window_decorations = "RESIZE"
-config.window_background_opacity = 0.95
 config.enable_scroll_bar = false
 
 config.window_padding = {
