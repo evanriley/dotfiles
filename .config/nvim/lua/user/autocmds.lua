@@ -28,8 +28,24 @@ vim.api.nvim_create_autocmd({ 'BufEnter' }, {
 
 vim.api.nvim_create_autocmd({ 'VimLeave' }, {
   callback = function()
-    -- Setting title to empty string causes wezterm to revert to its
-    -- -- default behavior of setting the tab title automatically
+    -- Setting title to empty string causes wezterm to revert to its default behavior of setting the tab title automatically
     vim.fn.system { 'wezterm', 'cli', 'set-tab-title', '' }
+  end,
+})
+
+-- Clojure/Conjure
+vim.api.nvim_create_autocmd('BufNewFile', {
+  desc = 'Conjure Log disable LSP diagnostics',
+  pattern = { 'conjure-log-*' },
+  callback = function()
+    vim.diagnostic.disable(0)
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  desc = 'Lisp style line comment',
+  pattern = { 'clojure' },
+  callback = function()
+    vim.bo.commentstring = ';; %s'
   end,
 })

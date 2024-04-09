@@ -23,6 +23,7 @@ return {
       'saadparwaiz1/cmp_luasnip',
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
+      'PaterJason/cmp-conjure',
       'SergioRibera/cmp-dotenv',
     },
     config = function()
@@ -75,6 +76,7 @@ return {
         sources = {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
+          { name = 'conjure' },
           { name = 'path' },
           { name = 'dotenv' },
         },
