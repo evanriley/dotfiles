@@ -20,6 +20,7 @@ M.toggle = function(window, pane)
 		srcPath,
 		srcPath .. "/personal",
 		srcPath .. "/work",
+		"/Users/evan/.config/",
 	})
 
 	if not success then
@@ -61,15 +62,6 @@ M.toggle = function(window, pane)
 				else
 					w.log_info("Selected " .. label)
 					win:perform_action(act.SwitchToWorkspace({ name = id, spawn = { cwd = label } }), pane)
-					-- System determined themes weren't applying to new workspace
-					-- TODO: Surely there is a better way to handle this.
-					local overrides = window:get_config_overrides() or {}
-					local appearance = window:get_appearance()
-					local scheme = scheme_for_appearance(appearance)
-					if overrides.color_scheme ~= scheme then
-						overrides.color_scheme = scheme
-						window:set_config_overrides(overrides)
-					end
 				end
 			end),
 			fuzzy = true,

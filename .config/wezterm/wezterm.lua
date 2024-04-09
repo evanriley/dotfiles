@@ -8,7 +8,7 @@ config.default_workspace = "main"
 config.scrollback_lines = 3000
 config.window_close_confirmation = "AlwaysPrompt"
 
-config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
+config.leader = { key = " ", mods = "CTRL", timeout_milliseconds = 1000 }
 config.keys = {
 	-- Send C-a when pressing C-a twice
 	{ key = "a", mods = "LEADER|CTRL", action = act.SendKey({ key = "a", mods = "CTRL" }) },
@@ -93,23 +93,7 @@ config.key_tables = {
 
 config.force_reverse_video_cursor = true
 
-function scheme_for_appearance(appearance)
-	if appearance:find("Dark") then
-		return "duskfox"
-	else
-		return "dayfox"
-	end
-end
-
-wezterm.on("window-config-reloaded", function(window, pane)
-	local overrides = window:get_config_overrides() or {}
-	local appearance = window:get_appearance()
-	local scheme = scheme_for_appearance(appearance)
-	if overrides.color_scheme ~= scheme then
-		overrides.color_scheme = scheme
-		window:set_config_overrides(overrides)
-	end
-end)
+config.color_scheme = "duskfox"
 
 config.font = wezterm.font_with_fallback({
 	"Berkeley Mono",
