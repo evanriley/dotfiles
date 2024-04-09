@@ -34,6 +34,7 @@ return {
           show_hidden = true,
         },
       }
+      vim.keymap.set('n', '<leader>e', require('oil').toggle_float)
     end,
   },
 }
