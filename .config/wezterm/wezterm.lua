@@ -1,5 +1,6 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
+local sessionizer = require("sessionizer")
 local smart_splits = wezterm.plugin.require("https://github.com/mrjones2014/smart-splits.nvim")
 local config = wezterm.config_builder()
 
@@ -55,8 +56,11 @@ config.keys = {
 	{ key = "{", mods = "LEADER|SHIFT", action = act.MoveTabRelative(-1) },
 	{ key = "}", mods = "LEADER|SHIFT", action = act.MoveTabRelative(1) },
 
-	-- Lastly, workspace
+	-- Workspaces
 	{ key = "w", mods = "LEADER", action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) },
+
+	-- Open sessioniser window
+	{ key = "f", mods = "LEADER", action = wezterm.action_callback(sessionizer.toggle) },
 }
 
 -- I can use the tab navigator (LDR t), but I also want to quickly navigate tabs with index
