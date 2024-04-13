@@ -19,7 +19,6 @@ return {
       }
       -- Simple and easy statusline.
       local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
       statusline.setup {}
       ---@diagnostic disable-next-line: duplicate-set-field
       statusline.section_location = function()
