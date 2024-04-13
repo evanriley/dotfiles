@@ -50,6 +50,23 @@ config.keys = {
 			end),
 		}),
 	},
+
+	{
+		key = "e",
+		mods = "LEADER",
+		action = act.PromptInputLine({
+			description = wezterm.format({
+				{ Attribute = { Intensity = "Bold" } },
+				{ Foreground = { AnsiColor = "Fuchsia" } },
+				{ Text = "Renaming Tab Title...:" },
+			}),
+			action = wezterm.action_callback(function(window, pane, line)
+				if line then
+					window:active_tab():set_title(line)
+				end
+			end),
+		}),
+	},
 	-- Key table for moving tabs around
 	{ key = "m", mods = "LEADER", action = act.ActivateKeyTable({ name = "move_tab", one_shot = false }) },
 	-- Or shortcuts to move tab w/o move_tab table. SHIFT is for when caps lock is on
@@ -58,6 +75,30 @@ config.keys = {
 
 	-- Workspaces
 	{ key = "w", mods = "LEADER", action = act.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }) },
+	{
+		key = "E",
+		mods = "LEADER",
+		action = act.PromptInputLine({
+			description = wezterm.format({
+				{ Attribute = { Intensity = "Bold" } },
+				{ Foreground = { AnsiColor = "Fuchsia" } },
+				{ Text = "Renaming Workspace Title...:" },
+			}),
+			action = wezterm.action_callback(function(window, pane, line)
+				if line then
+					wezterm.mux.rename_workspace(wezterm.mux.get_active_workspace(), line)
+				end
+			end),
+		}),
+	},
+	{
+		key = "g",
+		mods = "LEADER",
+		action = act.SwitchToWorkspace({
+			name = "gh-dash",
+			spawn = { args = { "/opt/homebrew/bin/fish", "-c", "gh dash" } },
+		}),
+	},
 
 	-- Open sessioniser window
 	{ key = "f", mods = "LEADER", action = wezterm.action_callback(sessionizer.toggle) },
