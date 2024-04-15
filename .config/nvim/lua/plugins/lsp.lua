@@ -94,9 +94,23 @@ return {
             },
           },
         },
-        rust_analyzer = {},
         elixirls = {},
         clojure_lsp = {},
+        taplo = {
+          keys = {
+            {
+              'K',
+              function()
+                if vim.fn.expand '%:t' == 'Cargo.toml' and require('crates').popup_available() then
+                  require('crates').show_popup()
+                else
+                  vim.lsp.buf.hover()
+                end
+              end,
+              desc = 'Show Crate Documentation',
+            },
+          },
+        },
         lua_ls = {
           settings = {
             Lua = {
@@ -113,12 +127,13 @@ return {
       require('mason').setup()
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
+        'codelldb',
+        'delve',
         'gofumpt', -- Superior go formatter
         'goimports',
         'gomodifytags',
         'impl',
-        'delve',
+        'stylua', -- Used to format Lua code
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
       require('mason-lspconfig').setup {

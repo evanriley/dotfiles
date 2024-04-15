@@ -4,6 +4,15 @@ return {
     event = 'InsertEnter',
     dependencies = {
       {
+        'Saecki/crates.nvim',
+        event = { 'BufRead Cargo.toml' },
+        opts = {
+          src = {
+            cmp = { enabled = true },
+          },
+        },
+      },
+      {
         'L3MON4D3/LuaSnip',
         build = (function()
           if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
@@ -77,6 +86,7 @@ return {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'conjure' },
+          { name = 'crates' },
           { name = 'path' },
           { name = 'dotenv' },
         },
