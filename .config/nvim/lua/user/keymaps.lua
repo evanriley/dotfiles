@@ -11,8 +11,5 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit nicer
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>')
 
--- Keybinds to make split navigation easier.
--- vim.keymap.set('n', '<C-h>', '<C-w><C-h>')
--- vim.keymap.set('n', '<C-l>', '<C-w><C-l>')
--- vim.keymap.set('n', '<C-j>', '<C-w><C-j>')
--- vim.keymap.set('n', '<C-k>', '<C-w><C-k>')
+vim.api.nvim_create_user_command('Wq', 'wq', {})
+vim.api.nvim_create_user_command('W', 'w', {})
