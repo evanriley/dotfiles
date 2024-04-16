@@ -31,7 +31,13 @@ M.toggle = function(window, pane)
 	for line in stdout:gmatch("([^\n]*)\n?") do
 		local project = platform.is_win and line:gsub("\\", "/") or line -- handles Windows backslash
 		local label = project
-		local id = project
+
+		-- Split the project path and get the last part as the id
+		local parts = {}
+		for part in string.gmatch(project, "([^/]+)") do
+			table.insert(parts, part)
+		end
+		local id = parts[#parts]
 
 		-- handle git bare repositories,
 		-- assuming following name convention `myproject.git`
@@ -43,7 +49,11 @@ M.toggle = function(window, pane)
 				for wt_line in stdout:gmatch("([^\n]*)\n?") do
 					local wt_project = platform.is_win and wt_line:gsub("\\", "/") or wt_line -- handles Windows backslash
 					local wt_label = wt_project
-					local wt_id = wt_project
+					local wt_parts = {}
+					for wt_part in string.gmatch(wt_project, "([^/]+)") do
+						table.insert(wt_parts, wt_part)
+					end
+					local wt_id = wt_parts[#wt_parts]
 					table.insert(projects, { label = tostring(wt_label), id = tostring(wt_id) })
 				end
 			else
