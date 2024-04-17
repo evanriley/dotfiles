@@ -30,25 +30,6 @@ alias du dust
 ## fast clj repl
 alias clj-repl 'clj "-J-Dclojure.server.repl={:port 5555 :accept clojure.core.server/repl :server-daemon false}"'
 
-# Open neovide with transparent frame and given file, given dir, or `.`
-function n
-    if count $argv >0 # Check if an argument is provided
-        set arg $argv[1]
-    else
-        set arg "." # Default to current directory
-    end
-
-    if test -d "$arg" # Check if argument is a directory
-        set neovide_cwd (realpath "$arg")
-        set file $neovide_cwd
-    else
-        set file (realpath "$arg")
-        set neovide_cwd (dirname "$file")
-    end
-
-    open -a Neovide.app --args $file --frame transparent -- -c "cd $neovide_cwd"
-end
-
 # use pinentry-mac instead of pinentry on macos
 if test (uname) = Darwin
     alias pinentry pinentry-mac
