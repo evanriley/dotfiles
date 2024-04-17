@@ -2,43 +2,43 @@
 [include]
   path = ~/.gitconfig.local
 [hub]
-  protocol = https
+  protocol = ssh
 [alias]
-  co = checkout
-  lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
   a = add
   aa = add --all
-  d = diff
-  dc = diff --cached
-  pl = pull
-  pu = push
-  puf = push --force
-  s = status
-  co = checkout
-  cob = checkout -b
-  com = checkout main
   amend = commit --amend --no-edit
   c = commit
   ca = commit -a
   cam = commit -a -m
   cm = commit -m
+  co = checkout
+  co = checkout
+  cob = checkout -b
+  com = checkout main
+  d = diff
+  dc = diff --cached
   gone = "!f() { git fetch --all --prune; git branch -vv | awk '/: gone]/{print $1}' | xargs git branch -D; }; f"
+  lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+  pl = pull
+  pu = push
+  puf = push --force
+  r = reset HEAD
+  r1 = reset HEAD^
+  r2 = reset HEAD^^
   rb = rebase
   rba = rebase --abort
   rbc = rebase --continue
   rbi = rebase --interactive
   rbs = rebase --skip
-  r = reset HEAD
-  r1 = reset HEAD^
-  r2 = reset HEAD^^
   rhard = reset --hard
   rhard1 = reset HEAD^ --hard
   rhard2 = reset HEAD^^ --hard
+  rs = restore --staged
+  s = status
   sd = stash drop
   spo = stash pop
   spu = stash push
   spua = stash push --all
-  rs = restore --staged
 [core]
   excludesfile = /Users/evan/.gitignore
   filemode = false
@@ -59,6 +59,7 @@
 [diff]
   colorMoved = default
   tool = difftastic
+  external = difft
 [mergetool]
   keepBackup = false
 [help]
