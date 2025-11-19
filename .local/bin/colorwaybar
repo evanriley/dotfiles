@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+image="$1"
+waybar_css="$HOME/.config/waybar/color.css"
+
+touch "$waybar_css"
+
+# Calculate brightness
+brightness=$(convert "$image" -resize 500x500^ -format "%[fx:int(mean*100)]" info:)
+if (( brightness < 48 )); then
+    color="rgba(255,255,255,0.8)"  
+else
+    color="rgba(0,0,0,0.8)"        
+fi
+
+# Write color to css
+echo "@define-color primary $color;" > "$waybar_css"

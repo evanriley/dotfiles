@@ -1,0 +1,23 @@
+# Earl Grey
+palette = 0=#F7F3EE
+palette = 1=#8F5652
+palette = 2=#747B4D
+palette = 3=#886A44
+palette = 4=#556995
+palette = 5=#83577D
+palette = 6=#477A7B
+palette = 7=#605A52
+palette = 8=#BEBBB6
+palette = 9=#E6DAD8
+palette = 10=#E1E1D7
+palette = 11=#E5DED5
+palette = 12=#DBDEE5
+palette = 13=#E4DAE0
+palette = 14=#D8E1E0
+palette = 15=#7F7A73
+background = #FCFBF9
+foreground = #605A52
+cursor-color = #7686A9
+cursor-text = #FCFBF9
+selection-background = #E4DAE0
+# selection-foreground = #c6d0f5

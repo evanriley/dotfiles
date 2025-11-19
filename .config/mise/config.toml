@@ -1,0 +1,11 @@
+[tools]
+clojure = "latest"
+elixir = "latest"
+erlang = "latest"
+gleam = "latest"
+java = "temurin-21"
+node = "latest"
+protonge = "latest"
+python = "latest"
+rust = "nightly"
+zig = "latest"

@@ -1,0 +1,25 @@
+# Earl Grey Dark
+palette = 0=#3C3632
+palette = 1=#BB9895
+palette = 2=#B8BBA3
+palette = 3=#C2B39F
+palette = 4=#98A3BD
+palette = 5=#B399AF
+palette = 6=#8FAEAD
+palette = 7=#ECEBE8
+
+palette = 8=#9E9A95  
+palette = 9=#BB9895  
+palette = 10=#B8BBA3 
+palette = 11=#C2B39F 
+palette = 12=#98A3BD 
+palette = 13=#B399AF 
+palette = 14=#8FAEAD 
+palette = 15=#F7F3EE 
+
+background = #3C3632
+foreground = #ECEBE8
+cursor-color = #98A3BD
+cursor-text = #3C3632
+selection-background = #605A52
+# selection-foreground = #ECEBE8
