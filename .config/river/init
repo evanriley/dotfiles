@@ -2,7 +2,6 @@
 
 # --- Startup & Reset ---
 pkill -f mascen
-pkill -f swww-daemon
 pkill -f waybar
 pkill -f mako
 pkill -f yubikey-touch-detector
@@ -29,8 +28,7 @@ yubikey-touch-detector -libnotify &
 
 riverctl spawn "waybar"
 riverctl spawn "sh -c 'sleep 1; pkill -SIGUSR1 waybar'"
-riverctl spawn "swww-daemon"
-riverctl spawn "swww img /home/evan/Pictures/wallpapers/07u.png"
+riverctl spawn "swaybg -i /home/evan/Pictures/wallpapers/kanso.png -m center -c \"#15171c\""
 riverctl spawn "/usr/lib/polkit-kde-authentication-agent-1"
 
 # --- Display Configuration (EXACT REFRESH RATE) ---
@@ -78,9 +76,15 @@ for mode in normal locked; do
 done
 
 # Screenshots
-riverctl map normal None Print spawn "screenshot"
-riverctl map normal Control Print spawn "screenshot-screen"
-riverctl map normal Alt Print spawn "screenshot-window"
+
+riverctl spawn "mkdir -p ~/Pictures/Screenshots"
+
+# Print: Interactive (Drag selection OR Click window)
+riverctl map normal None Print spawn 'grim -g "$(slurp)" "$HOME/Pictures/Screenshots/Screenshot-$(date +%Y-%m-%d-%H%M%S).png"'
+# Ctrl+Print: Full Screen (All monitors)
+riverctl map normal Control Print spawn 'grim "$HOME/Pictures/Screenshots/Screenshot-$(date +%Y-%m-%d-%H%M%S).png"'
+# Alt+Print: Focused Window Only (Auto-detects geometry)
+riverctl map normal Alt Print spawn 'grim -g "$(riverctl list-views | jq -r ".[] | select(.focused) | \"\(.bbox.x),\(.bbox.y) \(.bbox.width)x\(.bbox.height)\"")" "$HOME/Pictures/Screenshots/Screenshot-$(date +%Y-%m-%d-%H%M%S).png"'
 
 # --- Navigation (HJKL) ---
 
@@ -114,19 +118,15 @@ riverctl map-pointer normal $mod BTN_MIDDLE toggle-float
 
 
 # --- Rules ---
-riverctl rule-add -app-id "steam" -title "*notificationtoasts*" float
-riverctl rule-add -app-id "Plexamp" float
-riverctl rule-add -app-id "authenticator" float
-riverctl rule-add -title "Friends List" float
+all_tags=$(((1 << 32) - 1))
+# float and borderless Picture-in-Picture
+riverctl rule-add -title "Picture-in-Picture" float
+riverctl rule-add -title "Picture-in-Picture" csd
+riverctl rule-add -title "Picture-in-Picture" tags $all_tags
 
-# --- Start Layout Generator (Center Master Fixed) ---
+riverctl rule-add -app-id "steam_app_*" csd # csd steam games
 
-# Logic:
-# 1. --layout left: Base vertical split.
-# 2. --count-wide-left 1: Pushes exactly 1 stack window to the left side.
-# 3. --ratio-master 0.50: Forces the Center Window (Master) to be 50% width.
-# 4. --ratio-wide 0.25: Forces the Left Stack Window to be 25% width.
-#    (This leaves the remaining 25% for the Right Stack).
+# --- Layout Generator  ---
 
 mascen --master-width 0.5 --gap 20 --inner-gap 10 --smart-gaps false &
 
