@@ -4,6 +4,8 @@
 pkill -f mascen
 pkill -f swww-daemon
 pkill -f waybar
+pkill -f mako
+pkill -f yubikey-touch-detector
 # FORCE KILL any existing portals so they restart with the new variables below
 killall -q xdg-desktop-portal-wlr
 killall -q xdg-desktop-portal
@@ -22,6 +24,9 @@ export XDG_SESSION_TYPE="wayland"
 systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
 
+mako &
+yubikey-touch-detector -libnotify &
+
 riverctl spawn "waybar"
 riverctl spawn "sh -c 'sleep 1; pkill -SIGUSR1 waybar'"
 riverctl spawn "swww-daemon"
@@ -29,7 +34,7 @@ riverctl spawn "swww img /home/evan/Pictures/wallpapers/07u.png"
 riverctl spawn "/usr/lib/polkit-kde-authentication-agent-1"
 
 # --- Display Configuration (EXACT REFRESH RATE) ---
-wlr-randr --output DP-1 --mode 5120x1440@119.978996 --scale 1 --transform normal --adaptive-sync enabled
+wlr-randr --output DP-1 --mode 5120x1440@239.998993 --scale 1 --transform normal --adaptive-sync enabled
 
 # --- Input Configuration ---
 riverctl set-repeat 50 300
@@ -41,7 +46,7 @@ riverctl input pointer-* tap enabled
 riverctl input pointer-* natural-scroll disabled
 
 riverctl focus-follows-cursor normal
-riverctl set-cursor-warp on
+riverctl set-cursor-warp disabled
 riverctl hide-cursor timeout 3000
 riverctl xcursor-theme "Bibata-Original-Classic"
 
@@ -107,16 +112,6 @@ riverctl map-pointer normal $mod BTN_LEFT move-view
 riverctl map-pointer normal $mod BTN_RIGHT resize-view
 riverctl map-pointer normal $mod BTN_MIDDLE toggle-float
 
-# --- Layout Control ---
-
-
-# Resize Master Width
-riverctl map normal $mod Equal send-layout-cmd wideriver "ratio +0.05"
-riverctl map normal $mod Minus send-layout-cmd wideriver "ratio -0.05"
-
-# Count Control
-riverctl map normal $mod BracketLeft send-layout-cmd wideriver "count +1"
-riverctl map normal $mod BracketRight send-layout-cmd wideriver "count -1"
 
 # --- Rules ---
 riverctl rule-add -app-id "steam" -title "*notificationtoasts*" float
