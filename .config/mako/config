@@ -34,6 +34,20 @@ padding=1
 layer=overlay
 default-timeout=1000
 
+[app-name=yubikey-touch-detector]
+anchor=bottom-center
+width=200
+border-size=28
+border-radius=14
+border-color=#d79921ff
+background-color=#d79921ff
+text-color=#282828ff
+outer-margin=0,0,20,0
+padding=1
+layer=overlay
+default-timeout=0
+format=<b>Touch Yubikey</b>
+
 [anchor=bottom-center]
 max-visible=1
 
