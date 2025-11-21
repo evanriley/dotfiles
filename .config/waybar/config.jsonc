@@ -1,16 +1,26 @@
 {
     "layer": "top",
-    "exclusive": false,
-    "start_hidden": true,
+    "position": "bottom",
+    "width": 650,
+    "margin-bottom": 15,
+    "height": 40,
+    "spacing": 4,
+    "exclusive": false, 
+    "passthrough": false,
+    "fixed-center": true,
     "reload_style_on_change": true,
-    "margin-top": 233,
-    "modules-center": ["clock", "custom/separator", "tray"],
+
+    "modules-left": [],
+    "modules-center": ["clock"],
+    "modules-right": ["tray"],
+
     "clock": {
-      "format": " {:%a %b %H:%M}"
+        "format": "{:%A, %B %d   —   %I:%M %p}",
+        "tooltip": false
     },
-    "custom/separator": {
-      "format": "󰇙"
+
+    "tray": {
+        "icon-size": 18,
+        "spacing": 12
     }
 }
-
-

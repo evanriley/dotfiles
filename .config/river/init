@@ -3,6 +3,7 @@
 # --- Startup & Reset ---
 pkill -f mascen
 pkill -f swww-daemon
+pkill -f waybar
 # FORCE KILL any existing portals so they restart with the new variables below
 killall -q xdg-desktop-portal-wlr
 killall -q xdg-desktop-portal
@@ -21,6 +22,8 @@ export XDG_SESSION_TYPE="wayland"
 systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
 
+riverctl spawn "waybar"
+riverctl spawn "sh -c 'sleep 1; pkill -SIGUSR1 waybar'"
 riverctl spawn "swww-daemon"
 riverctl spawn "swww img /home/evan/Pictures/wallpapers/07u.png"
 riverctl spawn "/usr/lib/polkit-kde-authentication-agent-1"
@@ -51,6 +54,7 @@ riverctl map normal $mod Space spawn "appdrawer"
 riverctl map normal $mod Q close
 riverctl map normal $mod+Shift E exit
 riverctl map normal $mod+Alt L spawn "swaylock"
+riverctl map normal $mod+Shift M spawn "pkill -SIGUSR1 waybar"
 
 # Utility
 riverctl map normal $mod P spawn "powermenu"
