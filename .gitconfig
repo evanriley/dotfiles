@@ -28,7 +28,7 @@
 [user]
   name = Evan Riley
   email = evan@evanriley.net
-	signingkey = 6654D512E44E3D20
+	signingkey = /home/evan/.ssh/id_ed25519_sk.pub
 [commit]
 	gpgsign = true
 [difftool]
@@ -66,3 +66,4 @@
 	ui = auto
 [gpg]
 	program = gpg2
+	format = ssh
