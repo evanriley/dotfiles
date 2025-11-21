@@ -1,0 +1,134 @@
+#!/bin/sh
+
+# --- Startup & Reset ---
+pkill -f mascen
+pkill -f swww-daemon
+# FORCE KILL any existing portals so they restart with the new variables below
+killall -q xdg-desktop-portal-wlr
+killall -q xdg-desktop-portal
+# If using systemd, stop them there too just to be safe
+systemctl --user stop xdg-desktop-portal-wlr
+systemctl --user stop xdg-desktop-portal
+
+# --- Environment ---
+export MOZ_ENABLE_WAYLAND=1
+export QT_QPA_PLATFORM="wayland;xcb"
+export XDG_CURRENT_DESKTOP="river"
+export XDG_SESSION_TYPE="wayland"
+
+# --- Background Apps ---
+# We run these directly so the script waits for them to finish before moving on
+systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
+dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
+
+riverctl spawn "swww-daemon"
+riverctl spawn "swww img /home/evan/Pictures/wallpapers/07u.png"
+riverctl spawn "/usr/lib/polkit-kde-authentication-agent-1"
+
+# --- Display Configuration (EXACT REFRESH RATE) ---
+wlr-randr --output DP-1 --mode 5120x1440@119.978996 --scale 1 --transform normal --adaptive-sync enabled
+
+# --- Input Configuration ---
+riverctl set-repeat 50 300
+riverctl keyboard-layout -options "caps:none" us
+
+riverctl input pointer-* accel-profile flat
+riverctl input pointer-* pointer-accel 0.0
+riverctl input pointer-* tap enabled
+riverctl input pointer-* natural-scroll disabled
+
+riverctl focus-follows-cursor normal
+riverctl set-cursor-warp on
+riverctl hide-cursor timeout 3000
+riverctl xcursor-theme "Bibata-Original-Classic"
+
+# --- Keybindings ---
+mod="Super"
+
+# Core Apps
+riverctl map normal $mod Return spawn "ghostty"
+riverctl map normal $mod Space spawn "appdrawer"
+riverctl map normal $mod Q close
+riverctl map normal $mod+Shift E exit
+riverctl map normal $mod+Alt L spawn "swaylock"
+
+# Utility
+riverctl map normal $mod P spawn "powermenu"
+riverctl map normal $mod B spawn "bgselector"
+riverctl map normal $mod E spawn "nautilus"
+
+# Media Keys
+for mode in normal locked; do
+    riverctl map $mode None XF86AudioRaiseVolume  spawn "volumeosd up"
+    riverctl map $mode None XF86AudioLowerVolume  spawn "volumeosd down"
+    riverctl map $mode None XF86AudioMute         spawn "volumeosd mute"
+    riverctl map $mode None XF86AudioMicMute      spawn "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+    riverctl map $mode None XF86AudioPlay         spawn "playerctl play-pause"
+    riverctl map $mode None XF86AudioPrev         spawn "playerctl previous"
+    riverctl map $mode None XF86AudioNext         spawn "playerctl next"
+done
+
+# Screenshots
+riverctl map normal None Print spawn "screenshot"
+riverctl map normal Control Print spawn "screenshot-screen"
+riverctl map normal Alt Print spawn "screenshot-window"
+
+# --- Navigation (HJKL) ---
+
+# Focus 
+riverctl map normal $mod J focus-view next
+riverctl map normal $mod K focus-view previous
+riverctl map normal $mod L focus-view next
+riverctl map normal $mod H focus-view previous
+
+# Move Windows (Swap in stack)
+riverctl map normal $mod+Shift J swap next
+riverctl map normal $mod+Shift K swap previous
+riverctl map normal $mod+Shift L swap next
+riverctl map normal $mod+Shift H swap previous
+
+# Floating & Fullscreen
+riverctl map normal $mod V toggle-float
+riverctl map normal $mod+Shift F toggle-fullscreen
+
+# Tags
+for i in $(seq 1 9); do
+    tags=$((1 << ($i - 1)))
+    riverctl map normal $mod $i set-focused-tags $tags
+    riverctl map normal $mod+Shift $i set-view-tags $tags
+done
+
+# Mouse
+riverctl map-pointer normal $mod BTN_LEFT move-view
+riverctl map-pointer normal $mod BTN_RIGHT resize-view
+riverctl map-pointer normal $mod BTN_MIDDLE toggle-float
+
+# --- Layout Control ---
+
+
+# Resize Master Width
+riverctl map normal $mod Equal send-layout-cmd wideriver "ratio +0.05"
+riverctl map normal $mod Minus send-layout-cmd wideriver "ratio -0.05"
+
+# Count Control
+riverctl map normal $mod BracketLeft send-layout-cmd wideriver "count +1"
+riverctl map normal $mod BracketRight send-layout-cmd wideriver "count -1"
+
+# --- Rules ---
+riverctl rule-add -app-id "steam" -title "*notificationtoasts*" float
+riverctl rule-add -app-id "Plexamp" float
+riverctl rule-add -app-id "authenticator" float
+riverctl rule-add -title "Friends List" float
+
+# --- Start Layout Generator (Center Master Fixed) ---
+
+# Logic:
+# 1. --layout left: Base vertical split.
+# 2. --count-wide-left 1: Pushes exactly 1 stack window to the left side.
+# 3. --ratio-master 0.50: Forces the Center Window (Master) to be 50% width.
+# 4. --ratio-wide 0.25: Forces the Left Stack Window to be 25% width.
+#    (This leaves the remaining 25% for the Right Stack).
+
+mascen --master-width 0.5 --gap 20 --inner-gap 10 --smart-gaps false &
+
+riverctl default-layout mascen
