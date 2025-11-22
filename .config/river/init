@@ -77,14 +77,12 @@ done
 
 # Screenshots
 
+# Ensure directory exist
 riverctl spawn "mkdir -p ~/Pictures/Screenshots"
-
-# Print: Interactive (Drag selection OR Click window)
-riverctl map normal None Print spawn 'grim -g "$(slurp)" "$HOME/Pictures/Screenshots/Screenshot-$(date +%Y-%m-%d-%H%M%S).png"'
-# Ctrl+Print: Full Screen (All monitors)
-riverctl map normal Control Print spawn 'grim "$HOME/Pictures/Screenshots/Screenshot-$(date +%Y-%m-%d-%H%M%S).png"'
-# Alt+Print: Focused Window Only (Auto-detects geometry)
-riverctl map normal Alt Print spawn 'grim -g "$(riverctl list-views | jq -r ".[] | select(.focused) | \"\(.bbox.x),\(.bbox.y) \(.bbox.width)x\(.bbox.height)\"")" "$HOME/Pictures/Screenshots/Screenshot-$(date +%Y-%m-%d-%H%M%S).png"'
+# Print: Interactive (Drag selection OR Click window) — saves and copies
+riverctl map normal None Print spawn 'grim -g "$(slurp)" - | tee "$HOME/Pictures/Screenshots/Screenshot-$(date +%Y-%m-%d-%H%M%S).png" | wl-copy'
+# Ctrl+Print: Full Screen (All monitors) — saves and copies
+riverctl map normal Control Print spawn 'grim - | tee "$HOME/Pictures/Screenshots/Screenshot-$(date +%Y-%m-%d-%H%M%S).png" | wl-copy'
 
 # --- Navigation (HJKL) ---
 
