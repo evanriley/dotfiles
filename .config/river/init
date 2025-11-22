@@ -62,6 +62,7 @@ riverctl map normal $mod+Shift M spawn "pkill -SIGUSR1 waybar"
 # Utility
 riverctl map normal $mod P spawn "powermenu"
 riverctl map normal $mod B spawn "bgselector"
+riverctl map normal $mod O spawn "outputselector"
 riverctl map normal $mod E spawn "nautilus"
 
 # Media Keys

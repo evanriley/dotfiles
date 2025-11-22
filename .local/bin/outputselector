@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# Icon glyphs (Material Symbols Rounded)
+speaker="$(printf '\ue32e')"
+headset="$(printf '\ue310')"
+
+chosen="$(printf '%s\n%s\n' "$speaker" "$headset" \
+          | rofi -dmenu -config ~/.config/rofi/powermenu.rasi)"
+
+case "$chosen" in
+  "$speaker")
+    pactl set-default-sink alsa_output.usb-Focusrite_Scarlett_Solo_4th_Gen_S1RPPCD3992A5C-00.HiFi__Line1__sink
+    ;;
+  "$headset")
+    pactl set-default-sink alsa_output.usb-Topping_DX5_II-00.HiFi__Headphones__sink
+    ;;
+  *) exit 0 ;;
+esac
