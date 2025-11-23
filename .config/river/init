@@ -48,6 +48,13 @@ riverctl set-cursor-warp disabled
 riverctl hide-cursor timeout 3000
 riverctl xcursor-theme "Bibata-Original-Classic"
 
+# --- Border Settings ---
+riverctl rule-add ssd
+riverctl background-color 0x002b36
+riverctl border-width 2
+riverctl border-color-focused 0x417563
+riverctl border-color-unfocused 0x00000000
+
 # --- Keybindings ---
 mod="Super"
 
