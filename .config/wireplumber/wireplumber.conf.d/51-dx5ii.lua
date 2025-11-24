@@ -1,6 +1,6 @@
 rule = {
 	matches = {
-		{ { "device.name", "equals", "alsa_output.usb-Topping_DX5_II-00.HiFi__Headphones__sink" } },
+		{ { "device.name", "equals", "alsa_output.usb-Topping_DX5_II-00.pro-output-0" } },
 	},
 	apply_properties = {
 		["audio.rate"] = 0, -- 0 = follow source rate
