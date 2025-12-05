@@ -20,8 +20,8 @@ export XDG_SESSION_TYPE="wayland"
 
 # --- Background Apps ---
 # We run these directly so the script waits for them to finish before moving on
-systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
-dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE
+systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY QT_QPA_PLATFORM
+dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY QT_QPA_PLATFORM
 
 mako &
 yubikey-touch-detector -libnotify &
@@ -131,6 +131,9 @@ riverctl rule-add -title "Picture-in-Picture" csd
 riverctl rule-add -title "Picture-in-Picture" tags $all_tags
 
 riverctl rule-add -app-id "steam_app_*" csd # csd steam games
+riverctl rule-add -app-id "gamescope" csd # csd steam games
+riverctl rule-add -app-id "gamescope" float
+
 
 # --- Layout Generator  ---
 
