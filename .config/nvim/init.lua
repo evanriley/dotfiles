@@ -49,7 +49,7 @@ opt.foldenable = false
 opt.foldlevel = 99
 opt.completeopt = 'menuone,noinsert,noselect'
 
--- Statusline (minimal native)
+-- Statusline
 opt.laststatus = 2
 opt.statusline = [[%f %m%r%h%w%=%{v:lua.vim.lsp.status()} %l:%c %p%%]]
 
@@ -156,7 +156,7 @@ local path_package = vim.fn.stdpath 'data' .. '/site/'
 local mini_path = path_package .. 'pack/deps/start/mini.nvim'
 if not vim.uv.fs_stat(mini_path) then
   vim.cmd 'echo "Installing mini.nvim..." | redraw'
-  vim.fn.system { 'git', 'clone', '--filter=blob:none', 'https://github.com/echasnovski/mini.nvim', mini_path }
+  vim.fn.system { 'git', 'clone', '--filter=blob:none', 'https://github.com/mini-nvim/mini.nvim', mini_path }
   vim.cmd 'packadd mini.nvim | helptags ALL'
 end
 require('mini.deps').setup { path = { package = path_package } }
@@ -188,6 +188,10 @@ now(function()
   add 'neovim/nvim-lspconfig'
 end)
 
+now(function()
+  add 'rafamadriz/friendly-snippets'
+end)
+
 -- Mini modules
 now(function()
   require('mini.icons').setup()
@@ -202,8 +206,24 @@ later(function()
   require('mini.bufremove').setup()
   require('mini.trailspace').setup()
   require('mini.completion').setup { lsp_completion = { source_func = 'omnifunc', auto_setup = true } }
+
+  local gen_loader = require('mini.snippets').gen_loader
+  require('mini.snippets').setup {
+    snippets = {
+      gen_loader.from_lang(),
+    },
+  }
+
   vim.keymap.set('i', '<Tab>', function()
-    return vim.fn.pumvisible() == 1 and '<C-n>' or '<Tab>'
+    if vim.fn.pumvisible() == 1 then
+      return '<C-n>'
+    end
+    local can_expand = require('mini.snippets').session.get() ~= nil or (#require('mini.snippets').expand { insert = false } > 0)
+    if can_expand then
+      require('mini.snippets').expand()
+      return ''
+    end
+    return '<Tab>'
   end, { expr = true })
   vim.keymap.set('i', '<S-Tab>', function()
     return vim.fn.pumvisible() == 1 and '<C-p>' or '<S-Tab>'
@@ -211,6 +231,16 @@ later(function()
   vim.keymap.set('i', '<CR>', function()
     return vim.fn.pumvisible() == 1 and '<C-y>' or '<CR>'
   end, { expr = true })
+  vim.keymap.set({ 'i', 's' }, '<C-l>', function()
+    if require('mini.snippets').session.get() then
+      require('mini.snippets').session.jump 'next'
+    end
+  end, { desc = 'Jump to next snippet placeholder' })
+  vim.keymap.set({ 'i', 's' }, '<C-h>', function()
+    if require('mini.snippets').session.get() then
+      require('mini.snippets').session.jump 'prev'
+    end
+  end, { desc = 'Jump to prev snippet placeholder' })
   require('mini.move').setup {
     mappings = {
       left = '<M-S-h>',
@@ -274,7 +304,6 @@ later(function()
   end, { desc = 'Delete all buffers' })
 end)
 
--- Deferred plugins
 later(function()
   add 'ibhagwan/fzf-lua'
   require('fzf-lua').setup {
