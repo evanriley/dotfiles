@@ -59,7 +59,7 @@ riverctl border-color-unfocused 0x00000000
 mod="Super"
 
 # Core Apps
-riverctl map normal $mod Return spawn "ghostty"
+riverctl map normal $mod Return spawn "foot"
 riverctl map normal $mod Space spawn "appdrawer"
 riverctl map normal $mod Q close
 riverctl map normal $mod+Shift E exit
@@ -94,7 +94,7 @@ riverctl map normal Control Print spawn 'grim - | tee "$HOME/Pictures/Screenshot
 
 # --- Navigation (HJKL) ---
 
-# Focus 
+# Focus
 riverctl map normal $mod J focus-view next
 riverctl map normal $mod K focus-view previous
 riverctl map normal $mod L focus-view next
@@ -115,12 +115,24 @@ for i in $(seq 1 9); do
     tags=$((1 << ($i - 1)))
     riverctl map normal $mod $i set-focused-tags $tags
     riverctl map normal $mod+Shift $i set-view-tags $tags
+    riverctl map normal $mod+Control $i toggle-focused-tags $tags
 done
+
+# Scratchpad
+# Using the 20th tag (2^19) as the scratchpad
+scratch_tag=$((1 << 19))
+riverctl map normal $mod S toggle-focused-tags $scratch_tag
+riverctl map normal $mod+Shift S set-view-tags $scratch_tag
 
 # Mouse
 riverctl map-pointer normal $mod BTN_LEFT move-view
 riverctl map-pointer normal $mod BTN_RIGHT resize-view
 riverctl map-pointer normal $mod BTN_MIDDLE toggle-float
+
+
+# --- Layout Generator  ---
+mascen --master-width 0.5 --gap 20 --inner-gap 10 --smart-gaps false &
+riverctl default-layout mascen
 
 
 # --- Rules ---
@@ -134,9 +146,22 @@ riverctl rule-add -app-id "steam_app_*" csd # csd steam games
 riverctl rule-add -app-id "gamescope" csd # csd steam games
 riverctl rule-add -app-id "gamescope" float
 
+# spawn on right tag
+riverctl rule-add -app-id 'steam' -title "Steam" tags 2
+riverctl rule-add -app-id 'steam' -title "Friends List" tags 2
+riverctl rule-add -app-id 'org.nicotine_plus.Nicotine' tags 4
+riverctl rule-add -app-id 'org.mozilla.Thunderbird' tags 8
+riverctl rule-add -app-id 'com.borgbase.Vorta' tags 16
+riverctl rule-add -app-id 'firefox' tags 1
+riverctl rule-add -app-id 'discord' tags 1
 
-# --- Layout Generator  ---
+# autostart programs
+riverctl spawn "firefox"
+riverctl spawn "steam"
+riverctl spawn "nicotine"
+riverctl spawn "discord"
+riverctl spawn "vorta"
+riverctl spawn "thunderbird"
 
-mascen --master-width 0.5 --gap 20 --inner-gap 10 --smart-gaps false &
-
-riverctl default-layout mascen
+# boot sound
+mpv --quiet ~/.config/media/lovelyboot.ogg
