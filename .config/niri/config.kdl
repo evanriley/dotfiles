@@ -31,8 +31,8 @@ binds {
     MOD+SHIFT+SLASH {
         show-hotkey-overlay
     }
-    MOD+RETURN hotkey-overlay-title="Open Terminal: ghostty" {
-        spawn "ghostty"
+    MOD+RETURN hotkey-overlay-title="Open Terminal: foot" {
+        spawn "foot"
     }
     Mod+SPACE hotkey-overlay-title="Run an Application: rofi" {
         spawn "appdrawer"
@@ -336,7 +336,7 @@ binds {
     }
 }
 spawn-sh-at-startup "/usr/lib/polkit-kde-authentication-agent-1 &"
-spawn-sh-at-startup "swww img /home/evan/Pictures/wallpapers/07u.png"
+spawn-sh-at-startup "swww img /home/evan/Pictures/wallpapers/07.png"
 prefer-no-csd
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
 layout {
@@ -441,6 +441,12 @@ window-rule {
 }
 window-rule {
     match app-id="com.mitchellh.ghostty"
+    default-column-width {
+        proportion 0.25
+    }
+}
+window-rule {
+    match app-id="foot"
     default-column-width {
         proportion 0.25
     }
