@@ -1,7 +1,7 @@
+vim.loader.enable()
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ','
 
--- Options
 local opt = vim.opt
 opt.number = true
 opt.relativenumber = true
@@ -42,18 +42,50 @@ opt.undofile = true
 opt.splitright = true
 opt.splitbelow = true
 opt.smoothscroll = true
+opt.inccommand = 'split'
+opt.virtualedit = 'block'
+opt.breakindent = true
+opt.list = true
+opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 opt.confirm = true
 opt.foldmethod = 'expr'
 opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 opt.foldenable = false
 opt.foldlevel = 99
 opt.completeopt = 'menuone,noinsert,noselect'
+opt.cursorline = true
+opt.winborder = 'single'
+opt.termguicolors = true
+opt.swapfile = false
+opt.shortmess:append 'I'
 
--- Statusline
-opt.laststatus = 2
-opt.statusline = [[%f %m%r%h%w%=%{v:lua.vim.lsp.status()} %l:%c %p%%]]
+opt.laststatus = 3
+local function open_floating_term(cmd)
+  local width = math.ceil(vim.o.columns * 0.8)
+  local height = math.ceil(vim.o.lines * 0.8)
+  local row = math.ceil((vim.o.lines - height) / 2)
+  local col = math.ceil((vim.o.columns - width) / 2)
 
--- Keymaps
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_open_win(buf, true, {
+    style = 'minimal',
+    relative = 'editor',
+    width = width,
+    height = height,
+    row = row,
+    col = col,
+    border = 'rounded',
+  })
+  vim.fn.termopen(cmd)
+  vim.cmd 'startinsert'
+  vim.api.nvim_create_autocmd('TermClose', {
+    buffer = buf,
+    callback = function()
+      vim.cmd 'close'
+    end,
+  })
+end
+
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '<C-h>', '<C-w>h')
 vim.keymap.set('n', '<C-j>', '<C-w>j')
@@ -71,8 +103,13 @@ vim.keymap.set('n', 'N', 'Nzzzv')
 vim.keymap.set('n', '<C-s>', '<cmd>w<cr>')
 vim.keymap.set('i', '<C-s>', '<Esc><cmd>w<cr>')
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Open diagnostic float' })
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic list' })
+vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
--- Diagnostics
+vim.keymap.set('n', '<leader>om', function()
+  open_floating_term 'aerc'
+end, { desc = 'Open Mail (aerc)' })
+
 vim.diagnostic.config {
   severity_sort = true,
   float = { border = 'rounded', source = true },
@@ -88,8 +125,9 @@ vim.diagnostic.config {
   virtual_text = { spacing = 2 },
 }
 
--- Autocmds
 vim.api.nvim_create_autocmd('TextYankPost', {
+  desc = 'Highlight when yanking (copying) text',
+  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.hl.on_yank()
   end,
@@ -144,14 +182,9 @@ vim.api.nvim_create_autocmd('VimResized', {
   end,
 })
 
--- User commands
 vim.api.nvim_create_user_command('W', 'w', {})
 vim.api.nvim_create_user_command('Wq', 'wq', {})
 
--- LSP servers (nvim 0.11+ style)
-vim.lsp.enable { 'lua_ls', 'rust_analyzer', 'zls', 'clojure_lsp', 'ruff', 'gleam' }
-
--- Bootstrap mini.deps
 local path_package = vim.fn.stdpath 'data' .. '/site/'
 local mini_path = path_package .. 'pack/deps/start/mini.nvim'
 if not vim.uv.fs_stat(mini_path) then
@@ -163,7 +196,6 @@ require('mini.deps').setup { path = { package = path_package } }
 
 local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
--- Immediate loading (colorscheme, core functionality)
 now(function()
   add 'webhooked/kanso.nvim'
   require('kanso').setup { disableItalics = true, background = { dark = 'zen', light = 'pearl' } }
@@ -171,13 +203,31 @@ now(function()
 end)
 
 now(function()
+  add { source = 'folke/lazydev.nvim', checkout = 'main' }
+  require('lazydev').setup()
+end)
+
+vim.lsp.enable { 'lua_ls', 'rust_analyzer', 'zls', 'clojure_lsp', 'ruff', 'gleam' }
+
+now(function()
   add { source = 'nvim-treesitter/nvim-treesitter', hooks = {
     post_checkout = function()
       vim.cmd 'TSUpdate'
     end,
   } }
+
+  local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
+  parser_config.org = {
+    install_info = {
+      url = 'https://github.com/milisims/tree-sitter-org',
+      revision = 'main',
+      files = { 'src/parser.c', 'src/scanner.c' },
+    },
+    filetype = 'org',
+  }
+
   require('nvim-treesitter.configs').setup {
-    ensure_installed = { 'bash', 'c', 'clojure', 'elixir', 'gleam', 'go', 'lua', 'rust', 'zig', 'markdown', 'vim', 'vimdoc', 'toml', 'json', 'yaml' },
+    ensure_installed = { 'bash', 'c', 'clojure', 'elixir', 'gleam', 'go', 'lua', 'rust', 'zig', 'markdown', 'vim', 'vimdoc', 'toml', 'json', 'yaml', 'org' },
     auto_install = true,
     highlight = { enable = true },
     indent = { enable = true },
@@ -192,7 +242,6 @@ now(function()
   add 'rafamadriz/friendly-snippets'
 end)
 
--- Mini modules
 now(function()
   require('mini.icons').setup()
   require('mini.notify').setup()
@@ -241,6 +290,7 @@ later(function()
       require('mini.snippets').session.jump 'prev'
     end
   end, { desc = 'Jump to prev snippet placeholder' })
+
   require('mini.move').setup {
     mappings = {
       left = '<M-S-h>',
@@ -253,7 +303,9 @@ later(function()
       line_up = '<M-S-k>',
     },
   }
+
   require('mini.git').setup()
+
   require('mini.bracketed').setup()
   require('mini.hipatterns').setup {
     highlighters = {
@@ -264,7 +316,9 @@ later(function()
       hex_color = require('mini.hipatterns').gen_highlighter.hex_color(),
     },
   }
-  require('mini.clue').setup {
+
+  local clue = require 'mini.clue'
+  clue.setup {
     triggers = {
       { mode = 'n', keys = '<leader>' },
       { mode = 'x', keys = '<leader>' },
@@ -281,19 +335,24 @@ later(function()
       { mode = 'n', keys = '<C-w>' },
       { mode = 'n', keys = 'z' },
       { mode = 'x', keys = 'z' },
-      { mode = 'n', keys = '[' },
-      { mode = 'n', keys = ']' },
     },
     clues = {
-      require('mini.clue').gen_clues.builtin_completion(),
-      require('mini.clue').gen_clues.g(),
-      require('mini.clue').gen_clues.marks(),
-      require('mini.clue').gen_clues.registers(),
-      require('mini.clue').gen_clues.windows(),
-      require('mini.clue').gen_clues.z(),
+      clue.gen_clues.builtin_completion(),
+      clue.gen_clues.g(),
+      clue.gen_clues.marks(),
+      clue.gen_clues.registers(),
+      clue.gen_clues.windows(),
+      clue.gen_clues.z(),
+      -- Doom-like Groups
+      { mode = 'n', keys = '<leader>f', desc = '+Find/Files' },
+      { mode = 'n', keys = '<leader>b', desc = '+Buffers' },
+      { mode = 'n', keys = '<leader>g', desc = '+Git' },
+      { mode = 'n', keys = '<leader>p', desc = '+Project' },
+      { mode = 'n', keys = '<leader>o', desc = '+Open/Org' },
     },
-    window = { delay = 1000 },
+    window = { delay = 500 },
   }
+
   vim.keymap.set('n', '<leader>bd', function()
     require('mini.bufremove').delete(0, false)
   end, { desc = 'Delete buffer' })
@@ -328,6 +387,39 @@ later(function()
   vim.keymap.set('n', '<leader>/', function()
     require('fzf-lua').blines()
   end, { desc = 'Search buffer' })
+
+  -- Doom: Project Switcher (requires zoxide installed on system)
+  vim.keymap.set('n', '<leader>pp', function()
+    require('fzf-lua').zoxide()
+  end, { desc = 'Switch Project' })
+end)
+
+later(function()
+  add 'nvim-orgmode/orgmode'
+  add 'akinsho/org-bullets.nvim'
+  require('orgmode').setup {
+    org_agenda_files = '~/cloud/org/**/*',
+    org_default_notes_file = '~/cloud/org/refile.org',
+  }
+  require('org-bullets').setup()
+
+  vim.keymap.set('n', '<leader>oa', function()
+    vim.cmd 'OrgAgenda'
+  end, { desc = 'Org Agenda' })
+  vim.keymap.set('n', '<leader>oc', function()
+    require('orgmode').action 'capture.prompt'
+  end, { desc = 'Org Capture' })
+end)
+
+later(function()
+  -- Doom: Git (Neogit)
+  add 'nvim-lua/plenary.nvim'
+  add 'sindrets/diffview.nvim'
+  add 'NeogitOrg/neogit'
+  require('neogit').setup {}
+  vim.keymap.set('n', '<leader>gg', function()
+    require('neogit').open()
+  end, { desc = 'Magit (Neogit)' })
 end)
 
 later(function()
@@ -371,7 +463,6 @@ later(function()
   }
 end)
 
--- Filetype-specific: Clojure
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'clojure',
   once = true,
