@@ -17,11 +17,13 @@ export MOZ_ENABLE_WAYLAND=1
 export QT_QPA_PLATFORM="wayland;xcb"
 export XDG_CURRENT_DESKTOP="river"
 export XDG_SESSION_TYPE="wayland"
+export GTK_THEME="Adwaita:dark"
+export QT_QPA_PLATFORMTHEME="gtk3"
 
 # --- Background Apps ---
 # We run these directly so the script waits for them to finish before moving on
-systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY QT_QPA_PLATFORM
-dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY QT_QPA_PLATFORM
+systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY QT_QPA_PLATFORM QT_QPA_PLATFORMTHEME GTK_THEME
+dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP XDG_SESSION_TYPE DISPLAY QT_QPA_PLATFORM QT_QPA_PLATFORMTHEME GTK_THEME
 
 mako &
 yubikey-touch-detector -libnotify &
