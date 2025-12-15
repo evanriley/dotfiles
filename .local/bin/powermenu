@@ -21,7 +21,8 @@ case "$chosen" in
     ;;
   "$logout")
     # niri msg action quit
-    riverctl exit
+    # riverctl exit
+    mmsg -q
     ;;
   *)
     exit 0
