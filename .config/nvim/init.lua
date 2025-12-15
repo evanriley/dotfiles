@@ -197,9 +197,12 @@ require('mini.deps').setup { path = { package = path_package } }
 local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
 now(function()
-  add 'webhooked/kanso.nvim'
-  require('kanso').setup { disableItalics = true, background = { dark = 'zen', light = 'pearl' } }
-  vim.cmd.colorscheme 'kanso'
+  add 'sainnhe/gruvbox-material'
+  vim.g.gruvbox_material_enable_italic = false
+  vim.g.gruvbox_material_background = 'medium'
+  vim.g.gruvbox_material_foreground = 'original'
+  vim.o.background = dark
+  vim.cmd.colorscheme 'gruvbox-material'
 end)
 
 now(function()
@@ -209,28 +212,23 @@ end)
 
 vim.lsp.enable { 'lua_ls', 'rust_analyzer', 'zls', 'clojure_lsp', 'ruff', 'gleam' }
 
-now(function()
-  add { source = 'nvim-treesitter/nvim-treesitter', hooks = {
-    post_checkout = function()
-      vim.cmd 'TSUpdate'
-    end,
-  } }
-
-  local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
-  parser_config.org = {
-    install_info = {
-      url = 'https://github.com/milisims/tree-sitter-org',
-      revision = 'main',
-      files = { 'src/parser.c', 'src/scanner.c' },
+later(function()
+  add {
+    source = 'nvim-treesitter/nvim-treesitter',
+    hooks = {
+      post_checkout = function()
+        vim.cmd 'TSUpdate'
+      end,
     },
-    filetype = 'org',
-  }
-
-  require('nvim-treesitter.configs').setup {
-    ensure_installed = { 'bash', 'c', 'clojure', 'elixir', 'gleam', 'go', 'lua', 'rust', 'zig', 'markdown', 'vim', 'vimdoc', 'toml', 'json', 'yaml', 'org' },
-    auto_install = true,
-    highlight = { enable = true },
-    indent = { enable = true },
+    -- *** This 'config' function runs right after the plugin is on the runtime path ***
+    config = function()
+      require('nvim-treesitter.configs').setup {
+        ensure_installed = { 'bash', 'c', 'clojure', 'elixir', 'gleam', 'go', 'lua', 'rust', 'zig', 'markdown', 'vim', 'vimdoc', 'toml', 'json', 'yaml' },
+        auto_install = true,
+        highlight = { enable = true },
+        indent = { enable = true },
+      }
+    end,
   }
 end)
 
@@ -348,7 +346,6 @@ later(function()
       { mode = 'n', keys = '<leader>b', desc = '+Buffers' },
       { mode = 'n', keys = '<leader>g', desc = '+Git' },
       { mode = 'n', keys = '<leader>p', desc = '+Project' },
-      { mode = 'n', keys = '<leader>o', desc = '+Open/Org' },
     },
     window = { delay = 500 },
   }
@@ -392,23 +389,6 @@ later(function()
   vim.keymap.set('n', '<leader>pp', function()
     require('fzf-lua').zoxide()
   end, { desc = 'Switch Project' })
-end)
-
-later(function()
-  add 'nvim-orgmode/orgmode'
-  add 'akinsho/org-bullets.nvim'
-  require('orgmode').setup {
-    org_agenda_files = '~/cloud/org/**/*',
-    org_default_notes_file = '~/cloud/org/refile.org',
-  }
-  require('org-bullets').setup()
-
-  vim.keymap.set('n', '<leader>oa', function()
-    vim.cmd 'OrgAgenda'
-  end, { desc = 'Org Agenda' })
-  vim.keymap.set('n', '<leader>oc', function()
-    require('orgmode').action 'capture.prompt'
-  end, { desc = 'Org Capture' })
 end)
 
 later(function()
