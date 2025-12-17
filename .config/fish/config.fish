@@ -26,3 +26,6 @@ mise activate fish | source
 
 # opencode
 fish_add_path /home/evan/.opencode/bin
+
+set -gx PATH $PATH /home/evan/.lmstudio/bin
+
