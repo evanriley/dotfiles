@@ -12,7 +12,7 @@ swaync -c ~/.config/swaync/config.jsonc -s ~/.config/swaync/style.css >/dev/null
 wlsunset -l 35.9 -L -78.8 >/dev/null 2>&1 &
 
 # wallpaper
-swaybg -i ~/Pictures/wallpapers/gruv-commit.png -m "center" -c "#282828" >/dev/null 2>&1 &
+swaybg -i ~/Pictures/wallpapers/portal-wide.png -m "center" -c "#282828" >/dev/null 2>&1 &
 
 # waybar
 waybar -c ~/.config/waybar/config.jsonc -s ~/.config/waybar/style.css >/dev/null 2>&1 &
@@ -35,5 +35,16 @@ blueman-applet >/dev/null 2>&1 &
 # volume control
 swayosd-server >/dev/null 2>&1 &
 
-# boot sound
-mpv --quiet ~/.config/media/lovelyboot.ogg
+# swayidle
+swayidle -w \
+    timeout 600 'hyprlock --grace 10' \
+    timeout 1200 'systemctl suspend' \
+    before-sleep 'hyprlock' &
+
+# autostart some programs
+firefox &
+discord &
+steam &
+thunderbird &
+vorta &
+nicotine &
