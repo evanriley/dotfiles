@@ -1,16 +1,19 @@
 // -*- mode: jsonc -*-
 {
-  //"layer": "top", // Waybar at top layer
-  "position": "top", // Waybar position (top|bottom|left|right)
+  "layer": "overlay", // Waybar at top layer
+  "position": "bottom", // Waybar position (top|bottom|left|right)
+  "exclusive": false,
   "height": 0,
   "spacing": 0, // Gaps between modules (4px)
+  "margin-left": 1287,
+  "margin-right": 1287,
   "reload_style_on_change": true,
-  "group/cpuntemp": {
+   "group/cpuntemp": {
     "orientation": "horizontal",
-    "on-click": "alacritty",
-    "modules": ["cpu", "temperature#cpu"],
+    "modules": ["cpu", "temperature#cpu"]
   },
   "modules-right": [
+    "mpd",
     "tray",
     "group/pulseaudionslider",
     "network#ethernet",
@@ -19,18 +22,38 @@
   "modules-center": ["dwl/window"],
   "modules-left": [
     "clock",
-    "battery",
     "group/cpuntemp",
     "memory",
-    "disk",
+    "disk"
   ],
-  "group/pulseaudionslider": {
+   "group/pulseaudionslider": {
     "orientation": "horizontal",
-    "modules": ["pulseaudio", "pulseaudio/slider"],
+    "modules": ["pulseaudio", "pulseaudio/slider"]
   },
-  "group/backlightnslider": {
-    "orientation": "horizontal",
-    "modules": ["backlight", "backlight/slider"],
+  "mpd": {
+    "format": "{stateIcon} {artist} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ",
+    "format-disconnected": "Disconnected ",
+    "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped ",
+    "interval": 10,
+    "consume-icons": {
+      "on": " " // Icon shows only when "consume" is on
+    },
+    "random-icons": {
+      "off": "<span color=\"#f53c3c\"></span> ", // Icon grayed out when "random" is off
+      "on": " "
+    },
+    "repeat-icons": {
+      "on": " "
+    },
+    "single-icons": {
+      "on": "1 "
+    },
+    "state-icons": {
+      "paused": "",
+      "playing": ""
+    },
+    "tooltip-format": "MPD (connected)",
+    "tooltip-format-disconnected": "MPD (disconnected)"
   },
   "clock": {
     "locale": "en_US.UTF-8",
@@ -48,37 +71,22 @@
         "days": "<span color='#e8e1dd'><b>{}</b></span>",
         "weeks": "<span color='#efe0cf'><b>W{}</b></span>",
         "weekdays": "<span color='#efe0cf'><b>{}</b></span>",
-        "today": "<span bgcolor='#efe0cf' color='#000000'><b>{}</b></span>",
-      },
+        "today": "<span bgcolor='#efe0cf' color='#000000'><b>{}</b></span>"
+      }
     },
     "actions": {
       "on-click-middle": "mode",
       "on-click-forward": "tz_up",
       "on-click-backward": "tz_down",
       "on-scroll-up": "shift_up",
-      "on-scroll-down": "shift_down",
-    },
-  },
-  "battery": {
-    "bat": "BAT0",
-    "interval": 20,
-    "states": {
-      "warning": 30,
-      "critical": 15,
-    },
-    "format": "{icon} <span foreground=\"#e8e1dd\">{capacity}%</span>",
-    "format-charging": "{icon}󱐋 {capacity}%",
-    "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
-    "max-length": 25,
-    "tooltip": true,
-    "tooltip-format": "Time: {time} left\nCapacity: {health}%\n{power} watts",
+      "on-scroll-down": "shift_down"
+    }
   },
   "cpu": {
     "interval": 2,
     "format": " <span foreground=\"#e8e1dd\">{usage}%</span>",
     "max-length": 10,
     "tooltip": true,
-    "on-click": "waybar-scripts htop_cpu",
   },
   "memory": {
     "interval": 2,
@@ -86,7 +94,6 @@
     "tooltip": true,
     "tooltip-format": "{used:0.1f}GiB used\n{avail:0.1f}GiB available",
     "max-length": 10,
-    "on-click": "waybar-scripts htop_mem",
   },
   "temperature#cpu": {
     // for i in /sys/class/hwmon/hwmon*/temp*_input; do                                                3:11:15
@@ -96,15 +103,14 @@
     "critical-threshold": 90,
     "interval": 2,
     "format-critical": " {temperatureC}°C",
-    "format": " <span foreground=\"#e8e1dd\">{temperatureC}°C</span>",
-    "on-click": "waybar-scripts htop_cpu",
+    "format": " <span foreground=\"#e8e1dd\">{temperatureC}°C</span>"
   },
   "disk": {
     "interval": 60,
     "format": "󰋊 <span foreground=\"#e8e1dd\">{percentage_used}%</span>",
     "tooltip": true,
     "tooltip-format": "Free: {free} ({percentage_free}%)\nTotal: {total}",
-    "path": "/",
+    "path": "/"
   },
   "network#ethernet": {
     "interface": "enp10s0",
@@ -116,7 +122,7 @@
     "tooltip-format-wifi": "SSID: {essid}\nIP: {ipaddr}",
     "tooltip-format-ethernet": "IP Address: {ipaddr}/{gwaddr}\nInterface: {ifname}",
     "tooltip-format-disconnected": "",
-    "max-length": 50,
+    "max-length": 50
   },
   "pulseaudio": {
     "format": "{volume} {icon}",
@@ -134,20 +140,19 @@
       "phone-muted": "",
       "portable": "",
       "car": "",
-      "default": ["󰕿", "󰖀", "󰕾"],
+      "default": ["󰕿", "󰖀", "󰕾"]
     },
     "scroll-step": 1,
     "on-click-right": "pavucontrol",
-    "on-click": "waybar-scripts switch_audio_sink",
-    "ignored-sinks": ["Easy Effects Sink"],
+    "ignored-sinks": ["Easy Effects Sink"]
   },
   "pulseaudio/slider": {
     "min": 0,
     "max": 120,
-    "orientation": "horizontal",
+    "orientation": "horizontal"
   },
   "tray": {
     "icon-size": 15,
-    "spacing": 10,
+    "spacing": 10
   }
 }
