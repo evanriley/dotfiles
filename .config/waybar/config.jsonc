@@ -1,0 +1,112 @@
+{
+  "reload_style_on_change": true,
+  "layer": "top",
+  "position": "top",
+  "spacing": 0,
+  "height": 28,
+  "modules-left": [
+    "hyprland/workspaces"
+  ],
+  "modules-center": [
+    "mpris"
+  ],
+  "modules-right": [
+    "memory",
+    "disk",
+    "network",
+    "pulseaudio",
+    "clock",
+    "tray"
+  ],
+  "hyprland/workspaces": {
+    "on-click": "activate",
+    "format": "{icon}",
+    "format-icons": {
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "10",
+      "default": ""
+    }
+  },
+  "disk": {
+    "interval": 30,
+    "format": "󱛟 {percentage_free}%",
+    "tooltip-format": "Used: {used}\nFree: {free}\nTotal: {total}",
+    "path": "/"
+  },
+  "cpu": {
+    "interval": 2,
+    "format": "󰍛 {usage}%",
+    "on-click": "kitty -e btop"
+  },
+  "memory": {
+    "format": " {used:0.1f}gb",
+    "interval": 2,
+    "on-click": "kitty -e btop"
+  },
+  "clock": {
+    "format": "{:L%H:%M}",
+    "format-alt": "{:L%A %d %B}",
+    "tooltip": false
+  },
+  "network": {
+    "format-icons": [
+      "󰤯",
+      "󰤟",
+      "󰤢",
+      "󰤥",
+      "󰤨"
+    ],
+    "format": "{icon} {essid}",
+    "format-wifi": "{icon}",
+    "format-ethernet": "󰀂",
+    "format-disconnected": "󰤮",
+    "tooltip-format-wifi": "{essid} ({frequency} GHz)\n⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
+    "tooltip-format-ethernet": "⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
+    "tooltip-format-disconnected": "Disconnected",
+    "interval": 3,
+    "spacing": 1,
+    "on-click": "kitty -e --class=impala impala"
+  },
+  "pulseaudio": {
+    "format": "{icon}",
+    "on-click": "kitty --class=Wiremix -e wiremix",
+    "on-click-right": "pamixer -t",
+    "tooltip-format": "🎵 {volume}%",
+    "scroll-step": 5,
+    "format-muted": "",
+    "format-icons": {
+      "default": [
+        "",
+        "",
+        ""
+      ]
+    }
+  },
+  "tray": {
+    "icon-size": 13,
+    "spacing": 4
+  },
+  "mpris": {
+    "format": " {player_icon} {artist} - {title}",
+    "format-paused": "{status_icon} <i>{artist} - {title}</i>",
+    "player-icons": {
+      "default": "🎵",
+      "spotify": "🎵",
+      "mpv": "🎵",
+      "mpd": ""
+    },
+    "player": "mpd",
+    "status-icons": {
+      "paused": "⏸"
+    },
+    "max-length": 70
+  }
+}

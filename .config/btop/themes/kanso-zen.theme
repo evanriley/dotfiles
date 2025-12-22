@@ -1,0 +1,76 @@
+# Kanso Zen Theme for btop
+# Main background (Kanso BG)
+theme[main_bg]="#090E13"
+
+# Main text color (Kanso FG)
+theme[main_fg]="#C5C9C7"
+
+# Title color for boxes (Kanso Blue)
+theme[title]="#8ba4b0"
+
+# Highlight color for keyboard shortcuts (Kanso Red Bright)
+theme[hi_fg]="#E46876"
+
+# Background color of selected item in processes box (Kanso Selection BG)
+theme[selected_bg]="#393B44"
+
+# Foreground color of selected item (Kanso FG)
+theme[selected_fg]="#C5C9C7"
+
+# Color of inactive/disabled text (Kanso Gray/Comments)
+theme[inactive_fg]="#A4A7A4"
+
+# Misc colors for mini cpu graphs/details (Kanso Cyan)
+theme[proc_misc]="#8ea4a2"
+
+# Box outline colors (Kanso Selection/Gray)
+theme[cpu_box]="#393B44"
+theme[mem_box]="#393B44"
+theme[net_box]="#393B44"
+theme[proc_box]="#393B44"
+
+# Divider line color
+theme[div_line]="#393B44"
+
+# --- Gradients ---
+# Strategy: Start 'Zen' (Sage/Blue), transition to 'Warn' (Sand), end 'Danger' (Clay/Red)
+
+# Temperature: Sage -> Sand -> Red
+theme[temp_start]="#8a9a7b"
+theme[temp_mid]="#c4b28a"
+theme[temp_end]="#c4746e"
+
+# CPU: Sage -> Sand -> Red
+theme[cpu_start]="#8a9a7b"
+theme[cpu_mid]="#c4b28a"
+theme[cpu_end]="#c4746e"
+
+# Free Memory: Cyan -> Blue (Cool colors for empty space)
+theme[free_start]="#8ea4a2"
+theme[free_mid]="#8ba4b0"
+theme[free_end]="#7FB4CA"
+
+# Cached: Gray -> Purple (Subtle)
+theme[cached_start]="#A4A7A4"
+theme[cached_mid]="#a292a3"
+theme[cached_end]="#938AA9"
+
+# Available: Sage -> Cyan
+theme[available_start]="#8a9a7b"
+theme[available_mid]="#8ea4a2"
+theme[available_end]="#8ba4b0"
+
+# Used: Sage -> Sand -> Red
+theme[used_start]="#8a9a7b"
+theme[used_mid]="#c4b28a"
+theme[used_end]="#c4746e"
+
+# Download: Cyan -> Blue -> Purple
+theme[download_start]="#8ea4a2"
+theme[download_mid]="#8ba4b0"
+theme[download_end]="#938AA9"
+
+# Upload: Purple -> Red
+theme[upload_start]="#a292a3"
+theme[upload_mid]="#c4746e"
+theme[upload_end]="#E46876"
