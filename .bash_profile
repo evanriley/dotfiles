@@ -17,4 +17,6 @@ export QT_QPA_PLATFORM="wayland;xcb"
 export GDK_BACKEND=wayland,x11
 export CLUTTER_BACKEND=wayland
 
+export BROWSER=qutebrowser
+
 alias hypr="dbus-run-session Hyprland"
