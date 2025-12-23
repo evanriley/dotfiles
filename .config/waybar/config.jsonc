@@ -75,7 +75,6 @@
     "tooltip-format-disconnected": "Disconnected",
     "interval": 3,
     "spacing": 1,
-    "on-click": "kitty -e --class=impala impala"
   },
   "pulseaudio": {
     "format": "{icon}",
