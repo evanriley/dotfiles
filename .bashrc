@@ -87,12 +87,17 @@ alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 alias ip='ip -c'
 
+alias gsync='doas emaint --auto sync'
+alias gupdate='doas emerge --ask --verbose --update --deep --newuse @world'
+alias gclean='doas emerge --ask --depclean'
+alias glogs='ls -lt /var/tmp/portage/*/*/temp/build.log'
+
 # Clojure REPL
 alias clj-repl='clj "-J-Dclojure.server.repl={:port 5555 :accept clojure.core.server/repl :server-daemon false}"'
 
 if command -v zoxide &> /dev/null; then
     eval "$(zoxide init bash)"
-    alias cd='z' # Optional: replaces cd with zoxide entirely
+    alias cd='z'
 fi
 
 if command -v mise &> /dev/null; then
