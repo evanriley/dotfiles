@@ -1,0 +1,51 @@
+[mgr]
+layout         = [ 1, 4, 3 ]  # Parent: 1, Current: 4, Preview: 3 ratio
+sort_by        = "natural"
+sort_sensitive = false
+sort_reverse   = false
+sort_dir_first = true
+linemode       = "size"
+show_hidden    = true
+show_symlink   = true
+scrolloff      = 5            # Keep context above/below cursor
+
+[preview]
+tab_size       = 2
+max_width      = 600
+max_height     = 900
+cache_dir      = ""
+image_filter   = "lanczos3"   # High quality scaling
+image_quality  = 90
+sixel_fraction = 15
+
+[opener]
+edit = [
+    { run = 'nvim "$@"', block = true, desc = "Neovim" }
+]
+play = [
+    { run = 'mpv "$@"', orphan = true, desc = "MPV" }
+]
+open = [
+    { run = 'xdg-open "$@"', desc = "Open", orphan = true }
+]
+# Specific wrappers for your tools to ensure they detach correctly
+view_pdf = [
+    { run = 'zathura "$@"', orphan = true, desc = "Zathura" }
+]
+view_img = [
+    { run = 'imv "$@"', orphan = true, desc = "Imv" }
+]
+
+[open]
+rules = [
+    { name = "*/", use = [ "edit", "open", "reveal" ] },
+
+    { mime = "text/*",  use = [ "edit", "reveal" ] },
+    { mime = "image/*", use = [ "view_img", "reveal" ] },
+    { mime = "video/*", use = [ "play", "reveal" ] },
+    { mime = "audio/*", use = [ "play", "reveal" ] },
+    { mime = "inode/x-empty", use = [ "edit", "reveal" ] },
+    { mime = "application/json", use = [ "edit", "reveal" ] },
+    { mime = "application/pdf", use = [ "view_pdf", "reveal" ] },
+    { name = "*", use = [ "open", "reveal" ] },
+]

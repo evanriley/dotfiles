@@ -1,0 +1,61 @@
+[manager]
+cwd = { fg = "#7FB4CA" } # Bright Blue
+
+# Hovered file (The cursor)
+hovered         = { fg = "#C5C9C7", bg = "#22262D" } # Main FG on Selection BG
+preview_hovered = { underline = true }
+
+# Find/Search matches
+find_keyword  = { fg = "#E6C384", italic = true } # Bright Yellow
+find_position = { fg = "#938AA9", bg = "reset", italic = true } # Bright Magenta
+
+# Markers (Selected files)
+marker_copied   = { fg = "#87A987", bg = "#87A987" } # Bright Green
+marker_cut      = { fg = "#E46876", bg = "#E46876" } # Bright Red
+marker_selected = { fg = "#7FB4CA", bg = "#7FB4CA" } # Bright Blue
+
+# Tab bar
+tab_active   = { fg = "#090E13", bg = "#7FB4CA" } # Bg on Blue
+tab_inactive = { fg = "#C5C9C7", bg = "#22262D" } # FG on Selection
+tab_width    = 1
+
+# Border colors
+border_symbol = "│"
+border_style  = { fg = "#8BA4B0" } # Normal Blue (muted)
+
+[status]
+separator_open  = ""
+separator_close = ""
+separator_style = { fg = "#22262D", bg = "#22262D" }
+
+# Mode colors
+mode_normal = { fg = "#090E13", bg = "#7FB4CA", bold = true } # Blue
+mode_select = { fg = "#090E13", bg = "#938AA9", bold = true } # Magenta
+mode_unset  = { fg = "#090E13", bg = "#E46876", bold = true } # Red
+
+progress_label  = { fg = "#ffffff", bold = true }
+progress_normal = { fg = "#22262D", bg = "#C5C9C7" }
+progress_error  = { fg = "#E46876", bg = "#22262D" }
+
+[filetype]
+rules = [
+    # Images
+    { mime = "image/*", fg = "#E6C384" }, # Yellow
+
+    # Videos
+    { mime = "video/*", fg = "#938AA9" }, # Magenta
+
+    # Archives
+    { mime = "application/zip", fg = "#E46876" }, # Red
+    { mime = "application/gzip", fg = "#E46876" },
+    { mime = "application/x-tar", fg = "#E46876" },
+
+    # Documents
+    { mime = "application/pdf", fg = "#7FB4CA" }, # Blue
+
+    # Executables
+    { permissions = "x", fg = "#87A987" }, # Green
+    
+    # Directories
+    { is_dir = true, fg = "#7FB4CA", bold = true }, # Blue
+]
