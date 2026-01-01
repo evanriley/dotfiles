@@ -339,6 +339,9 @@ binds {
     MOD+CTRL+T {
 	spawn-sh "~/.config/scripts/ns.py -id scratch_btop"
     }
+    MOD+B {
+	spawn-sh "killall -SIGUSR1 waybar"
+    }
     XF86AudioRaiseVolume allow-when-locked=true {
         spawn "swayosd-client" "--output-volume" "raise"
     }
