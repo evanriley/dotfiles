@@ -115,7 +115,7 @@ layout {
 spawn-at-startup "awww" "restore"
 spawn-at-startup "kitty" "--class" "scratch_rmpc" "-e" "rmpc"
 spawn-at-startup "kitty" "--class" "scratch_btop" "-e" "btop"
-spawn-at-startup "flatpak" "run" "org.mozzila.firefox"
+spawn-at-startup "flatpak" "run" "org.mozilla.firefox"
 spawn-at-startup "flatpak" "run" "com.discordapp.Discord"
 spawn-at-startup "flatpak" "run" "com.valvesoftware.Steam"
 spawn-at-startup "flatpak" "run" "org.nicotine_plus.Nicotine"
@@ -258,6 +258,7 @@ window-rule {
 }
 window-rule {
     match title="Friends List"
+    open-on-workspace "games"
     default-column-width {
         fixed 600
     }
