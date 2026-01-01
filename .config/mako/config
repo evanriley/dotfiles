@@ -3,15 +3,24 @@ max-history=20
 sort=-time
 
 # --- Style ---
+background-color=#0d0d0dff
+text-color=#f2f2f2ff
+border-color=#2a2a2aff
+progress-color=over #5588AAFF
+
+# Geometry & Font
 border-radius=0
 border-size=1
 font=Berkeley Mono 10
 height=120
+width=400
 margin=10
 outer-margin=20
 padding=12,16
-width=400
-progress-color=over #5588AAFF
+
+# Layout
+anchor=top-right
+layer=top
 icons=1
 max-icon-size=24
 icon-location=left
@@ -19,186 +28,18 @@ markup=1
 actions=1
 history=1
 text-alignment=left
+
+# Default Format (Applied to everything)
+format=<b>%s</b>\n%b
 default-timeout=10000
-
 ignore-timeout=0
-anchor=top-right
-layer=top
 
-# Bindings
+# --- Bindings ---
 on-button-left=invoke-default-action
 on-button-middle=dismiss
 on-button-right=dismiss-all
 on-touch=dismiss
 # on-notify=exec mpv /usr/share/sounds/freedesktop/stereo/message.oga --no-video --volume=50 2>/dev/null || true
-
-# --- App Overrides ---
-# Messaging applications
-[app-name=Telegram]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>◆ %s</b>\n%b
-
-[app-name=discord]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>◇ %s</b>\n%b
-
-[app-name=Signal]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>■ %s</b>\n%b
-
-[app-name=niri]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>◌ %s</b>\n%b
-default-timeout=3000
-
-# --- System Notifications ---
-[app-name=notify-send]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>∴ System</b>\n%b
-
-# --- Terminal Notifications ---
-[app-name=kitty]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>λ %s</b>\n%b
-
-[app-name=ghostty]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>λ %s</b>\n%b
-
-[app-name=foot]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>λ %s</b>\n%b
-
-[app-name=alacritty]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>λ %s</b>\n%b
-
-# Bluetooth notifications
-[app-name=blueman]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>⊹ %s</b>\n%b
-default-timeout=4000
-
-# Volume notifications
-[summary~="Volume"]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>♪</b> %b
-default-timeout=3000
-
-# Brightness notifications
-[summary~="Brightness"]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>☀</b> %b
-default-timeout=3000
-
-# Battery notifications
-[summary~="Battery"]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>◙ %s</b>\n%b
-
-# Email notifications
-[app-name=thunderbird]
-background-color=#262626FF
-text-color=#f2f2f2ff
-border-color=#3c3c3cFF
-format=<b>⍋ %s</b>\n%b
-
-# Download notifications
-[summary~="Download"]
-background-color=#1e1e1eFF
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>↓ %s</b>\n%b
-
-# Security/Authentication
-[summary~="Authentication"]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>⌺ %s</b>\n%b
-default-timeout=0
-
-# USB/Device notifications
-[summary~="Device"]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>▣ %s</b>\n%b
-
-# Screenshot notifications
-[app-name=flameshot]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>◌ %s</b>\n%b
-default-timeout=3000
-
-[app-name=spectacle]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>◌ %s</b>\n%b
-default-timeout=3000
-
-# Git notifications
-[summary~="Git"]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>⎇ %s</b>\n%b
-
-# Build/Compilation notifications
-[summary~="Build"]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>⚙ %s</b>\n%b
-
-# Calendar/Schedule
-[app-name=gnome-calendar]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>◷ %s</b>\n%b
-
-# File manager
-[app-name=nautilus]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>▤ %s</b>\n%b
-
-[app-name=thunar]
-background-color=#0d0d0dff
-text-color=#f2f2f2ff
-border-color=#2a2a2aff
-format=<b>▤ %s</b>\n%b
 
 # --- Grouped Notifications ---
 [grouped]
@@ -213,36 +54,18 @@ format=%s
 border-size=0
 padding=8
 
-# NOTE:
-# All these override my entire setup.
-# They're forbidden and should never be used.
 # --- Urgency Styling ---
-# Low priority
 # [urgency=low]
 # background-color=#1a1a1aFF
 # text-color=#888888FF
 # border-color=#2a2a2aFF
-# format=<b>─ %s</b>\n%b
-# default-timeout=8000
 #
-# # Normal priority
 # [urgency=normal]
 # background-color=#2a2a2aFF
 # text-color=#f2f2f2ff
 # border-color=#3c3c3cFF
-# format=<b>▶ %s</b>\n%b
-# default-timeout=10000
 #
-# # Critical priority
 # [urgency=critical]
 # background-color=#3a3a3aFF
 # text-color=#f2f2f2ff
 # border-color=#555555FF
-# format=<b>▓ %s ▓</b>\n%b
-# default-timeout=0
-
-# # --- Default Format ---
-# format=<b>⊹ %s</b>\n%b
-# background-color=#2a2a2aFF
-# border-color=#3c3c3cFF
-# text-color=#f2f2f2ff
