@@ -1,0 +1,205 @@
+@define-color fg #888071;
+@define-color sepcolor #6B6863;
+@define-color bg #090E13;
+@define-color bordercolor #080D0F;
+@define-color disabled #A5A5A5;
+@define-color warning #938AA9;
+@define-color alert #C13F42;
+@define-color activegreen #7AA89F;
+@define-color highlight #E6C384;
+
+* {
+  min-height: 25px;
+  font-size: 15px;
+  font-family: "Berkeley Mono";
+}
+
+window#waybar {
+  color: @fg;
+  background: @bg;
+  transition-property: background-color;
+  transition-duration: 1s;
+  border: 2px solid @bordercolor;
+  border-radius: 0px;
+}
+
+window#waybar.empty {
+  opacity: 0.3;
+}
+
+.hidden {
+  opacity: 0;
+  margin-left: -6px;
+}
+
+button {
+  box-shadow: inset 0 -3px transparent;
+  border: none;
+}
+
+button:hover {
+  background: inherit;
+  box-shadow: inset 0 -3px transparent;
+}
+
+#workspaces button {
+  color: @fg;
+  padding: 0px 7px;
+  background: @bg;
+}
+
+#workspaces button:hover {
+  color: @highlight;
+}
+
+#workspaces button.empty:hover {
+  color: @highlight;
+}
+
+#workspaces button.urgent {
+  color: @alert;
+}
+
+#workspaces button.empty {
+  color: @fg;
+}
+
+#workspaces button.active {
+  color: @highlight;
+}
+
+#workspaces {
+  margin-left: 7px;
+}
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#disk,
+#temperature,
+#language,
+#backlight,
+#backlight-slider,
+#network,
+#wireplumber,
+#custom-media,
+#taskbar,
+#mode,
+#idle_inhibitor,
+#scratchpad,
+#custom-power,
+#custom-notification,
+#window,
+#keyboard-state,
+#bluetooth,
+#custom-vpn,
+#mpd
+#tray {
+  background: transparent;
+  border: none;
+  padding: 0px 5px;
+  margin: 3px 3px;
+  color: @fg;
+}
+
+#custom-thm-cpu,
+#custom-thm-amd,
+#custom-thm-nvidia,
+#custom-thm-nvme,
+#custom-thm-amb,
+#custom-thm-pwr,
+#custom-thm-batv,
+#custom-thm-bati,
+#custom-thm-fan,
+#mpd {
+  background: transparent;
+  border: none;
+  padding: 0px 4px;
+  margin: 2px 2px;
+}
+
+#custom-clock.local {
+  color: @fg;
+}
+
+#custom-clock.nonlocal {
+  color: @highlight;
+}
+
+#clock:hover,
+#battery:hover,
+#cpu:hover,
+#memory:hover,
+#disk:hover,
+#temperature:hover,
+#language:hover,
+#backlight:hover,
+#backlight-slider:hover,
+#network:hover,
+#wireplumber:hover,
+#custom-media:hover,
+#taskbar:hover,
+#mode:hover,
+#idle_inhibitor:hover,
+#scratchpad:hover,
+#custom-power:hover,
+#custom-notification:hover,
+#window:hover,
+#keyboard-state:hover,
+#bluetooth:hover,
+#custom-vpn:hover,
+#mpd:hover,
+.bar_item:hover {
+  color: @highlight;
+}
+
+#custom-separator {
+  color: @sepcolor;
+}
+
+#custom-power {
+  color: @fg;
+  padding-left: 10px;
+}
+
+#tray {
+  background-color: @bordercolor;
+  border-radius: 0px;
+  padding: 0px 10px;
+  margin: 5px;
+}
+
+#battery.charging,
+#battery.plugged {
+  color: @activegreen;
+}
+
+label:focus {
+  background-color: @bg;
+}
+
+#pulseaudio.warning,
+#wireplumber.warning {
+  color: @warning;
+}
+
+#pulseaudio.critical,
+#wireplumber.critical {
+  color: @alert;
+}
+
+#network.disconnected,
+#pulseaudio.muted,
+#battery.critical:not(.charging),
+#wireplumber.muted {
+  color: @alert;
+}
+
+tooltip {
+  border-radius: 0px;
+  background-color: #090e13;
+  color: #f2f2f2;
+}
+
+

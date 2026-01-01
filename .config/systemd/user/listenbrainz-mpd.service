@@ -1,0 +1,12 @@
+[Unit]
+Description=Listenbrainz Scrobbler for MPD
+After=mpd.service
+Wants=mpd.service
+PartOf=mpd.service
+
+[Service]
+ExecStart=/usr/bin/listenbrainz-mpd
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

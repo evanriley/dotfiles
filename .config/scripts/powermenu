@@ -1,0 +1,14 @@
+#!/bin/bash
+
+SELECTION="$(printf "Suspend\nLog out\nReboot\nShutdown" | fuzzel --dmenu -l 4 -p "Power Menu: ")"
+
+case $SELECTION in
+	*"Suspend")
+		systemctl suspend;;
+	*"Log out")
+		swaymsg exit;;
+	*"Reboot")
+		systemctl reboot;;
+	*"Shutdown")
+		systemctl poweroff;;
+esac

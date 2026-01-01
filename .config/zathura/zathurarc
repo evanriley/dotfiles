@@ -1,0 +1,41 @@
+set default-bg                  "#090E13"
+set default-fg                  "#C5C9C7"
+
+set statusbar-bg                "#22262D"
+set statusbar-fg                "#C5C9C7"
+
+set inputbar-bg                 "#090E13"
+set inputbar-fg                 "#7FB4CA"
+
+set notification-error-bg       "#E46876"
+set notification-error-fg       "#090E13"
+
+set notification-warning-bg     "#E6C384"
+set notification-warning-fg     "#090E13"
+
+set highlight-color             "#22262D"
+set highlight-active-color      "#7FB4CA"
+
+set completion-bg               "#22262D"
+set completion-fg               "#C5C9C7"
+
+set completion-highlight-bg     "#7FB4CA"
+set completion-highlight-fg     "#090E13"
+
+# --- Dark Mode Toggle ---
+# Toggles between original document colors and this theme
+set recolor-lightcolor          "#090E13"
+set recolor-darkcolor           "#C5C9C7"
+set recolor                     "true"
+set keep-zoom-window            "true"
+
+# --- Mappings ---
+set selection-clipboard clipboard
+map u scroll half-up
+map d scroll half-down
+map D toggle_page_mode
+map r reload
+map R rotate
+map K zoom in
+map J zoom out
+map i recolor

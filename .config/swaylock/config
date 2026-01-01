@@ -1,0 +1,24 @@
+daemonize
+ignore-empty-password
+show-failed-attempts
+font=Berkeley Mono
+image=~/Pictures/wallpapers/nebula-locked.png
+color=090e13ff
+indicator-idle-visible
+indicator-radius=120
+indicator-thickness=20
+inside-color=090e13d9
+inside-clear-color=090e13d9
+inside-ver-color=090e13d9
+inside-wrong-color=090e13d9
+ring-color=8ba4b0ff
+ring-clear-color=8ba4b0ff
+ring-ver-color=8a9a7bff
+ring-wrong-color=c4746eff
+line-color=00000000
+text-color=c5c9c7ff
+text-clear-color=c5c9c7ff
+text-ver-color=c5c9c7ff
+text-wrong-color=c5c9c7ff
+key-hl-color=c5c9c7ff
+bs-hl-color=c4746eff

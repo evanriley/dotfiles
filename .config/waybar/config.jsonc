@@ -1,0 +1,219 @@
+{
+  "layer": "top",
+  "position": "top",
+  "height": 35,
+  "margin-left": 12,
+  "margin-right": 12,
+  "margin-top": 10,
+  "margin-bottom": 0,
+  "spacing": 1,
+  "reload_style_on_change": true,
+
+  "modules-left": ["niri/workspaces"],
+
+  "modules-center": ["clock"],
+
+  "modules-right": [
+    "niri/language",
+    "keyboard-state#capslock",
+    "tray",
+  ],
+
+
+
+  "custom/separator": {
+    "format": " │ ",
+    "tooltip": false,
+  },
+
+  "custom/bullet": {
+    "format": "•",
+    "tooltip": false,
+  },
+
+  "niri/workspaces": {
+    "format": "●",
+    "on-click": "activate",
+    "on-scroll-up": "niri msg action focus-workspace-up",
+    "on-scroll-down": "niri msg action focus-workspace-down",
+    "smooth-scrolling-threshold": 2.0,
+  },
+
+  "clock": {
+    "interval": 1,
+    "format": "{:%H.%M.%S}",
+    "format-alt": "{:%A, %B %d, %Y | %R} ",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "year",
+      "mode-mon-col": 3,
+      "weeks-pos": "right",
+      "on-scroll": 1,
+      "on-click-right": "mode",
+      "format": {
+        "months": "<span color='#E6C384'><b>{}</b></span>",
+        "days": "<span color='#C5C9C7'><b>{}</b></span>",
+        "weeks": "<span color='#7AA89F'><b>W{}</b></span>",
+        "weekdays": "<span color='#c4b28a'><b>{}</b></span>",
+        "today": "<span color='#E46876'><b><u>{}</u></b></span>",
+      },
+    },
+    "actions": {
+      "on-click-left": "kitty -e calcure",
+      "on-click-right": "mode",
+      "on-click-forward": "tz_up",
+      "on-click-backward": "tz_down",
+      "on-scroll-up": "format-alt",
+      "on-scroll-down": "shift_down",
+    },
+  },
+
+  "network#wifi-dl": {
+    "interval": 1,
+    "format-wifi": "{bandwidthDownBytes:>} ↓",
+    "format-linked": "≏ No IP",
+    "format-disconnected": "⌽",
+    "tooltip": false,
+  },
+
+  "network#wifi-ul": {
+    "interval": 1,
+    "format-wifi": "{bandwidthUpBytes:>} ↑",
+    "format-linked": "",
+    "format-disconnected": "",
+    "tooltip": false,
+  },
+
+  "bluetooth": {
+    "format": " {num_connections} {status}",
+    "format-disabled": "0 ▽",
+    "format-off": "0 ▼",
+    "format-on": "0 △",
+    "format-connected": "{num_connections} ▲",
+    "tooltip": true,
+    "tooltip-format": "⋊ Bluetooth\n━━━━━━━━━━━━━━━━━━\n• {controller_alias} ⟶ {controller_address}\n• {num_connections} connected",
+    "tooltip-format-connected": "⋊ Bluetooth\n━━━━━━━━━━━━━━━━━━\n• {controller_alias} ⟶ {controller_address}\n\n• {device_enumerate}",
+    "tooltip-format-enumerate-connected": "↳ {device_alias} [{device_address}]",
+    "tooltip-format-enumerate-connected-battery": "↳ {device_alias} [{device_address}] ⦚ {device_battery_percentage}%",
+    "on-click": "$XDG_BIN_HOME/fuzzel/fuzzel-bluetooth.sh",
+    "on-click-right": "blueman-manager",
+  },
+
+  "cpu": {
+    "interval": 1,
+    "format": "⚙ {usage}%",
+    "format-alt": "⚙ U {usage}% L {load}% AVG {avg_frequency}GHz MAX {max_frequency}GHz MIN {min_frequency}GHz",
+    "format-icons": [
+      "[⠀]",
+      "[⢀]",
+      "[⣀]",
+      "[⣠]",
+      "[⣤]",
+      "[⣴]",
+      "[⣶]",
+      "[⣾]",
+      "[⣿]",
+    ],
+    "tooltip": true,
+    "on-click-right": "$XDG_BIN_HOME/launchers/launchers-btop.sh",
+  },
+
+  "memory": {
+    "interval": 2,
+    "format": "𝍖 {percentage}%",
+    "format-alt": "𝍖 {percentage}% {icon}",
+    "format-icons": [
+      "[⠀]",
+      "[⢀]",
+      "[⣀]",
+      "[⣠]",
+      "[⣤]",
+      "[⣴]",
+      "[⣶]",
+      "[⣾]",
+      "[⣿]",
+    ],
+    "tooltip": true,
+    "tooltip-format": "𝍖 RAM\n━━━━━━━━━━━━━━━━━━\n• Usage ⟶ {used} / {total} ({percentage}%)\n• Available ⟶ {avail}",
+    "on-click-right": "btop",
+  },
+
+  "disk": {
+    "interval": 15,
+    "path": "/",
+    "format": "⬢ {percentage_used}%",
+    "format-alt": "⬢ {free} / {total}",
+    "tooltip": true,
+    "tooltip-format": "⬢ Disk Storage\n━━━━━━━━━━━━━━━━━━\n• Usage ⟶ {used} / {total} ({percentage_used}%)\n• Available ⟶ {free} ({percentage_free}%)\n• Mount Point ⟶ {path}",
+    "on-click-right": "thunar /",
+    "states": {
+      "warning": 70,
+      "critical": 85,
+    },
+  },
+
+  "backlight": {
+    "format": "☀ {percent}%",
+    "format-alt": "☀ {percent}% {icon}",
+    "format-icons": ["[-]", "[=]", "[≡]", "[≣]"],
+  },
+
+  "wireplumber#sink": {
+    "node-type": "Audio/Sink",
+    "format": "∿ {volume}%",
+    "format-muted": "∅ {volume}%",
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
+    "on-click-right": "helvum",
+    "scroll-step": 1,
+    "states": {
+      "warning": 75,
+      "critical": 100,
+    },
+    "tooltip": true,
+    "tooltip-format": "∿ Playback Device\n━━━━━━━━━━━━━━━━━━\n• Device ⟶ {node_name}\n• Volume ⟶ {volume}%",
+  },
+
+  "wireplumber#source": {
+    "node-type": "Audio/Source",
+    "format": "◌ {volume}% {icon}",
+    "format-muted": "◌ {volume}% [⌽]",
+    "format-icons": ["[-]", "[=]", "[≡]", "[≣]"],
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
+    "on-click-right": "helvum",
+    "scroll-step": 1,
+    "states": {
+      "warning": 75,
+      "critical": 100,
+    },
+    "tooltip": true,
+    "tooltip-format": "Recording Device\n━━━━━━━━━━━━━━━━━━\n•Device ⟶ {node_name}\n• Volume ⟶ {volume}%",
+  },
+
+  "niri/language": {
+    "format": "{short}",
+    "format-alt": "{long}",
+  },
+
+  "keyboard-state#capslock": {
+    "numlock": false,
+    "capslock": true,
+    "scrolllock": false,
+    "format": "{icon}",
+    "format-icons": {
+      "locked": "⋢",
+      "unlocked": "⊑",
+    },
+  },
+
+  "keyboard-state#numlock": {
+    "numlock": true,
+    "capslock": false,
+    "scrolllock": false,
+    "format": "N [{icon}]",
+    "format-icons": {
+      "locked": "⌽",
+      "unlocked": "○",
+    },
+  },
+}
+
