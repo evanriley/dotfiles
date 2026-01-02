@@ -26,7 +26,6 @@ input {
     }
 
     mouse {
-        // natural-scroll
         accel-speed 0.0
         accel-profile "flat"
     }
@@ -77,7 +76,7 @@ layout {
     }
 
     tab-indicator {
-	// off
+	      // off
         // hide-when-single-tab
         place-within-column
         gap 5
@@ -121,8 +120,6 @@ spawn-at-startup "flatpak" "run" "com.valvesoftware.Steam"
 spawn-at-startup "flatpak" "run" "org.nicotine_plus.Nicotine"
 spawn-at-startup "flatpak" "run" "org.mozilla.Thunderbird"
 spawn-at-startup "flatpak" "run" "org.gnome.World.PikaBackup"
-spawn-at-startup "wl-clip-persist" "--clipboard" "regular"
-spawn-at-startup "wl-paste" "--watch" "cliphist" "store"
 
 
 hotkey-overlay {
@@ -230,7 +227,7 @@ window-rule {
 
 window-rule {
     match at-startup=true app-id="steam"
-    open-on-workspace "games"
+    open-on-workspace "game"
 }
 
 
@@ -258,7 +255,7 @@ window-rule {
 }
 window-rule {
     match title="Friends List"
-    open-on-workspace "games"
+    open-on-workspace "game"
     default-column-width {
         fixed 600
     }
@@ -311,6 +308,18 @@ window-rule {
 
 window-rule {
     match title=r"((?i)(?:[a-z0-9-]+\.)*youtube\.com_/|app\.zoom\.us_/wc/home)"
+    opacity 1.0
+}
+
+window-rule {
+    match app-id="org.pulseaudio.pavucontrol"
+    open-floating true
+    default-column-width { fixed 800; }
+    default-window-height { fixed 600; }
+}
+
+window-rule {
+    match app-id=r"^steam_app_\d+$"
     opacity 1.0
 }
 
