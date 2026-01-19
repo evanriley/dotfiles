@@ -6,7 +6,7 @@ clipboard-write = allow
 copy-on-select = false
 window-new-tab-position = end
 window-padding-balance = true
-theme = kanso-zen
+theme = no-clown-fiesta
 font-size = 13
 font-family = Berkeley Mono
 font-family = Symbols Nerd Font
@@ -18,10 +18,3 @@ window-padding-x = 8
 window-padding-y = 8
 mouse-hide-while-typing = true
 window-decoration = none
-keybind = performable:ctrl+h=goto_split:left
-keybind = performable:ctrl+j=goto_split:bottom
-keybind = performable:ctrl+k=goto_split:top
-keybind = performable:ctrl+l=goto_split:right
-keybind = ctrl+a>h=new_split:down
-keybind = ctrl+a>v=new_split:right
-keybind = ctrl+a>q=close_surface
