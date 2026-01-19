@@ -1,4 +1,3 @@
--- Leaders (must be set before plugins)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ','
 
@@ -31,10 +30,8 @@ vim.o.showtabline = 0
 vim.o.laststatus = 3
 vim.o.statusline = ' %f %m%r%h%w%=%y %l:%c '
 
--- Conjure (clojure only) - set before loading
 vim.g['conjure#filetypes'] = { 'clojure' }
 
--- Plugins (vim.pack)
 vim.pack.add({
   'https://github.com/aktersnurra/no-clown-fiesta.nvim',
   'https://github.com/nvim-treesitter/nvim-treesitter',
@@ -51,17 +48,14 @@ vim.pack.add({
   'https://github.com/christoomey/vim-tmux-navigator',
 })
 
--- Colorscheme (with fallback)
 local ok = pcall(vim.cmd.colorscheme, 'no-clown-fiesta')
 if not ok then vim.cmd.colorscheme('default') end
 
--- Plugin configs (wrapped for first-run safety)
 local function setup(name, opts)
   local ok, mod = pcall(require, name)
   if ok and mod.setup then mod.setup(opts or {}) end
 end
 
--- mini.icons (must be before mini.completion)
 local ok_icons, mini_icons = pcall(require, 'mini.icons')
 if ok_icons then
   mini_icons.setup()
@@ -72,7 +66,6 @@ setup('mini.pairs')
 setup('mini.surround')
 setup('mini.diff')
 
--- mini.snippets (load friendly-snippets)
 local ok_snip, mini_snippets = pcall(require, 'mini.snippets')
 if ok_snip then
   mini_snippets.setup({
@@ -96,7 +89,6 @@ setup('zk', { picker = 'select' })
 setup('render-markdown')
 vim.keymap.set('n', '<leader>m', '<Cmd>RenderMarkdown toggle<CR>', { desc = 'Toggle markdown render' })
 
--- Copilot
 setup('copilot', {
   suggestion = {
     auto_trigger = true,
@@ -106,13 +98,10 @@ setup('copilot', {
   filetypes = { markdown = true, yaml = true },
 })
 
--- Parinfer (clojure only)
 vim.g.parinfer_filetypes = { 'clojure' }
 
--- Oil keymap
 vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 
--- Treesitter
 local ok, ts = pcall(require, 'nvim-treesitter.configs')
 if ok then
   ts.setup({
@@ -123,11 +112,9 @@ if ok then
   })
 end
 
--- LSP
 vim.lsp.config('*', { root_markers = { '.git' } })
 vim.lsp.enable({ 'rust_analyzer', 'ruff', 'zls', 'clangd', 'clojure_lsp', 'lua_ls' })
 
--- LSP attach autocmd
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('lsp-attach', {}),
   callback = function(args)
@@ -135,7 +122,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
     if not client then return end
     local buf = args.buf
 
-    -- Format on save
     if client:supports_method('textDocument/formatting') then
       vim.api.nvim_create_autocmd('BufWritePre', {
         group = vim.api.nvim_create_augroup('lsp-format-' .. buf, {}),
@@ -146,7 +132,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
       })
     end
 
-    -- Keymaps
     local map = function(mode, lhs, rhs, desc)
       vim.keymap.set(mode, lhs, rhs, { buffer = buf, desc = desc })
     end
@@ -161,7 +146,6 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
--- Completion keymaps (TAB, S-TAB, Enter)
 vim.keymap.set('i', '<Tab>', function()
   if vim.fn.pumvisible() == 1 then
     return '<C-n>'
@@ -198,7 +182,6 @@ vim.keymap.set('i', '<CR>', function()
   return '<CR>'
 end, { expr = true })
 
--- Diagnostic config
 vim.diagnostic.config({
   virtual_text = { spacing = 4, prefix = '' },
   signs = true,
@@ -206,7 +189,6 @@ vim.diagnostic.config({
   update_in_insert = false,
 })
 
--- Terminal toggle
 local term_buf, term_win = nil, nil
 local function toggle_terminal()
   if term_win and vim.api.nvim_win_is_valid(term_win) then
@@ -228,7 +210,6 @@ local function toggle_terminal()
 end
 vim.keymap.set({ 'n', 't' }, '<leader>t', toggle_terminal, { desc = 'Toggle terminal' })
 
--- mini.pick keymaps
 local ok_pick, pick = pcall(require, 'mini.pick')
 if ok_pick then
   vim.keymap.set('n', '<leader><leader>', pick.builtin.files, { desc = 'Find files' })
@@ -237,7 +218,6 @@ if ok_pick then
   vim.keymap.set('n', '<leader>h', pick.builtin.help, { desc = 'Help' })
 end
 
--- QoL keymaps
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.keymap.set('n', '<Esc>', '<Cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
 vim.keymap.set('n', '<leader>w', '<Cmd>w<CR>', { desc = 'Save file' })
@@ -248,7 +228,6 @@ vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = 'Window down' })
 vim.keymap.set('n', '<C-k>', '<C-w>k', { desc = 'Window up' })
 vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = 'Window right' })
 
--- Close certain windows with q
 vim.api.nvim_create_autocmd('FileType', {
   group = vim.api.nvim_create_augroup('close-with-q', {}),
   pattern = { 'help', 'qf', 'man', 'notify', 'checkhealth' },
@@ -258,7 +237,6 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- vim-tmux-navigator (override C-hjkl when in tmux)
 if vim.env.TMUX then
   vim.keymap.set('n', '<C-h>', '<Cmd>TmuxNavigateLeft<CR>', { desc = 'Navigate left' })
   vim.keymap.set('n', '<C-j>', '<Cmd>TmuxNavigateDown<CR>', { desc = 'Navigate down' })
@@ -266,7 +244,6 @@ if vim.env.TMUX then
   vim.keymap.set('n', '<C-l>', '<Cmd>TmuxNavigateRight<CR>', { desc = 'Navigate right' })
 end
 
--- Yank highlight
 vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('yank-highlight', {}),
   callback = function() vim.hl.on_yank({ timeout = 200 }) end,
