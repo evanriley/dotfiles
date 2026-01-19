@@ -187,12 +187,12 @@ layer-rule {
 window-rule {
     match is-active=true
     // Apply to all windows
-    opacity 0.98
+    opacity 0.95
 }
 window-rule {
     match is-active=false
     // Apply to all windows
-    opacity 0.98
+    opacity 0.95
 }
 
 // Open the Firefox picture-in-picture player as floating by default.
@@ -286,17 +286,17 @@ window-rule {
     opacity 1.0
 }
 window-rule {
-    match app-id=r"((google-)?[cC]hrom(e|ium)|[bB]rave-browser|[mM]icrosoft-edge|Vivaldi-stable|helium)" is-active=true
+    match app-id=r"((google-)?[cC]hrom(e|ium)|[bB]rave-browser|[mM]icrosoft-edge|Vivaldi-stable|helium)"
     opacity 1.0
 }
 
 window-rule {
-    match app-id=r"([fF]irefox|zen|librewolf|firefox-bin)" is-active=true
+    match app-id=r"([fF]irefox|zen|librewolf|firefox-bin)"
     opacity 1.0
 }
 
 window-rule {
-    match app-id=r"(org\.qutebrowser\.qutebrowser|qutebrowser)" is-active=true
+    match app-id=r"(org\.qutebrowser\.qutebrowser|qutebrowser)"
     opacity 1.0
 }
 
@@ -323,6 +323,10 @@ window-rule {
     opacity 1.0
 }
 
+window-rule {
+    match app-id=r"bg3"
+    opacity 1.0
+}
 
 binds {
     MOD+SHIFT+SLASH {
