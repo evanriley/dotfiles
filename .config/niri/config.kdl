@@ -36,7 +36,7 @@ input {
 }
 
 output "DP-1" {
-    mode "5120x1440@239.999"
+    mode "5120x1440@119.979"
     scale 1
     transform "normal"
     variable-refresh-rate
