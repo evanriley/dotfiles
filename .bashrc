@@ -77,11 +77,12 @@ set_bash_prompt() {
 
 PROMPT_COMMAND=set_bash_prompt
 
+# fix for when I'm on my e-os setup
+unset -f module 2>/dev/null
+
 alias dots='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias vim='nvim'
-alias emacs='emacsclient'
 
-unalias fastfetch 2>/dev/null
 alias fastfetch='fastfetch --config ~/.config/fastfetch/config.jsonc'
 
 alias ..='cd ..'
