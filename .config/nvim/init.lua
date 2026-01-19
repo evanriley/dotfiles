@@ -24,6 +24,18 @@ vim.o.pumheight = 10
 vim.o.scrolloff = 8
 vim.o.sidescrolloff = 8
 vim.o.mouse = 'a'
+-- OSC 52 clipboard (works over SSH/tmux)
+vim.g.clipboard = {
+  name = 'OSC 52',
+  copy = {
+    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
+  },
+  paste = {
+    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
+    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+  },
+}
 vim.o.clipboard = 'unnamedplus'
 vim.o.showmode = false
 vim.o.showtabline = 0
