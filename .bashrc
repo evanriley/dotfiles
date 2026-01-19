@@ -38,6 +38,12 @@ set_bash_prompt() {
 
     local RESET="\[\033[0m\]"
 
+    # Distrobox/Container Indicator
+    local CONTAINER_INFO=""
+    if [ -n "$CONTAINER_ID" ]; then
+        CONTAINER_INFO="${K_PURPLE}[${CONTAINER_ID}]${RESET} "
+    fi
+
     local GIT_INFO=""
     if command -v git &>/dev/null; then
         if git rev-parse --is-inside-work-tree &>/dev/null; then
@@ -66,7 +72,7 @@ set_bash_prompt() {
     fi
 
     # Directory (Sage Blue) + Git + Jobs + Arrow
-    PS1="${K_BLUE}\w${RESET}${GIT_INFO}${JOB_INDICATOR} ${PROMPT_SYMBOL} "
+    PS1="${CONTAINER_INFO}${K_BLUE}\w${RESET}${GIT_INFO}${JOB_INDICATOR} ${PROMPT_SYMBOL} "
 }
 
 PROMPT_COMMAND=set_bash_prompt
