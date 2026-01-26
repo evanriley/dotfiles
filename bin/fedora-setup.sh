@@ -358,8 +358,8 @@ main() {
     info "Next steps:"
     echo "  1. Log out and back in (or reboot) for all changes to take effect"
     echo "  2. Run 'sudo tailscale up' to connect to Tailscale"
+    echo "  3. Run 'sudo tailscale set --operator=$USER'"
     echo "  3. Ensure ~/.cargo/bin and ~/go/bin are in your PATH"
-    echo "  4. Run your dotfiles installer to apply configurations"
     echo ""
 }
 
