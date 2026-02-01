@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: TODO item
+# key: todo
+# --
+** TODO ${1:Task}
+$0

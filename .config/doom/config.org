@@ -1,0 +1,1253 @@
+#+title: Doom Emacs Configuration
+#+author: Evan Riley
+#+property: header-args :tangle config.el
+#+startup: fold
+
+* General Configuration
+** User Information
+#+begin_src emacs-lisp
+(setq user-full-name "Evan Riley"
+      user-real-login-name "Evan Riley"
+      user-login-name "evan"
+      user-mail-address (rot13 "rina@rinaevyrl.pbz"))
+#+end_src
+
+** System & Defaults
+#+begin_src emacs-lisp
+(setq auth-sources '("~/.authinfo.gpg")
+      auth-source-cache-expiry nil)
+
+(setq-default custom-file (expand-file-name ".custom.el" doom-private-dir))
+(when (file-exists-p custom-file)
+  (load custom-file))
+
+;; Performance
+(setq gcmh-idle-delay 10
+      gcmh-high-cons-threshold (* 512 1024 1024)) ; 512MB idle GC
+(setq read-process-output-max (* 4 1024 1024))
+(setq process-adaptive-read-buffering nil)
+(setq inhibit-compacting-font-caches t)
+
+;; Behavior
+(setq-default
+ delete-by-moving-to-trash t
+ window-combination-resize t
+ x-stretch-cursor t)
+
+(setq undo-limit 80000000
+      evil-want-fine-undo t
+      auto-save-default t
+      create-lockfiles nil
+      display-time-default-load-average nil)
+
+(display-time-mode 1)
+(global-subword-mode 1)
+
+;; Disable ispell word completion (using Jinx instead)
+(setq text-mode-ispell-word-completion nil)
+
+;; Which-key settings
+(after! which-key
+  (setq which-key-idle-delay 0.3
+        which-key-idle-secondary-delay 0.05
+        which-key-add-column-padding 1
+        which-key-max-display-columns nil
+        which-key-sort-order 'which-key-key-order-alpha))
+
+;; Recent files
+(after! recentf
+  (setq recentf-max-saved-items 200
+        recentf-auto-cleanup 'never)
+  (add-to-list 'recentf-exclude "^/tmp/")
+  (add-to-list 'recentf-exclude "/ssh:")
+  (add-to-list 'recentf-exclude "\\.git/"))
+#+end_src
+
+** Window Management
+#+begin_src emacs-lisp
+;; Prompt for buffer after split (instead of showing same buffer)
+(defun my/split-window-right-and-switch ()
+  "Split window right and prompt for buffer."
+  (interactive)
+  (split-window-right)
+  (other-window 1)
+  (consult-buffer))
+
+(defun my/split-window-below-and-switch ()
+  "Split window below and prompt for buffer."
+  (interactive)
+  (split-window-below)
+  (other-window 1)
+  (consult-buffer))
+
+(map! :leader
+      :prefix "w"
+      "v" #'my/split-window-right-and-switch
+      "s" #'my/split-window-below-and-switch)
+
+;; Quick scratch buffer
+(defun my/toggle-scratch-buffer ()
+  "Toggle *scratch* buffer in a popup."
+  (interactive)
+  (if-let ((scratch-buf (get-buffer "*scratch*")))
+      (if (get-buffer-window scratch-buf)
+          (delete-window (get-buffer-window scratch-buf))
+        (pop-to-buffer scratch-buf))
+    (doom/open-scratch-buffer)))
+
+(map! :leader "X" #'my/toggle-scratch-buffer)
+#+end_src
+
+* UI & Visuals
+** Theme
+#+begin_src emacs-lisp
+(setq doom-theme 'doom-earl-grey)
+#+end_src
+
+** Theme Auto-Switching (Light/Dark)
+Automatically switch between light and dark themes based on system preference via D-Bus.
+#+begin_src emacs-lisp
+(defvar my/light-theme 'doom-earl-grey)
+(defvar my/dark-theme 'doom-one)
+
+(defun my/get-system-dark-mode ()
+  "Query system dark mode setting via D-Bus (freedesktop portal)."
+  (when (and (featurep 'dbus) (dbus-ping :session "org.freedesktop.portal.Desktop"))
+    (let ((result (dbus-call-method
+                   :session "org.freedesktop.portal.Desktop"
+                   "/org/freedesktop/portal/desktop"
+                   "org.freedesktop.portal.Settings" "Read"
+                   "org.freedesktop.appearance" "color-scheme")))
+      (when result
+        (= 1 (caar result))))))
+
+(defun my/apply-system-theme ()
+  "Apply theme based on system dark mode setting."
+  (interactive)
+  (let ((dark-mode (my/get-system-dark-mode)))
+    (setq doom-theme (if dark-mode my/dark-theme my/light-theme))
+    (doom/reload-theme)))
+
+(defun my/watch-system-theme-change (namespace key value)
+  "React to system theme changes via D-Bus signal."
+  (when (and (string= namespace "org.freedesktop.appearance")
+             (string= key "color-scheme"))
+    (let ((dark-mode (= 1 (car value))))
+      (setq doom-theme (if dark-mode my/dark-theme my/light-theme))
+      (doom/reload-theme))))
+
+(when (featurep 'dbus)
+  (dbus-register-signal
+   :session "org.freedesktop.portal.Desktop"
+   "/org/freedesktop/portal/desktop"
+   "org.freedesktop.portal.Settings" "SettingChanged"
+   #'my/watch-system-theme-change)
+  (add-hook 'after-init-hook #'my/apply-system-theme))
+#+end_src
+
+** Fonts
+#+begin_src emacs-lisp
+(setq doom-font (font-spec :family "Berkeley Mono" :size 14)
+      doom-big-font (font-spec :family "Berkeley Mono" :size 24)
+      doom-variable-pitch-font (font-spec :family "Berkeley Mono" :size 24)
+      doom-symbol-font (font-spec :family "JuliaMono" :size 14))
+#+end_src
+
+** Modeline
+#+begin_src emacs-lisp
+(defun modeline-contitional-buffer-encoding ()
+  "Hide \"LF UTF-8\" in modeline."
+  (setq-local doom-modeline-buffer-encoding
+              (unless (and (memq (plist-get (coding-system-plist buffer-file-coding-system) :category)
+                                 '(coding-category-undecided coding-category-utf-8))
+                           (not (memq (coding-system-eol-type buffer-file-coding-system) '(1 2))))
+                t)))
+(add-hook 'after-change-major-mode-hook #'modeline-contitional-buffer-encoding)
+
+(setq doom-modeline-enable-word-count nil
+      doom-modeline-continuous-word-count-modes nil
+      doom-modeline-checker-simple-format t)
+#+end_src
+
+** Window Title
+#+begin_src emacs-lisp
+(setq frame-title-format
+      '(""
+        (:eval
+         (if (string-match-p (regexp-quote (or (bound-and-true-p org-roam-directory) "\u0000"))
+                             (or buffer-file-name ""))
+             (replace-regexp-in-string
+              ".*/[0-9]*-?" "☰ "
+              (subst-char-in-string ?_ ?\s buffer-file-name))
+           "%b"))
+        (:eval
+         (when-let ((project-name (and (featurep 'projectile) (projectile-project-name))))
+           (unless (string= "-" project-name)
+             (format (if (buffer-modified-p)  " ◉ %s" "  ●  %s") project-name))))))
+#+end_src
+
+** Scrolling (Ultra Scroll)
+#+begin_src emacs-lisp
+(use-package! ultra-scroll
+  :init
+  (setq scroll-conservatively 101
+        scroll-margin 0)
+  :config
+  (ultra-scroll-mode 1))
+#+end_src
+
+** Visual Bell
+#+begin_src emacs-lisp
+(setq visible-bell t)
+#+end_src
+
+** Page Breaks
+Display form-feed characters (^L) as horizontal lines.
+#+begin_src emacs-lisp
+(use-package! page-break-lines
+  :config
+  (setq page-break-lines-max-width fill-column)
+  (global-page-break-lines-mode))
+#+end_src
+
+** Pulse Highlight
+Briefly highlight line after certain operations for visual feedback.
+#+begin_src emacs-lisp
+(defun my/pulse-line (&rest _)
+  "Pulse the current line."
+  (pulse-momentary-highlight-one-line (point)))
+
+(dolist (cmd '(scroll-up-command scroll-down-command
+               recenter-top-bottom other-window
+               evil-scroll-up evil-scroll-down))
+  (advice-add cmd :after #'my/pulse-line))
+#+end_src
+
+* Editor
+** Formatting & Spacing
+#+begin_src emacs-lisp
+(add-hook 'before-save-hook #'whitespace-cleanup)
+(setq-default sentence-end-double-space nil)
+(setq-default indent-tabs-mode nil)
+(add-hook 'prog-mode-hook (lambda () (setq indent-tabs-mode nil)))
+
+;; Line numbers
+(setq display-line-numbers 'relative)
+(setq display-line-numbers-type 'visual)
+
+;; Fill column
+(setq display-fill-column-indicator-column 80)
+(add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
+#+end_src
+
+** Completion
+#+begin_src emacs-lisp
+;; Ensure proper indentation with TAB in insert mode
+(map! :i [tab] #'indent-for-tab-command
+      :i "TAB" #'indent-for-tab-command)
+
+;; Ensure Org-cycle works in Org mode
+(map! :after org
+      :map org-mode-map
+      :n [tab] #'org-cycle
+      :n "TAB" #'org-cycle)
+
+;; Corfu configuration (Doom handles activation, just customize behavior)
+(after! corfu
+  (setq corfu-auto t
+        corfu-auto-delay 0.2
+        corfu-auto-prefix 2
+        corfu-preview-current nil
+        corfu-preselect 'prompt))
+#+end_src
+
+** Marginalia Colorization
+Beautiful file metadata in completions with relative times and size gradients.
+#+begin_src emacs-lisp
+(after! marginalia
+  (setq marginalia-align 'right)
+
+  (defun my/marginalia-time-relative (time)
+    "Format TIME as relative human-readable string."
+    (let* ((now (current-time))
+           (delta (float-time (time-subtract now time))))
+      (cond
+       ((< delta 60) "now")
+       ((< delta 3600) (format "%dm ago" (/ delta 60)))
+       ((< delta 86400) (format "%dh ago" (/ delta 3600)))
+       ((< delta 604800) (format "%dd ago" (/ delta 86400)))
+       ((< delta 2592000) (format "%dw ago" (/ delta 604800)))
+       (t (format-time-string "%Y-%m-%d" time)))))
+
+  (defun my/marginalia-file-size-colorize (size)
+    "Return propertized SIZE string with color gradient."
+    (let* ((size-num (string-to-number size))
+           (color (cond
+                   ((< size-num 1024) "green")
+                   ((< size-num 102400) "yellow")
+                   ((< size-num 1048576) "orange")
+                   (t "red"))))
+      (propertize size 'face `(:foreground ,color))))
+
+  (defun my/marginalia-annotate-file (orig-fn cand)
+    "Enhance file annotations with relative time and colored size."
+    (if-let ((attrs (ignore-errors
+                      (file-attributes (substitute-in-file-name
+                                        (marginalia--full-candidate cand))))))
+        (let* ((size (file-size-human-readable (or (file-attribute-size attrs) 0)))
+               (time (my/marginalia-time-relative (file-attribute-modification-time attrs))))
+          (marginalia--fields
+           ((my/marginalia-file-size-colorize size) :width 7 :face 'marginalia-size)
+           (time :width 12 :face 'marginalia-date)))
+      (funcall orig-fn cand)))
+
+  (advice-add 'marginalia-annotate-file :around #'my/marginalia-annotate-file))
+#+end_src
+
+** Magit
+#+begin_src emacs-lisp
+(after! magit
+  (setq magit-revision-show-gravatars '("^Author:     " . "^Commit:     ")
+        magit-diff-refine-hunk t
+        magit-save-repository-buffers 'dontask
+        magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+
+  ;; Per-project commit message templates
+  (defun my/magit-commit-template ()
+    "Insert commit template based on project type."
+    (let ((template-file (expand-file-name ".gitmessage" (magit-toplevel))))
+      (when (file-exists-p template-file)
+        (insert-file-contents template-file))))
+
+  (add-hook 'git-commit-setup-hook #'my/magit-commit-template))
+
+;; Better diffs with Delta
+(use-package! magit-delta
+  :after magit
+  :config
+  (magit-delta-mode +1))
+#+end_src
+
+* Spell Checking (Jinx)
+Modern async spell-checker that's faster and less intrusive than Flyspell.
+#+begin_src emacs-lisp
+(use-package! jinx
+  :hook ((text-mode . jinx-mode)
+         (prog-mode . jinx-mode)
+         (conf-mode . jinx-mode))
+  :config
+  (setq jinx-languages "en_US")
+
+  ;; Exclude certain faces from spell checking in prog-mode
+  (add-to-list 'jinx-exclude-faces '(prog-mode font-lock-string-face))
+
+  ;; Keybindings
+  (map! :n "z=" #'jinx-correct
+        :n "]s" #'jinx-next
+        :n "[s" #'jinx-previous)
+
+  (map! :leader
+        :prefix ("z" . "spelling")
+        "z" #'jinx-correct
+        "n" #'jinx-next
+        "p" #'jinx-previous
+        "l" #'jinx-languages))
+#+end_src
+
+* Languages
+** Zig
+#+begin_src emacs-lisp
+(after! zig-mode
+  (setq zig-format-on-save t))
+#+end_src
+
+** Clojure
+#+begin_src emacs-lisp
+(after! cider
+  (setq cider-repl-display-help-banner nil
+        cider-repl-pop-to-buffer-on-connect 'display-only))
+#+end_src
+
+** Projectile
+#+begin_src emacs-lisp
+(after! projectile
+  (setq projectile-enable-caching t
+        projectile-indexing-method 'alien
+        projectile-files-cache-expire 604800
+        projectile-sort-order 'recently-active
+        projectile-project-search-path '("~/Code/Personal/" "~/Code/Work/")
+        projectile-auto-discover t)
+
+  ;; Custom project actions
+  (defun my/projectile-run-term ()
+    "Open vterm in project root."
+    (interactive)
+    (let ((default-directory (projectile-acquire-root)))
+      (+vterm/here nil)))
+
+  (map! :leader
+        :prefix "p"
+        "t" #'my/projectile-run-term))
+#+end_src
+
+** LSP
+#+begin_src emacs-lisp
+(after! lsp-mode
+  (setq lsp-idle-delay 0.5
+        lsp-file-watch-threshold 2000
+        lsp-enable-file-watchers nil
+        lsp-headerline-breadcrumb-enable t
+        lsp-lens-enable t))
+#+end_src
+
+** Debugger (Dape)
+Modern debug adapter protocol client replacing dap-mode.
+#+begin_src emacs-lisp
+(after! dape
+  (setq dape-buffer-window-arrangement 'right
+        dape-info-hide-mode-line nil
+        dape-inlay-hints t)
+
+  ;; Save buffers on startup
+  (add-hook 'dape-start-hook (lambda () (save-some-buffers t t))))
+#+end_src
+
+* Email (Mu4e)
+** General Setup
+#+begin_src emacs-lisp
+(add-hook! 'mu4e-view-mode-hook #'visual-line-mode)
+(add-hook! 'mu4e-compose-mode-hook #'visual-line-mode)
+
+;; Org-Msg for rich email composition
+(after! org-msg
+  (setq org-msg-options "html-postamble:nil H:5 num:nil ^:{} toc:nil author:nil email:nil \\n:t"
+        org-msg-startup "hidestars indent inlineimages"
+        org-msg-greeting-fmt nil  ; Disable auto-greeting, type your own
+        org-msg-greeting-name-limit 3
+        org-msg-convert-citation t))
+
+;; Tab through mail header fields
+(map! :after message
+      :map message-mode-map
+      :i "TAB" #'message-tab
+      :i "<tab>" #'message-tab)
+
+(map! :after org-msg
+      :map org-msg-edit-mode-map
+      :i "TAB" #'message-tab
+      :i "<tab>" #'message-tab
+      :n "g o" #'org-msg-goto-body)
+#+end_src
+
+** Real-time Mail Sync
+File watcher for near-instant mail notifications. Watches for changes and triggers reindex.
+#+begin_src emacs-lisp
+(defvar my/mu4e-reindex-request-file "/tmp/mu_reindex_now"
+  "File to watch for reindex requests from external mail sync.")
+
+(defvar my/mu4e-reindex-timer nil
+  "Timer for throttled reindexing.")
+
+(defun my/mu4e-request-reindex ()
+  "Request mu4e to reindex mail (throttled)."
+  (when (and (featurep 'mu4e) (mu4e-running-p))
+    (unless my/mu4e-reindex-timer
+      (setq my/mu4e-reindex-timer
+            (run-with-timer
+             5 nil
+             (lambda ()
+               (setq my/mu4e-reindex-timer nil)
+               (mu4e-update-index)))))))
+
+(defun my/mu4e-watch-reindex-file ()
+  "Set up file watcher for reindex requests."
+  (when (file-exists-p my/mu4e-reindex-request-file)
+    (delete-file my/mu4e-reindex-request-file))
+  (file-notify-add-watch
+   (file-name-directory my/mu4e-reindex-request-file)
+   '(change)
+   (lambda (event)
+     (when (and (eq (nth 1 event) 'created)
+                (string= (file-name-nondirectory (nth 2 event))
+                         (file-name-nondirectory my/mu4e-reindex-request-file)))
+       (my/mu4e-request-reindex)
+       (delete-file my/mu4e-reindex-request-file)))))
+
+(add-hook 'mu4e-main-mode-hook #'my/mu4e-watch-reindex-file)
+#+end_src
+
+** Configuration
+#+begin_src emacs-lisp
+;; Prefer plain text over HTML in mu4e (Gnus-based viewer in mu4e 1.8+)
+(with-eval-after-load 'mm-decode
+  (add-to-list 'mm-discouraged-alternatives "text/html")
+  (add-to-list 'mm-discouraged-alternatives "text/richtext"))
+
+(after! mu4e
+  (setq mu4e-maildir "~/.mail"
+        mu4e-get-mail-command "mbsync -a"
+        mu4e-update-interval 300
+        mu4e-index-update-in-background t
+        mu4e-change-filenames-when-moving t
+        mu4e-headers-date-format "%Y-%m-%d %H:%M"
+        mu4e-headers-fields '((:date . 20)
+                              (:flags . 6)
+                              (:from . 22)
+                              (:subject))
+        mu4e-context-policy 'pick-first
+        mu4e-compose-context-policy 'always-ask
+        mu4e-view-prefer-html nil
+        mu4e-view-html-plaintext-ratio-heuristic most-positive-fixnum
+        mu4e-headers-auto-update t
+        mu4e-headers-skip-duplicates t
+        mu4e-compose-dont-reply-to-self t)
+
+  ;; Toggle HTML view with H
+  (map! :map mu4e-view-mode-map
+        "H" #'mu4e-view-toggle-html)
+
+  ;; Quick actions
+  (map! :map mu4e-headers-mode-map
+        :n "A" #'mu4e-headers-mark-for-refile)
+
+  (setq mu4e-bookmarks
+        '((:name "Inbox"
+           :query "maildir:/personal/INBOX"
+           :key ?i)
+          (:name "Archive"
+           :query "maildir:/personal/Archive"
+           :key ?a)
+          (:name "Sent"
+           :query "maildir:/personal/Sent"
+           :key ?s)
+          (:name "Junk"
+           :query "maildir:/personal/Junk"
+           :key ?j)
+          (:name "Unread messages"
+           :query "flag:unread AND NOT flag:trashed"
+           :key ?u)
+          (:name "Today's messages"
+           :query "date:today..now"
+           :key ?t)
+          (:name "Last 7 days"
+           :query "date:7d..now"
+           :key ?w)
+          (:name "Flagged"
+           :query "flag:flagged"
+           :key ?f))))
+
+(set-email-account! "personal"
+  '((mu4e-sent-folder       . "/personal/Sent")
+    (mu4e-drafts-folder     . "/personal/Drafts")
+    (mu4e-trash-folder      . "/personal/Trash")
+    (mu4e-refile-folder     . "/personal/Archive")
+    (smtpmail-smtp-user     . "evan@evanriley.com")
+    (user-mail-address      . "evan@evanriley.com")
+    (user-full-name         . "Evan Riley"))
+  t)
+
+;; Use msmtp for sending mail (must be set after mu4e/org-msg load)
+(after! mu4e
+  (setq sendmail-program (executable-find "msmtp")
+        send-mail-function #'smtpmail-send-it
+        message-sendmail-f-is-evil t
+        message-sendmail-extra-arguments '("--read-envelope-from")
+        message-send-mail-function #'message-send-mail-with-sendmail))
+
+(after! org-msg
+  (setq message-send-mail-function #'message-send-mail-with-sendmail))
+
+(setq epg-pinentry-mode 'loopback)
+
+(if (string= (daemonp) "server")
+    (setenv "INSIDE_EMACS" "true"))
+#+end_src
+
+* RSS (Elfeed)
+#+begin_src emacs-lisp
+(after! elfeed
+  (setq elfeed-search-filter "@1-week-ago +unread"
+        elfeed-search-title-max-width 100
+        elfeed-search-title-min-width 30
+        elfeed-search-trailing-width 30
+        elfeed-show-entry-switch #'pop-to-buffer
+        elfeed-db-directory (concat doom-cache-dir "elfeed/"))
+
+  ;; Better entry display
+  (setq elfeed-search-print-entry-function #'my/elfeed-search-print-entry)
+
+  (defun my/elfeed-search-print-entry (entry)
+    "Custom elfeed entry format with author and better date display."
+    (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+           (title (or (elfeed-meta entry :title) (elfeed-entry-title entry) ""))
+           (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+           (feed (elfeed-entry-feed entry))
+           (feed-title (when feed
+                         (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+           (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+           (tags-str (mapconcat (lambda (s) (propertize s 'face 'elfeed-search-tag-face))
+                                tags ","))
+           (title-width (- (window-width) 10 elfeed-search-trailing-width))
+           (title-column (elfeed-format-column
+                          title (elfeed-clamp
+                                 elfeed-search-title-min-width
+                                 title-width
+                                 elfeed-search-title-max-width)
+                          :left)))
+      (insert (propertize date 'face 'elfeed-search-date-face) " ")
+      (insert (propertize title-column 'face title-faces 'kbd-help title) " ")
+      (when feed-title
+        (insert (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+      (when tags
+        (insert "(" tags-str ")"))))
+
+  (defun elfeed-mark-all-as-read ()
+    "Mark all visible entries as read."
+    (interactive)
+    (mark-whole-buffer)
+    (elfeed-search-untag-all-unread))
+
+  ;; Auto-fetch PDFs for arxiv entries
+  (defun my/elfeed-entry-arxiv-pdf (entry)
+    "Get PDF link from arxiv entry."
+    (let ((link (elfeed-entry-link entry)))
+      (when (string-match "arxiv.org/abs/\\(.+\\)" link)
+        (format "https://arxiv.org/pdf/%s.pdf" (match-string 1 link)))))
+
+  (map! :map elfeed-search-mode-map
+        :localleader
+        "m" #'elfeed-mark-all-as-read
+        "u" #'elfeed-update
+        "f" #'elfeed-search-set-filter)
+
+  (map! :map elfeed-show-mode-map
+        :n "o" #'elfeed-show-visit
+        :n "O" (cmd! (browse-url (elfeed-entry-link elfeed-show-entry)))
+        :n "p" (cmd! (when-let ((pdf (my/elfeed-entry-arxiv-pdf elfeed-show-entry)))
+                       (browse-url pdf)))))
+
+;; Visual fill for comfortable reading
+(add-hook! 'elfeed-show-mode-hook
+  (visual-fill-column-mode 1)
+  (setq-local visual-fill-column-width 90
+              visual-fill-column-center-text t))
+
+(use-package! elfeed-org
+  :after elfeed
+  :config
+  (setq rmh-elfeed-org-files (list (concat org-directory "feeds.org")))
+  (elfeed-org))
+
+(add-hook! 'elfeed-search-mode-hook #'elfeed-update)
+#+end_src
+
+* Calendar (CalDAV)
+:PROPERTIES:
+:header-args: :tangle no
+:END:
+
+Disabled for now — mxroute CalDAV requires Digest auth which has issues with Emacs' url.el.
+
+#+begin_src emacs-lisp
+(setq url-auth-source-function #'auth-source-search)
+
+(use-package! org-caldav
+  :after org
+  :config
+  (setq org-caldav-url "https://caldav.mxroute.com/calendars/xiskkcsycc"
+        org-caldav-calendar-id "ygbvn9ppq9"
+        org-caldav-inbox (concat org-directory "calendar-inbox.org")
+        org-caldav-files (list (concat org-directory "calendar.org"))
+        org-caldav-sync-changes-to-org 'all
+        org-caldav-delete-org-entries 'always
+        org-caldav-delete-calendar-entries 'never
+        org-icalendar-timezone "America/New_York"
+        org-icalendar-alarm-time 15
+        org-icalendar-include-todo t
+        org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
+        org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
+        org-caldav-save-directory (concat doom-cache-dir "org-caldav/"))
+  (unless (file-exists-p org-caldav-save-directory)
+    (make-directory org-caldav-save-directory t)))
+
+(map! :leader
+      :prefix ("C" . "calendar")
+      "s" #'org-caldav-sync
+      "c" #'calendar)
+#+end_src
+
+* Org Mode
+** General
+#+begin_src emacs-lisp
+(unpin! org)
+(use-package! org-contrib)
+(use-package! org-roam-ui)
+(use-package! org-modern)
+(use-package! org-appear)
+(use-package! org-ol-tree
+  :commands org-ol-tree)
+
+(setq org-directory "~/cloud/org/")
+(setq org-agenda-files (list org-directory))
+(add-hook! 'org-mode-hook #'visual-line-mode)
+
+(after! org
+  (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "WAITING(w)" "ONHOLD(h)" "|" "DONE(d)")
+                            (sequence "EMAIL(e)" "|" "SENT(s)")
+                            (sequence "|" "CANCELLED(c)")
+                            (sequence "|" "MOVED(m)")))
+  (setq org-log-done 'time
+        org-list-allow-alphabetical t
+        org-catch-invisible-edits 'show-and-error
+        org-enforce-todo-dependencies t
+        org-return-follows-link t
+        org-fontify-quote-and-verse-blocks nil
+        org-fontify-whole-heading-line nil
+        org-highlight-latex-and-related '(native script entities)
+        org-startup-with-latex-preview nil
+        org-startup-with-inline-images nil))
+#+end_src
+
+** Styling (Modern)
+#+begin_src emacs-lisp
+(use-package! org-modern
+  :hook (org-mode . org-modern-mode)
+  :config
+  (setq org-modern-star '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶")
+        org-modern-table-vertical 1
+        org-modern-table-horizontal 0.2
+        org-modern-list '((43 . "➤") (45 . "–") (42 . "•"))
+        org-modern-todo-faces
+        '(("TODO" :inverse-video t :inherit org-todo)
+          ("PROJ" :inverse-video t :inherit +org-todo-project)
+          ("STRT" :inverse-video t :inherit +org-todo-active)
+          ("WAIT" :inverse-video t :inherit +org-todo-onhold)
+          ("DONE" :inverse-video t :inherit org-done))
+        org-modern-block-fringe nil))
+
+(use-package! org-appear
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autoemphasis t
+        org-appear-autosubmarkers t
+        org-appear-autoentities t
+        org-appear-autokeywords t
+        org-appear-autolinks t
+        org-appear-delay 0.1
+        org-appear-trigger 'always))
+
+(custom-set-faces!
+  '(outline-1 :weight extra-bold :height 1.25)
+  '(outline-2 :weight bold :height 1.15)
+  '(outline-3 :weight bold :height 1.12)
+  '(org-document-title :height 1.2))
+
+;; Zero-width space for better emphasis control
+;; Use M-SPC M-SPC to insert a zero-width space (useful for emphasis at word boundaries)
+(map! :map org-mode-map
+      "M-SPC M-SPC" (cmd! (insert "\u200B")))
+
+;; Better return behavior in org
+(map! :after org
+      :map org-mode-map
+      :n "RET" #'org-open-at-point
+      :i "C-RET" #'org-insert-heading-respect-content
+      :i "C-S-RET" #'org-insert-todo-heading-respect-content)
+#+end_src
+
+** Agenda (Super Agenda)
+#+begin_src emacs-lisp
+(use-package! org-super-agenda
+  :commands org-super-agenda-mode)
+
+(after! org-agenda
+  (org-super-agenda-mode)
+  (setq org-agenda-skip-scheduled-if-done t
+        org-agenda-skip-deadline-if-done t
+        org-agenda-include-deadlines t
+        org-agenda-block-separator nil
+        org-agenda-tags-column 100
+        org-agenda-compact-blocks t))
+
+;; Custom Commands
+(setq org-agenda-custom-commands
+      '(("o" "Overview"
+         ((agenda "" ((org-agenda-span 'day)
+                      (org-super-agenda-groups
+                       '((:name "Today" :time-grid t :date today :todo "TODAY" :scheduled today :order 1)))))
+          (alltodo "" ((org-agenda-overriding-header "")
+                       (org-super-agenda-groups
+                        '((:name "Next to do" :todo "NEXT" :order 1)
+                          (:name "Important" :tag "Important" :priority "A" :order 6)
+                          (:name "Due Today" :deadline today :order 2)
+                          (:name "Due Soon" :deadline future :order 8)
+                          (:name "Overdue" :deadline past :face error :order 7)
+                          (:name "Projects" :tag "Project" :order 14)
+                          (:name "Waiting" :todo "WAITING" :order 20)
+                          (:discard (:tag ("Chore" "Routine" "Daily")))))))))))
+#+end_src
+
+** Capture
+#+begin_src emacs-lisp
+(use-package! doct :commands doct)
+
+(after! org-capture
+  (defvar +org-capture-todo-file (concat org-directory "todo.org"))
+  (defvar +org-capture-notes-file (concat org-directory "notes.org"))
+
+  (setq org-capture-templates
+        (doct `(("Personal todo" :keys "t"
+                 :icon ("nf-oct-checklist" :set "octicon" :color "green")
+                 :file +org-capture-todo-file
+                 :prepend t
+                 :headline "Inbox"
+                 :type entry
+                 :template ("* TODO %?" "%i %a"))
+                ("Personal note" :keys "n"
+                 :icon ("nf-fa-sticky_note_o" :set "faicon" :color "green")
+                 :file +org-capture-notes-file
+                 :prepend t
+                 :headline "Inbox"
+                 :type entry
+                 :template ("* %?" "%i %a"))
+                ("Email" :keys "e"
+                 :icon ("nf-fa-envelope" :set "faicon" :color "blue")
+                 :file +org-capture-todo-file
+                 :prepend t
+                 :headline "Inbox"
+                 :type entry
+                 :template ("* TODO %^{type|reply to|contact} %\\3 %? :email:"
+                            "Send an email to %^{recipiant}"
+                            "%U %i %a"))))))
+#+end_src
+
+** Roam
+#+begin_src emacs-lisp
+(setq org-roam-directory (concat (file-name-as-directory org-directory) "Notes/"))
+(setq org-roam-db-location (concat doom-cache-dir "org-roam.db"))
+(setq org-roam-db-update-method 'immediate)
+
+(use-package org-roam-ui
+  :after org-roam
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start nil))
+
+(setq org-roam-dailies-capture-templates
+      '(("d" "default" entry "* %?"
+         :if-new (file+head
+                  "%<%Y-%m-%d>.org"
+                  "#+title: %<%Y-%m-%d>\n")
+         :unnarrowed t
+         :immediate-finish t
+         :jump-to-captured t)))
+
+(after! org-roam
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?"
+           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+date: %U\n#+filetags:\n\n")
+           :unnarrowed t)
+          ("r" "reference" plain "%?"
+           :target (file+head "references/%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+date: %U\n#+filetags: :reference:\n\n* Source\n\n* Notes\n")
+           :unnarrowed t)
+          ("p" "project" plain "%?"
+           :target (file+head "projects/%<%Y%m%d%H%M%S>-${slug}.org"
+                              "#+title: ${title}\n#+date: %U\n#+filetags: :project:\n\n* Goals\n\n* Tasks\n\n* Notes\n")
+           :unnarrowed t))))
+#+end_src
+
+** Habits
+#+begin_src emacs-lisp
+(after! org
+  (add-to-list 'org-modules 'org-habit t)
+  (setq org-habit-show-habits t
+        org-habit-show-habits-only-for-today t
+        org-habit-graph-column 60
+        org-habit-preceding-days 21
+        org-habit-following-days 7))
+#+end_src
+
+** Transclusion
+Import and display content from other org files inline.
+#+begin_src emacs-lisp
+(use-package! org-transclusion
+  :after org
+  :config
+  (setq org-transclusion-exclude-elements '(property-drawer keyword))
+  (map! :map org-mode-map
+        :localleader
+        :prefix ("T" . "transclusion")
+        "a" #'org-transclusion-add
+        "A" #'org-transclusion-add-all
+        "r" #'org-transclusion-remove
+        "R" #'org-transclusion-remove-all
+        "t" #'org-transclusion-mode))
+#+end_src
+
+** Citations (Citar)
+#+begin_src emacs-lisp
+(after! citar
+  (setq citar-bibliography (list (concat org-directory "references.bib"))
+        citar-notes-paths (list (concat org-roam-directory "references/"))
+        citar-library-paths (list "~/Documents/papers/")
+        org-cite-global-bibliography citar-bibliography
+        org-cite-insert-processor 'citar
+        org-cite-follow-processor 'citar
+        org-cite-activate-processor 'citar))
+#+end_src
+
+** Export
+#+begin_src emacs-lisp
+(after! org
+  (setq org-export-headline-levels 5
+        org-export-with-toc t
+        org-export-with-section-numbers nil
+        org-export-with-smart-quotes t))
+
+(after! ox-html
+  (setq org-html-validation-link nil
+        org-html-head-include-scripts nil
+        org-html-head-include-default-style nil
+        org-html-doctype "html5"
+        org-html-html5-fancy t))
+#+end_src
+
+* Writing
+** Org Journal
+#+begin_src emacs-lisp
+(after! org-journal
+  (setq org-journal-dir (concat org-directory "journal/")
+        org-journal-date-prefix "#+title: "
+        org-journal-time-prefix "* "
+        org-journal-date-format "%Y-%m-%d %A"
+        org-journal-file-format "%Y-%m-%d.org"
+        org-journal-enable-agenda-integration t))
+
+(map! :leader
+      :prefix ("j" . "journal")
+      "j" #'org-journal-new-entry
+      "s" #'org-journal-search)
+#+end_src
+
+** Writeroom (Zen Mode)
+#+begin_src emacs-lisp
+(after! writeroom-mode
+  (setq writeroom-width 100
+        writeroom-mode-line t
+        writeroom-maximize-window nil
+        writeroom-global-effects '(writeroom-set-alpha
+                                   writeroom-set-menu-bar-lines
+                                   writeroom-set-tool-bar-lines
+                                   writeroom-set-vertical-scroll-bars
+                                   writeroom-set-bottom-divider-width))
+
+  ;; Enhanced prose mode in writeroom
+  (defvar my/writeroom-prev-line-spacing nil)
+
+  (defun my/writeroom-prose-on ()
+    "Enable prose-friendly settings."
+    (when (derived-mode-p 'org-mode 'markdown-mode)
+      (setq my/writeroom-prev-line-spacing line-spacing)
+      (setq-local line-spacing 0.3)
+      (display-line-numbers-mode -1)
+      (visual-fill-column-mode 1)))
+
+  (defun my/writeroom-prose-off ()
+    "Disable prose-friendly settings."
+    (when my/writeroom-prev-line-spacing
+      (setq-local line-spacing my/writeroom-prev-line-spacing))
+    (visual-fill-column-mode -1))
+
+  (add-hook 'writeroom-mode-enable-hook #'my/writeroom-prose-on)
+  (add-hook 'writeroom-mode-disable-hook #'my/writeroom-prose-off))
+#+end_src
+
+* File Management (Dired)
+#+begin_src emacs-lisp
+(after! dirvish
+  (setq dirvish-quick-access-entries
+        '(("h" "~/"                          "Home")
+          ("d" "~/Downloads/"                "Downloads")
+          ("c" "~/Code/"                     "Code")
+          ("o" "~/cloud/org/"                "Org")
+          ("p" "~/Pictures/"                 "Pictures")
+          ("t" "/tmp/"                       "Temp")))
+  (dirvish-override-dired-mode))
+
+(after! dired
+  (setq dired-dwim-target t
+        dired-recursive-copies 'always
+        dired-recursive-deletes 'always
+        delete-by-moving-to-trash t))
+#+end_src
+
+* PDF Tools
+#+begin_src emacs-lisp
+(after! pdf-view
+  (setq pdf-view-display-size 'fit-page
+        pdf-view-resize-factor 1.1
+        pdf-annot-activate-created-annotations t)
+  (add-hook! 'pdf-view-mode-hook #'pdf-view-midnight-minor-mode))
+#+end_src
+
+* Bibliography (Ebib)
+#+begin_src emacs-lisp
+(use-package! ebib
+  :commands ebib
+  :config
+  (setq ebib-preload-bib-files (list (concat org-directory "references.bib"))
+        ebib-notes-directory (concat org-roam-directory "references/")
+        ebib-file-associations '(("pdf" . "xdg-open"))
+        ebib-index-columns '(("Entry Key" 20 t)
+                            ("Author/Editor" 40 t)
+                            ("Year" 6 t)
+                            ("Title" 60 t))
+        ebib-reading-list-file (concat org-directory "reading-list.org")))
+#+end_src
+
+* Lookup & Search
+#+begin_src emacs-lisp
+(after! consult
+  (setq consult-narrow-key "<"
+        consult-preview-key "M-."
+        consult-async-min-input 2
+        consult-async-refresh-delay 0.15
+        consult-async-input-throttle 0.2
+        consult-async-input-debounce 0.1)
+
+  ;; Configure ripgrep for better search results
+  (setq consult-ripgrep-args
+        "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --smart-case --no-heading --with-filename --line-number --search-zip"))
+
+(map! :leader
+      "s g" #'consult-ripgrep
+      "s l" #'consult-line
+      "s o" #'consult-outline
+      "s i" #'consult-imenu
+      "s f" #'consult-find
+      "s r" #'consult-recent-file
+      "s b" #'consult-buffer)
+
+;; Better buffer switching with consult
+(map! "C-x b" #'consult-buffer
+      "C-x 4 b" #'consult-buffer-other-window)
+#+end_src
+
+* AI Integration
+#+begin_src emacs-lisp
+(use-package! gptel
+  :commands gptel gptel-send gptel-menu gptel-rewrite
+  :config
+  (setq gptel-model 'claude-sonnet-4-20250514
+        gptel-backend (gptel-make-anthropic "Claude"
+                        :stream t
+                        :key #'gptel-api-key-from-auth-source))
+  (setq gptel-default-mode 'org-mode
+        gptel-org-branching-context t)
+
+  ;; Custom directives for common tasks
+  (setq gptel-directives
+        '((default . "You are a helpful AI assistant.")
+          (code . "You are a senior software engineer. Write clean, idiomatic code with minimal comments. Explain only when asked.")
+          (writing . "You are a writing assistant. Help improve clarity, grammar, and flow. Be concise.")
+          (explain . "You are a teacher. Explain concepts clearly with examples. Assume the reader is intelligent but unfamiliar with the topic.")
+          (refactor . "You are a code refactoring expert. Improve code quality, readability, and performance while maintaining functionality."))))
+
+(map! :leader
+      :prefix ("l" . "LLM")
+      "l" #'gptel
+      "s" #'gptel-send
+      "m" #'gptel-menu
+      "r" #'gptel-rewrite
+      "a" #'gptel-abort)
+
+;; Quick send in visual mode
+(map! :v "C-c RET" #'gptel-send)
+#+end_src
+
+* Calculator
+#+begin_src emacs-lisp
+(after! calc
+  (setq calc-angle-mode 'rad
+        calc-symbolic-mode t
+        calc-display-sci-low -5
+        calc-display-sci-high 10)
+
+  (map! :map calc-mode-map
+        :n "q" #'calc-quit))
+
+;; Quick calc from anywhere
+(map! :leader
+      :prefix ("=" . "calc")
+      "=" #'calc
+      "q" #'quick-calc
+      "g" #'calc-grab-region
+      "e" #'calc-embedded)
+
+;; Embedded calc in org-mode
+(map! :after org
+      :map org-mode-map
+      :localleader
+      "E" #'calc-embedded)
+#+end_src
+
+* Pomodoro
+#+begin_src emacs-lisp
+(use-package! org-pomodoro
+  :commands org-pomodoro
+  :config
+  (setq org-pomodoro-length 25
+        org-pomodoro-short-break-length 5
+        org-pomodoro-long-break-length 20
+        org-pomodoro-long-break-frequency 4
+        org-pomodoro-play-sounds t
+        org-pomodoro-keep-killed-pomodoro-time t))
+
+(map! :after org-agenda
+      :map org-agenda-mode-map
+      "P" #'org-pomodoro)
+#+end_src
+
+* Emacs Daemon
+Configuration for running Emacs as a daemon/server.
+** Daemon Initialization
+#+begin_src emacs-lisp
+(when (daemonp)
+  ;; Start mu4e in the background after daemon starts
+  (add-hook 'server-after-make-frame-hook
+            (lambda ()
+              (unless (get-buffer " *mu4e-main*")
+                (mu4e t))))
+
+  ;; Update elfeed periodically in daemon mode
+  (run-with-timer 0 (* 8 60 60) #'elfeed-update)
+
+  ;; New frames open to dashboard
+  (add-hook 'server-after-make-frame-hook
+            (lambda ()
+              (when (and (eq (length (frame-list)) 2)
+                         (daemonp))
+                (+doom-dashboard-reload t)))))
+#+end_src
+
+** Systemd Service
+To use Emacs as a daemon, create =~/.config/systemd/user/emacs.service=:
+#+begin_example
+[Unit]
+Description=Emacs text editor (daemon)
+Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/emacs --fg-daemon
+ExecStop=/usr/bin/emacsclient --eval "(kill-emacs)"
+Restart=on-failure
+Environment=COLORTERM=truecolor
+
+[Install]
+WantedBy=default.target
+#+end_example
+
+Then enable with: =systemctl --user enable --now emacs=
+
+** Desktop Entry
+Create =~/.local/share/applications/emacsclient.desktop=:
+#+begin_example
+[Desktop Entry]
+Name=Emacs Client
+GenericName=Text Editor
+Comment=Edit text
+MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-org;
+Exec=emacsclient -c -a "" %F
+Icon=emacs
+Type=Application
+Terminal=false
+Categories=Development;TextEditor;Utility;
+StartupWMClass=Emacs
+Keywords=Text;Editor;
+#+end_example
+
+* Dashboard
+#+begin_src emacs-lisp
+(defun my-doom-dashboard-draw-ascii-banner-fn ()
+  (let* ((banner '("███████╗███╗   ███╗ █████╗  ██████╗███████╗"
+                   "██╔════╝████╗ ████║██╔══██╗██╔════╝██╔════╝"
+                   "█████╗  ██╔████╔██║███████║██║     ███████╗"
+                   "██╔══╝  ██║╚██╔╝██║██╔══██║██║     ╚════██║"
+                   "███████╗██║ ╚═╝ ██║██║  ██║╚██████╗███████║"
+                   "╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚══════╝"))
+         (longest-line (apply #'max (mapcar #'length banner))))
+    (put-text-property
+     (point)
+     (dolist (line banner (point))
+       (insert (+doom-dashboard--center
+                +doom-dashboard--width
+                (concat line
+                        (make-string (max 0 (- longest-line (length line))) ?\s)))
+               "\n"))
+     'face 'doom-dashboard-banner)))
+
+(setq +doom-dashboard-ascii-banner-fn #'my-doom-dashboard-draw-ascii-banner-fn)
+
+;; Dashboard quick keys (like tecosaur's config)
+(defun my/dashboard-goto-org ()
+  "Open org directory from dashboard."
+  (interactive)
+  (find-file org-directory))
+
+(defun my/dashboard-goto-notes ()
+  "Open org-roam directory from dashboard."
+  (interactive)
+  (find-file org-roam-directory))
+
+(map! :map +doom-dashboard-mode-map
+      :n "O" #'my/dashboard-goto-org
+      :n "N" #'my/dashboard-goto-notes
+      :n "J" #'org-journal-new-entry
+      :n "A" #'org-agenda
+      :n "M" #'mu4e
+      :n "E" #'elfeed)
+
+(map! :leader
+      :desc "Elfeed" "o e" #'elfeed)
+
+(setq +doom-dashboard-menu-sections
+      '(("Open org-agenda"
+         :icon (nerd-icons-octicon "nf-oct-calendar" :face 'doom-dashboard-menu-title)
+         :when (fboundp 'org-agenda)
+         :face (:inherit (doom-dashboard-menu-title bold))
+         :key "SPC o A"
+         :action org-agenda)
+        ("Open elfeed"
+         :icon (nerd-icons-faicon "nf-fa-rss" :face 'doom-dashboard-menu-title)
+         :when (fboundp 'elfeed)
+         :face (:inherit (doom-dashboard-menu-title bold))
+         :key "SPC o e"
+         :action elfeed)
+        ("Open mu4e"
+         :icon (nerd-icons-mdicon "nf-md-email" :face 'doom-dashboard-menu-title)
+         :when (fboundp 'mu4e)
+         :face (:inherit (doom-dashboard-menu-title bold))
+         :key "SPC o m"
+         :action mu4e)
+        ("Recently opened files"
+         :icon (nerd-icons-faicon "nf-fa-file_text" :face 'doom-dashboard-menu-title)
+         :face (:inherit (doom-dashboard-menu-title bold))
+         :key "SPC f r"
+         :action recentf-open-files)
+        ("Open project"
+         :icon (nerd-icons-octicon "nf-oct-briefcase" :face 'doom-dashboard-menu-title)
+         :face (:inherit (doom-dashboard-menu-title bold))
+         :key "SPC p p"
+         :action projectile-switch-project)
+        ("Open private configuration"
+         :icon (nerd-icons-octicon "nf-oct-gear" :face 'doom-dashboard-menu-title)
+         :when (file-directory-p doom-private-dir)
+         :face (:inherit (doom-dashboard-menu-title bold))
+         :key "SPC f p"
+         :action doom/open-private-config)))
+#+end_src

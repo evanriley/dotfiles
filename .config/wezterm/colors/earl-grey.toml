@@ -1,0 +1,70 @@
+# -----------------------------------------------------------------------------
+# Earl Grey for WezTerm
+# -----------------------------------------------------------------------------
+
+[colors]
+foreground = "#605A52"
+background = "#FCFBF9"
+cursor_bg = "#7686A9"
+cursor_border = "#7686A9"
+cursor_fg = "#FCFBF9"
+selection_bg = "#E4DAE0"
+selection_fg = "#605A52"
+split = "#E4DAE0"
+compose_cursor = "#556995"
+scrollbar_thumb = "#BEBBB6"
+
+ansi = [
+  "#F7F3EE", # black
+  "#8F5652", # red
+  "#747B4D", # green
+  "#886A44", # yellow
+  "#556995", # blue
+  "#83577D", # magenta
+  "#477A7B", # cyan
+  "#605A52", # white
+]
+brights = [
+  "#BEBBB6", # bright black
+  "#E6DAD8", # bright red
+  "#E1E1D7", # bright green
+  "#E5DED5", # bright yellow
+  "#DBDEE5", # bright blue
+  "#E4DAE0", # bright magenta
+  "#D8E1E0", # bright cyan
+  "#7F7A73", # bright white
+]
+
+[colors.indexed]
+16 = "#BEBBB6"
+17 = "#8F5652"
+
+[colors.tab_bar]
+background = "#F7F3EE"
+inactive_tab_edge = "#556995"
+
+[colors.tab_bar.active_tab]
+fg_color = "#7686A9"
+bg_color = "#FCFBF9"
+intensity = "Bold"
+
+[colors.tab_bar.inactive_tab]
+fg_color = "#605A52"
+bg_color = "#F7F3EE"
+
+[colors.tab_bar.inactive_tab_hover]
+fg_color = "#83577D"
+bg_color = "#FCFBF9"
+
+[colors.tab_bar.new_tab]
+fg_color = "#605A52"
+bg_color = "#F7F3EE"
+
+[colors.tab_bar.new_tab_hover]
+fg_color = "#83577D"
+bg_color = "#FCFBF9"
+intensity = "Bold"
+
+[metadata]
+name = "earl-grey"
+author = "evanriley"

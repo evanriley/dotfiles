@@ -67,14 +67,16 @@ set_bash_prompt() {
     fi
 
     # Directory (Sage Blue) + Git + Jobs + Arrow
-    PS1="${K_BLUE}\w${RESET}${GIT_INFO}${JOB_INDICATOR} ${PROMPT_SYMBOL} "
+    PS1="${K_BLUE}\w${RESET}${GIT_INFO}${JOB_INDICATOR} ${PROMPT_SYMBOL}  "
 }
 
 PROMPT_COMMAND=set_bash_prompt
 
+alias fastfetch='fastfetch --config ~/.config/fastfetch/config.jsonc'
+
 alias dots='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias vim='nvim'
-alias emacs='emacsclient'
+#alias emacs='emacsclient'
 
 alias ..='cd ..'
 alias ...='cd ../../'
@@ -103,3 +105,4 @@ fi
 if command -v mise &> /dev/null; then
     eval "$(mise activate bash)"
 fi
+

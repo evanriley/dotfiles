@@ -1,0 +1,663 @@
+workspace "web"
+workspace "social"
+workspace "game"
+workspace "misc"
+workspace "system"
+workspace "scratch"
+
+environment {
+   QT_QPA_PLATFORMTHEME "gtk3" 
+}
+
+input {
+    keyboard {
+        xkb {
+		layout "us"
+        }
+	repeat-delay 300
+	repeat-rate 90
+        numlock
+    }
+
+    touchpad {
+        tap
+        dwt
+        dwtp
+    }
+
+    mouse {
+        accel-speed 0.0
+        accel-profile "flat"
+    }
+
+    warp-mouse-to-focus
+    focus-follows-mouse max-scroll-amount="90%"
+    workspace-auto-back-and-forth
+}
+
+output "DP-1" {
+    mode "5120x1440@119.979"
+    scale 1
+    transform "normal"
+    variable-refresh-rate
+}
+
+cursor {
+    xcursor-theme "Bibata-Original-Classic"
+    xcursor-size 24
+}
+
+layout {
+    gaps 6
+    center-focused-column "never"
+    always-center-single-column
+    background-color "transparent"
+    preset-column-widths {
+        proportion 0.25
+        proportion 0.5
+        proportion 0.75
+    }
+
+    default-column-width { proportion 0.5; }
+    focus-ring {
+	off
+        width 1
+        active-color 255 200 127 255
+        inactive-color 80 80 80 255
+    }
+
+    border {
+        off
+        width 1
+	active-gradient from="#090E13" to="#C14043" angle=45 relative-to="workspace-view"
+        // inactive-gradient from="#0d0c0c" to="#808080" angle=45 relative-to="workspace-view"
+        // active-color 34 38 45 255
+        inactive-color "#090D12"
+    }
+
+    tab-indicator {
+	      // off
+        // hide-when-single-tab
+        place-within-column
+        gap 5
+        width 4
+        length total-proportion=1.0
+        position "left"
+        gaps-between-tabs 2
+        corner-radius 0
+        // active-color "yellow"
+        // inactive-color "gray"
+        // urgent-color "blue"
+        active-gradient from="#c4b28a" to="#c4746e" angle=45
+        inactive-gradient from="#0d0c0c" to="#808080" angle=45 relative-to="workspace-view"
+        urgent-gradient from="#E46876" to="#c4746e" angle=45
+    }
+
+    shadow {
+        on
+        softness 10
+        spread 5
+        offset x=0 y=5
+	draw-behind-window false
+	color "#090D1270"
+        inactive-color "#00000054"
+    }
+
+    struts {
+	    left 0
+	    right 0
+	    top 0
+	    bottom 0
+    }
+}
+
+spawn-at-startup "/usr/libexec/polkit-mate-authentication-agent-1"
+spawn-at-startup "pipewire"
+spawn-at-startup "pipewire-pulse"
+spawn-at-startup "wireplumber"
+spawn-at-startup "awww-daemon"
+spawn-at-startup "awww" "img" "/home/evan/Pictures/wallpapers/nebula.png"
+spawn-at-startup "waybar"
+spawn-at-startup "swaync"
+spawn-at-startup "hypridle"
+spawn-at-startup "swayosd-server"
+spawn-at-startup "kitty" "--class" "scratch_rmpc" "-e" "rmpc"
+spawn-at-startup "kitty" "--class" "scratch_btop" "-e" "btop"
+spawn-at-startup "firefox"
+spawn-at-startup "discord"
+spawn-at-startup "steam"
+spawn-at-startup "nicotine"
+spawn-at-startup "mpd"
+spawn-at-startup "syncthing" "--no-browser"
+
+//hacky fix because it otherwise won't start in the correct order
+spawn-at-startup "sleep" "2" "&&" "mpd-mpris"
+spawn-at-startup "sleep" "2" "&&" "/home/evan/.cargo/bin/listenbrainz-mpd"
+
+
+hotkey-overlay {
+    skip-at-startup
+}
+
+prefer-no-csd
+
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+gestures {
+	hot-corners {
+		off
+	}
+}
+
+overview {
+	zoom 0.6
+	workspace-shadow {
+		off
+	}
+}
+
+animations {
+    // NOTE: Uncomment to turn off all animations
+    // NOTE: We can also put "off" into each individual animation to disable it.
+    // off
+    // HACK: Slow down all animations by this factor. Values below 1 speed them up instead.
+    slowdown 0.8
+    window-open {
+        duration-ms 150
+        curve "ease-out-expo"
+    }
+    window-close {
+        duration-ms 150
+        curve "ease-out-quad"
+    }
+    horizontal-view-movement {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+    window-movement {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+    window-resize {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+    config-notification-open-close {
+        spring damping-ratio=0.6 stiffness=1000 epsilon=0.001
+    }
+    screenshot-ui-open {
+        duration-ms 200
+        curve "ease-out-quad"
+    }
+    overview-open-close {
+        spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
+    }
+}
+
+layer-rule {
+    match namespace="^swww-daemon$"
+    place-within-backdrop true
+}
+
+// Transparency and blur
+window-rule {
+    match is-active=true
+    // Apply to all windows
+    opacity 0.95
+}
+window-rule {
+    match is-active=false
+    // Apply to all windows
+    opacity 0.95
+}
+
+// Open the Firefox picture-in-picture player as floating by default.
+window-rule {
+    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    open-floating true
+}
+
+window-rule {
+    match at-startup=true app-id="org.mozilla.firefox"
+    open-on-workspace "web"
+}
+
+
+window-rule {
+    match app-id="discord"
+    open-on-workspace "social"
+    default-column-width {
+        proportion 0.5
+    }
+}
+
+window-rule {
+    match at-startup=true app-id="org.mozilla.Thunderbird"
+    open-on-workspace "social"
+}
+
+window-rule {
+    match at-startup=true app-id="org.gnome.World.PikaBackup"
+    open-on-workspace "system"
+}
+
+window-rule {
+    match at-startup=true app-id="steam"
+    open-on-workspace "game"
+}
+
+
+window-rule {
+    match at-startup=true app-id="org.nicotine_plus.Nicotine"
+    open-on-workspace "misc"
+    default-column-width {
+        proportion 0.5
+    }
+}
+
+window-rule {
+    match app-id="steam" title="^notificationtoasts_\\d+_desktop$"
+    default-floating-position x=10 y=10 relative-to="bottom-right"
+}
+
+window-rule {
+    match app-id="Bitwarden"
+    default-column-width {
+        proportion 0.25
+    }
+}
+window-rule {
+    match app-id="com.mitchellh.ghostty"
+    default-column-width {
+        proportion 0.25
+    }
+}
+window-rule {
+    match title="Friends List"
+    open-on-workspace "game"
+    default-column-width {
+        fixed 600
+    }
+    default-window-height {
+        fixed 700
+    }
+}
+window-rule {
+    match app-id="scratch_rmpc"
+    open-on-workspace "scratch"
+    open-floating true
+    default-column-width { fixed 1920; }
+    default-window-height { fixed 1080; }
+}
+window-rule {
+    match app-id="scratch_btop"
+    open-on-workspace "scratch"
+    open-floating true
+    default-column-width { fixed 1920; }
+    default-window-height { fixed 1080; }
+}
+
+window-rule {
+    match app-id="mpv"
+    open-floating true
+    default-column-width { fixed 1920; }
+    default-window-height { fixed 1080; }
+    opacity 1.0
+}
+window-rule {
+    match app-id=r"((google-)?[cC]hrom(e|ium)|[bB]rave-browser|[mM]icrosoft-edge|Vivaldi-stable|helium)"
+    opacity 1.0
+}
+
+window-rule {
+    match app-id=r"([fF]irefox|zen|librewolf|firefox-bin)"
+    opacity 1.0
+}
+
+window-rule {
+    match app-id=r"(org\.qutebrowser\.qutebrowser|qutebrowser)"
+    opacity 1.0
+}
+
+// Qutebrowser specifically on YouTube
+window-rule {
+    match app-id=r"(org\.qutebrowser\.qutebrowser|qutebrowser)" title=r".*YouTube.*"
+    opacity 1.0
+}
+
+window-rule {
+    match title=r"((?i)(?:[a-z0-9-]+\.)*youtube\.com_/|app\.zoom\.us_/wc/home)"
+    opacity 1.0
+}
+
+window-rule {
+    match app-id="org.pulseaudio.pavucontrol"
+    open-floating true
+    default-column-width { fixed 800; }
+    default-window-height { fixed 600; }
+}
+
+window-rule {
+    match app-id=r"^steam_app_\d+$"
+    opacity 1.0
+}
+
+window-rule {
+    match app-id=r"bg3"
+    opacity 1.0
+}
+
+binds {
+    MOD+SHIFT+SLASH {
+        show-hotkey-overlay
+    }
+    MOD+RETURN hotkey-overlay-title="Open Terminal: ghostty" {
+        spawn "ghostty"
+    }
+    Mod+SPACE hotkey-overlay-title="Run an Application: fuzzel" {
+        spawn "fuzzel"
+    }
+    Mod+P {
+        spawn-sh "~/.config/scripts/powermenu"
+    }
+    MOD+ALT+L hotkey-overlay-title="Lock Screen: swaylock" {
+        spawn-sh "swaylock"
+    }
+    MOD+E hotkey-overlay-title="File Manager: Nautilus" {
+        spawn-sh "nautilus"
+    }
+    MOD+CTRL+S {
+	spawn-sh "~/.config/scripts/ns.py -id scratch_rmpc"
+    }
+    MOD+CTRL+T {
+	spawn-sh "~/.config/scripts/ns.py -id scratch_btop"
+  }
+    MOD+CTRL+N {
+      spawn "swaync-client -t"
+    }
+    MOD+B {
+	spawn-sh "killall -SIGUSR1 waybar"
+    }
+    XF86AudioRaiseVolume allow-when-locked=true {
+        spawn "swayosd-client" "--output-volume" "raise"
+    }
+    XF86AudioLowerVolume allow-when-locked=true {
+        spawn "swayosd-client" "--output-volume" "lower"
+    }
+    XF86AudioMute allow-when-locked=true {
+        spawn "swayosd-client" "--output-volume" "mute-toggle"
+    }
+    XF86AudioMicMute allow-when-locked=true {
+        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"
+    }
+    XF86AudioPlay allow-when-locked=true {
+        spawn-sh "playerctl play-pause"
+    }
+    XF86AudioStop allow-when-locked=true {
+        spawn-sh "playerctl stop"
+    }
+    XF86AudioPrev allow-when-locked=true {
+        spawn-sh "playerctl previous"
+    }
+    XF86AudioNext allow-when-locked=true {
+        spawn-sh "playerctl next"
+    }
+    Mod+O repeat=false {
+        toggle-overview
+    }
+    MOD+Q {
+        close-window
+    }
+    Mod+H {
+        focus-column-left
+    }
+    Mod+J {
+        focus-window-down
+    }
+    Mod+K {
+        focus-window-up
+    }
+    Mod+L {
+        focus-column-right
+    }
+    Mod+W {
+        toggle-column-tabbed-display
+    }
+    Mod+Shift+H {
+        move-column-left
+    }
+    Mod+Shift+J {
+        move-window-down
+    }
+    Mod+Shift+K {
+        move-window-up
+    }
+    Mod+Shift+L {
+        move-column-right
+    }
+    Mod+Home {
+        focus-column-first
+    }
+    Mod+End {
+        focus-column-last
+    }
+    Mod+Ctrl+Home {
+        move-column-to-first
+    }
+    Mod+Ctrl+End {
+        move-column-to-last
+    }
+    Mod+Ctrl+H {
+        focus-monitor-left
+    }
+    Mod+Ctrl+J {
+        focus-monitor-down
+    }
+    Mod+Ctrl+K {
+        focus-monitor-up
+    }
+    Mod+Ctrl+L {
+        focus-monitor-right
+    }
+    Mod+Shift+Ctrl+H {
+        move-column-to-monitor-left
+    }
+    Mod+Shift+Ctrl+J {
+        move-column-to-monitor-down
+    }
+    Mod+Shift+Ctrl+K {
+        move-column-to-monitor-up
+    }
+    Mod+Shift+Ctrl+L {
+        move-column-to-monitor-right
+    }
+    Mod+Page_Down {
+        focus-workspace-down
+    }
+    Mod+Page_Up {
+        focus-workspace-up
+    }
+    Mod+U {
+        focus-workspace-down
+    }
+    Mod+I {
+        focus-workspace-up
+    }
+    Mod+Shift+Page_Down {
+        move-column-to-workspace-down
+    }
+    Mod+Shift+Page_Up {
+        move-column-to-workspace-up
+    }
+    Mod+Shift+U {
+        move-column-to-workspace-down
+    }
+    Mod+Shift+I {
+        move-column-to-workspace-up
+    }
+    Mod+Shift+Ctrl+Page_Down {
+        move-workspace-down
+    }
+    Mod+Shift+Ctrl+Page_Up {
+        move-workspace-up
+    }
+    Mod+Shift+Ctrl+U {
+        move-workspace-down
+    }
+    Mod+Shift+Ctrl+I {
+        move-workspace-up
+    }
+    Mod+WheelScrollDown cooldown-ms=150 {
+        focus-workspace-down
+    }
+    Mod+WheelScrollUp cooldown-ms=150 {
+        focus-workspace-up
+    }
+    Mod+Ctrl+WheelScrollDown cooldown-ms=150 {
+        move-column-to-workspace-down
+    }
+    Mod+Ctrl+WheelScrollUp cooldown-ms=150 {
+        move-column-to-workspace-up
+    }
+    Mod+WheelScrollRight {
+        focus-column-right
+    }
+    Mod+WheelScrollLeft {
+        focus-column-left
+    }
+    Mod+Ctrl+WheelScrollRight {
+        move-column-right
+    }
+    Mod+Ctrl+WheelScrollLeft {
+        move-column-left
+    }
+    Mod+Shift+WheelScrollDown {
+        focus-column-right
+    }
+    Mod+Shift+WheelScrollUp {
+        focus-column-left
+    }
+    Mod+Ctrl+Shift+WheelScrollDown {
+        move-column-right
+    }
+    Mod+Ctrl+Shift+WheelScrollUp {
+        move-column-left
+    }
+    Mod+1 {
+        focus-workspace "web"
+    }
+    Mod+2 {
+        focus-workspace "social"
+    }
+    Mod+3 {
+        focus-workspace "game"
+    }
+    Mod+4 {
+        focus-workspace "misc"
+    }
+    Mod+5 {
+        focus-workspace "system"
+    }
+    Mod+6 {
+        focus-workspace "scratch"
+    }
+    Mod+7 {
+        focus-workspace 7
+    }
+    Mod+8 {
+        focus-workspace 8
+    }
+    Mod+9 {
+        focus-workspace 9
+    }
+    Mod+Shift+1 {
+        move-column-to-workspace "web"
+    }
+    Mod+Shift+2 {
+        move-column-to-workspace "social"
+    }
+    Mod+Shift+3 {
+        move-column-to-workspace "game"
+    }
+    Mod+Shift+4 {
+        move-column-to-workspace "misc"
+    }
+    Mod+Shift+5 {
+        move-column-to-workspace "system"
+    }
+    Mod+Shift+6 {
+        move-column-to-workspace "scratch"
+    }
+    Mod+Shift+7 {
+        move-column-to-workspace 7
+    }
+    Mod+Shift+8 {
+        move-column-to-workspace 8
+    }
+    Mod+Shift+9 {
+        move-column-to-workspace 9
+    }
+    Mod+BracketLeft {
+        consume-or-expel-window-left
+    }
+    Mod+BracketRight {
+        consume-or-expel-window-right
+    }
+    Mod+Comma {
+        consume-window-into-column
+    }
+    Mod+Period {
+        expel-window-from-column
+    }
+    Mod+R {
+        switch-preset-column-width
+    }
+    Mod+Shift+R {
+        switch-preset-window-height
+    }
+    Mod+Ctrl+R {
+        reset-window-height
+    }
+    Mod+F {
+        maximize-column
+    }
+    Mod+Shift+F {
+        fullscreen-window
+    }
+    Mod+C {
+        center-column
+    }
+    Mod+Minus {
+        set-column-width "-10%"
+    }
+    Mod+Equal {
+        set-column-width "+10%"
+    }
+    Mod+Shift+Minus {
+        set-window-height "-10%"
+    }
+    Mod+Shift+Equal {
+        set-window-height "+10%"
+    }
+    Mod+V {
+        toggle-window-floating
+    }
+    Mod+Shift+V {
+        switch-focus-between-floating-and-tiling
+    }
+    Print {
+        screenshot
+    }
+    Ctrl+Print {
+        screenshot-screen
+    }
+    Alt+Print {
+        screenshot-window
+    }
+    Mod+Shift+E {
+        quit
+    }
+    Ctrl+Alt+Delete {
+        quit
+    }
+    Mod+Shift+P {
+        power-off-monitors
+    }
+}

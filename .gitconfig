@@ -1,69 +1,90 @@
-[hub]
-  protocol = https
-[core]
-  excludesfile = /Users/evan/.gitignore
-  filemode = false
-  trustctime = false
-  autocrlf = false
-  safecrlf = false
-  pager = delta
-[apply]
-  whitespace = fix
-[interactive]
-  diffFilter = delta --color-only
-[delta]
-  navigate = true
-  dark = true
-[merge]
-  conflictstyle = diff3
-[diff]
-  tool = kitty
-  guitool = kitty.gui
-[mergetool]
-  keepBackup = false
-[help]
-  autocorrect = 1
-[push]
-  default = tracking
 [user]
-  name = Evan Riley
-  email = evan@evanriley.net
-	signingkey = /home/evan/.ssh/id_ed25519.pub
-[commit]
-	gpgsign = true
-[difftool]
-  prompt = false
-  trustExitCode = true
-[difftool "nvimdiff"]
-  cmd = nvim -d $LOCAL $REMOTE
-[difftool "kitty"]
-  cmd = kitten diff $LOCAL $REMOTE
-[difftool "kitty.gui"]
-  cmd = kitten diff $LOCAL $REMOTE
-[mergetool "nvimmerge"]
-  cmd = nvim -d $LOCAL $BASE $REMOTE $MERGED -c 'winc J | winc ='
-  trustExitCode = true
-[fsck]
-  zeroPaddedFilemode = ignore
+    name = Evan Riley
+    email = evan@evanriley.net
+    signingkey = ~/.ssh/id_ed25519.pub # Used ~ for cross-platform safety
+
+[core]
+    excludesfile = ~/.gitignore
+    pager = delta
+    # Performance & whitespace
+    autocrlf = false
+    safecrlf = false
+    filemode = false
+    trustctime = false
+
 [init]
-  defaultBranch = main
-[pull]
-  rebase = true
-[fetch]
-  prune = true
-[branch]
-  autosetupRebase = always
-  sort = -committerdate
-[github]
-  user = evanriley
-[submodule]
-  recurse = true
-[rebase]
-  autoStash = true
-[rerere]
-	enabled = true
+    defaultBranch = main
+
+[display]
+    # Moves the sort to a more global display logic if supported
+    ui = auto
+
 [column]
-	ui = auto
+    ui = auto
+
+[branch]
+    sort = -committerdate
+    autosetupRebase = always
+
+[fetch]
+    prune = true
+
+[push]
+    default = tracking
+    autoSetupRemote = true # Automatically sets up tracking for new branches
+
+[pull]
+    rebase = true
+
+[rebase]
+    autoStash = true
+
+[merge]
+    conflictstyle = diff3
+
+[mergetool]
+    keepBackup = false
+
+[diff]
+    tool = kitty
+    guitool = kitty
+
+[difftool]
+    prompt = false
+    trustExitCode = true
+
+[difftool "kitty"]
+    # 'kitten diff' is the correct modern command
+    cmd = kitten diff $LOCAL $REMOTE
+
+[delta]
+    navigate = true
+    dark = true
+
+[interactive]
+    diffFilter = delta --color-only
+
+[commit]
+    gpgsign = true
+
 [gpg]
-	program = gpg2
-	format = ssh
+    program = gpg2
+    format = ssh
+
+[help]
+    autocorrect = 1
+
+[rerere]
+    enabled = true
+
+[submodule]
+    recurse = true
+
+[github]
+    user = evanriley
+
+[hub]
+    protocol = https
+
+[fsck]
+    zeroPaddedFilemode = ignore

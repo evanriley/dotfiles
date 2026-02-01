@@ -1,0 +1,7 @@
+[tools]
+go = "latest"
+janet = "latest"
+protonge = "latest"
+python = "latest"
+zig = "latest"
+zls = "latest"
