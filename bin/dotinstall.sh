@@ -5,7 +5,7 @@ BASEDIR="$HOME/.dotfiles"
 REPOURL="https://github.com/evanriley/dotfiles"
 SAVEDIR=(".config" ".github" "bin" "gnupg")
 BACKUP_DIR="$HOME/.dotfiles_backup/$(date +'%Y.%m.%d.%H.%M.%S')"
-BRANCH="before-eos"
+BRANCH="main"
 
 # Function Wrapper
 function dots {
