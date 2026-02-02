@@ -4,49 +4,41 @@ workspace "game"
 workspace "misc"
 workspace "system"
 workspace "scratch"
-
 environment {
-   QT_QPA_PLATFORMTHEME "gtk3" 
+    QT_QPA_PLATFORMTHEME "gtk3"
 }
-
 input {
     keyboard {
         xkb {
-		layout "us"
+            layout "us"
         }
-	repeat-delay 300
-	repeat-rate 90
+        repeat-delay 300
+        repeat-rate 90
         numlock
     }
-
     touchpad {
         tap
         dwt
         dwtp
     }
-
     mouse {
         accel-speed 0.0
         accel-profile "flat"
     }
-
     warp-mouse-to-focus
     focus-follows-mouse max-scroll-amount="90%"
     workspace-auto-back-and-forth
 }
-
 output "DP-1" {
     mode "5120x1440@119.979"
     scale 1
     transform "normal"
     variable-refresh-rate
 }
-
 cursor {
     xcursor-theme "Bibata-Original-Classic"
     xcursor-size 24
 }
-
 layout {
     gaps 6
     center-focused-column "never"
@@ -57,26 +49,25 @@ layout {
         proportion 0.5
         proportion 0.75
     }
-
-    default-column-width { proportion 0.5; }
+    default-column-width {
+        proportion 0.5
+    }
     focus-ring {
-	off
+        off
         width 1
         active-color 255 200 127 255
         inactive-color 80 80 80 255
     }
-
     border {
         off
         width 1
-	active-gradient from="#090E13" to="#C14043" angle=45 relative-to="workspace-view"
+        active-gradient from="#090E13" to="#C14043" angle=45 relative-to="workspace-view"
         // inactive-gradient from="#0d0c0c" to="#808080" angle=45 relative-to="workspace-view"
         // active-color 34 38 45 255
         inactive-color "#090D12"
     }
-
     tab-indicator {
-	      // off
+        // off
         // hide-when-single-tab
         place-within-column
         gap 5
@@ -92,25 +83,22 @@ layout {
         inactive-gradient from="#0d0c0c" to="#808080" angle=45 relative-to="workspace-view"
         urgent-gradient from="#E46876" to="#c4746e" angle=45
     }
-
     shadow {
         on
         softness 10
         spread 5
         offset x=0 y=5
-	draw-behind-window false
-	color "#090D1270"
+        draw-behind-window false
+        color "#090D1270"
         inactive-color "#00000054"
     }
-
     struts {
-	    left 0
-	    right 0
-	    top 0
-	    bottom 0
+        left 0
+        right 0
+        top 0
+        bottom 0
     }
 }
-
 spawn-at-startup "/usr/libexec/polkit-mate-authentication-agent-1"
 spawn-at-startup "pipewire"
 spawn-at-startup "pipewire-pulse"
@@ -129,33 +117,27 @@ spawn-at-startup "steam"
 spawn-at-startup "nicotine"
 spawn-at-startup "mpd"
 spawn-at-startup "syncthing" "--no-browser"
-
+spawn-at-startup "/home/evan/.local/share/mise/installs/go/1.25.6/bin/goimapnotify" "--conf" "/home/evan/.config/goimapnotify/goimapnotify.yaml"
 //hacky fix because it otherwise won't start in the correct order
-spawn-at-startup "sleep" "2" "&&" "mpd-mpris"
-spawn-at-startup "sleep" "2" "&&" "/home/evan/.cargo/bin/listenbrainz-mpd"
-
-
+spawn-at-startup "sh" "-c" "sleep 2 && mpd-mpris"
+spawn-at-startup "sh" "-c" "sleep 2 && /home/evan/.cargo/bin/listenbrainz-mpd"
+spawn-at-startup "sh" "-c" "sleep 2 && /home/evan/.cargo/bin/mpd-discord-rpc"
 hotkey-overlay {
     skip-at-startup
 }
-
 prefer-no-csd
-
 screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
-
 gestures {
-	hot-corners {
-		off
-	}
+    hot-corners {
+        off
+    }
 }
-
 overview {
-	zoom 0.6
-	workspace-shadow {
-		off
-	}
+    zoom 0.6
+    workspace-shadow {
+        off
+    }
 }
-
 animations {
     // NOTE: Uncomment to turn off all animations
     // NOTE: We can also put "off" into each individual animation to disable it.
@@ -190,12 +172,10 @@ animations {
         spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
     }
 }
-
 layer-rule {
     match namespace="^swww-daemon$"
     place-within-backdrop true
 }
-
 // Transparency and blur
 window-rule {
     match is-active=true
@@ -207,56 +187,42 @@ window-rule {
     // Apply to all windows
     opacity 0.95
 }
-
 // Open the Firefox picture-in-picture player as floating by default.
 window-rule {
-    match app-id=r#"firefox$"# title="^Picture-in-Picture$"
+    match app-id="firefox$" title="^Picture-in-Picture$"
     open-floating true
 }
-
 window-rule {
-    match at-startup=true app-id="org.mozilla.firefox"
+    match at-startup=true app-id="firefox"
     open-on-workspace "web"
+    open-maximized-to-edges false
 }
-
-
 window-rule {
     match app-id="discord"
     open-on-workspace "social"
-    default-column-width {
-        proportion 0.5
-    }
+    open-maximized-to-edges false
 }
-
 window-rule {
     match at-startup=true app-id="org.mozilla.Thunderbird"
     open-on-workspace "social"
 }
-
 window-rule {
     match at-startup=true app-id="org.gnome.World.PikaBackup"
     open-on-workspace "system"
 }
-
 window-rule {
     match at-startup=true app-id="steam"
     open-on-workspace "game"
 }
-
-
 window-rule {
-    match at-startup=true app-id="org.nicotine_plus.Nicotine"
+    match app-id="org.nicotine_plus.Nicotine"
     open-on-workspace "misc"
-    default-column-width {
-        proportion 0.5
-    }
+    open-maximized-to-edges false
 }
-
 window-rule {
     match app-id="steam" title="^notificationtoasts_\\d+_desktop$"
     default-floating-position x=10 y=10 relative-to="bottom-right"
 }
-
 window-rule {
     match app-id="Bitwarden"
     default-column-width {
@@ -265,6 +231,12 @@ window-rule {
 }
 window-rule {
     match app-id="com.mitchellh.ghostty"
+    default-column-width {
+        proportion 0.25
+    }
+}
+window-rule {
+    match app-id="foot"
     default-column-width {
         proportion 0.25
     }
@@ -283,73 +255,80 @@ window-rule {
     match app-id="scratch_rmpc"
     open-on-workspace "scratch"
     open-floating true
-    default-column-width { fixed 1920; }
-    default-window-height { fixed 1080; }
+    default-column-width {
+        fixed 1920
+    }
+    default-window-height {
+        fixed 1080
+    }
 }
 window-rule {
     match app-id="scratch_btop"
     open-on-workspace "scratch"
     open-floating true
-    default-column-width { fixed 1920; }
-    default-window-height { fixed 1080; }
+    default-column-width {
+        fixed 1920
+    }
+    default-window-height {
+        fixed 1080
+    }
 }
-
 window-rule {
     match app-id="mpv"
     open-floating true
-    default-column-width { fixed 1920; }
-    default-window-height { fixed 1080; }
+    default-column-width {
+        fixed 1920
+    }
+    default-window-height {
+        fixed 1080
+    }
     opacity 1.0
 }
 window-rule {
-    match app-id=r"((google-)?[cC]hrom(e|ium)|[bB]rave-browser|[mM]icrosoft-edge|Vivaldi-stable|helium)"
+    match app-id="((google-)?[cC]hrom(e|ium)|[bB]rave-browser|[mM]icrosoft-edge|Vivaldi-stable|helium)"
     opacity 1.0
 }
-
 window-rule {
-    match app-id=r"([fF]irefox|zen|librewolf|firefox-bin)"
+    match app-id="([fF]irefox|zen|librewolf|firefox-bin)"
     opacity 1.0
 }
-
 window-rule {
-    match app-id=r"(org\.qutebrowser\.qutebrowser|qutebrowser)"
+    match app-id="(org\\.qutebrowser\\.qutebrowser|qutebrowser)"
     opacity 1.0
 }
-
 // Qutebrowser specifically on YouTube
 window-rule {
-    match app-id=r"(org\.qutebrowser\.qutebrowser|qutebrowser)" title=r".*YouTube.*"
+    match app-id="(org\\.qutebrowser\\.qutebrowser|qutebrowser)" title=".*YouTube.*"
     opacity 1.0
 }
-
 window-rule {
-    match title=r"((?i)(?:[a-z0-9-]+\.)*youtube\.com_/|app\.zoom\.us_/wc/home)"
+    match title="((?i)(?:[a-z0-9-]+\\.)*youtube\\.com_/|app\\.zoom\\.us_/wc/home)"
     opacity 1.0
 }
-
 window-rule {
     match app-id="org.pulseaudio.pavucontrol"
     open-floating true
-    default-column-width { fixed 800; }
-    default-window-height { fixed 600; }
+    default-column-width {
+        fixed 800
+    }
+    default-window-height {
+        fixed 600
+    }
 }
-
 window-rule {
-    match app-id=r"^steam_app_\d+$"
+    match app-id="^steam_app_\\d+$"
     opacity 1.0
 }
-
 window-rule {
-    match app-id=r"bg3"
+    match app-id="bg3"
     opacity 1.0
 }
-
 binds {
     MOD+SHIFT+SLASH {
         show-hotkey-overlay
     }
-    MOD+RETURN hotkey-overlay-title="Open Terminal: ghostty" {
-        spawn "ghostty"
+    MOD+RETURN hotkey-overlay-title="Open Terminal: foot" {
+        spawn "foot"
     }
     Mod+SPACE hotkey-overlay-title="Run an Application: fuzzel" {
         spawn "fuzzel"
@@ -364,16 +343,16 @@ binds {
         spawn-sh "nautilus"
     }
     MOD+CTRL+S {
-	spawn-sh "~/.config/scripts/ns.py -id scratch_rmpc"
+        spawn-sh "~/.config/scripts/ns.py -id scratch_rmpc"
     }
     MOD+CTRL+T {
-	spawn-sh "~/.config/scripts/ns.py -id scratch_btop"
-  }
+        spawn-sh "~/.config/scripts/ns.py -id scratch_btop"
+    }
     MOD+CTRL+N {
-      spawn "swaync-client -t"
+        spawn "swaync-client -t"
     }
     MOD+B {
-	spawn-sh "killall -SIGUSR1 waybar"
+        spawn-sh "killall -SIGUSR1 waybar"
     }
     XF86AudioRaiseVolume allow-when-locked=true {
         spawn "swayosd-client" "--output-volume" "raise"
