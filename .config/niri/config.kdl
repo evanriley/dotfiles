@@ -6,7 +6,6 @@ workspace "system"
 workspace "scratch"
 environment {
     QT_QPA_PLATFORMTHEME "gtk3"
-    QT_STYLE_OVERRIDE "Adwaita-Dark"
 }
 input {
     keyboard {
@@ -323,11 +322,11 @@ binds {
     Mod+SPACE hotkey-overlay-title="Run an Application: rofi" {
         spawn "rofi" "-show" "drun"
     }
-    Mod+P {
-        spawn-sh "~/.config/scripts/powermenu"
+    Mod+P hotkey-overlay-title="Open Power Menu: wlogout" {
+        spawn "wlogout"
     }
-    MOD+ALT+L hotkey-overlay-title="Lock Screen: swaylock" {
-        spawn-sh "swaylock"
+    MOD+ALT+L hotkey-overlay-title="Lock Screen: gtklock" allow-when-locked=true {
+        spawn "gtklock"
     }
     MOD+E hotkey-overlay-title="File Manager: Nautilus" {
         spawn-sh "nautilus"

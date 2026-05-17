@@ -1,0 +1,62 @@
+* {
+    background-image: none;
+    box-shadow: none;
+    font-family: "Berkeley Mono";
+}
+
+window {
+    background-color: rgba(9, 14, 19, 0.64);
+}
+
+button {
+    background-color: rgba(20, 24, 28, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 10px;
+    color: #c5c9c7;
+    margin: 12px;
+    min-height: 118px;
+    min-width: 132px;
+    padding: 16px;
+}
+
+button:hover,
+button:focus {
+    background-color: rgba(57, 59, 68, 0.88);
+    border-color: rgba(127, 180, 202, 0.46);
+    color: #ffffff;
+}
+
+button:active {
+    background-color: rgba(127, 180, 202, 0.24);
+}
+
+#lock {
+    background-image: image(url("/usr/share/wlogout/icons/lock.png"));
+}
+
+#suspend {
+    background-image: image(url("/usr/share/wlogout/icons/suspend.png"));
+}
+
+#logout {
+    background-image: image(url("/usr/share/wlogout/icons/logout.png"));
+}
+
+#reboot {
+    background-image: image(url("/usr/share/wlogout/icons/reboot.png"));
+}
+
+#shutdown {
+    background-image: image(url("/usr/share/wlogout/icons/shutdown.png"));
+}
+
+#lock,
+#suspend,
+#logout,
+#reboot,
+#shutdown {
+    background-position: center 28px;
+    background-repeat: no-repeat;
+    background-size: 42px;
+    padding-top: 74px;
+}
