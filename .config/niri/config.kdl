@@ -6,6 +6,7 @@ workspace "system"
 workspace "scratch"
 environment {
     QT_QPA_PLATFORMTHEME "gtk3"
+    QT_STYLE_OVERRIDE "Adwaita-Dark"
 }
 input {
     keyboard {
