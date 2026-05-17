@@ -16,17 +16,25 @@ window {
     padding: 32px;
 }
 
-#clock-label {
+window #clock-label,
+window.focused:not(.hidden) #clock-label {
     color: #c5c9c7;
     font-size: 64px;
     font-weight: 700;
     margin-bottom: 2px;
 }
 
-#date-label {
+window #date-label,
+window.focused:not(.hidden) #date-label {
     color: rgba(197, 201, 199, 0.74);
     font-size: 16px;
     margin-bottom: 22px;
+}
+
+#input-label {
+    color: rgba(197, 201, 199, 0.74);
+    font-size: 0;
+    min-width: 0;
 }
 
 #input-field {
@@ -45,7 +53,19 @@ window {
 }
 
 #warning-label,
-#error-label,
-#unlock-button {
+#error-label {
     color: #e46876;
+}
+
+#unlock-button {
+    background: rgba(127, 180, 202, 0.18);
+    border: 1px solid rgba(127, 180, 202, 0.28);
+    border-radius: 8px;
+    color: #c5c9c7;
+    padding: 8px 14px;
+}
+
+#unlock-button:hover,
+#unlock-button:focus {
+    background: rgba(127, 180, 202, 0.28);
 }
