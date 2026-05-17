@@ -5,7 +5,7 @@ After=graphical-session.target
 Requisite=graphical-session.target
 
 [Service]
-ExecStart=/usr/bin/env lxqt-policykit-agent
+ExecStart=/usr/libexec/lxqt-policykit-agent
 Restart=on-failure
 
 [Install]
