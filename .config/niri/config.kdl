@@ -104,6 +104,8 @@ spawn-at-startup "kitty" "--class" "scratch_btop" "-e" "btop"
 spawn-at-startup "firefox"
 spawn-at-startup "flatpak" "run" "org.gnome.World.PikaBackup"
 spawn-at-startup "flatpak" "run" "dev.deedles.Trayscale"
+spawn-at-startup "flatpak" "run" "com.discordapp.Discord" "--start-minimized"
+spawn-at-startup "steam" "-silent"
 hotkey-overlay {
     skip-at-startup
 }
@@ -180,7 +182,7 @@ window-rule {
     open-maximized-to-edges false
 }
 window-rule {
-    match app-id="discord"
+    match app-id="(discord|com\\.discordapp\\.Discord)"
     open-on-workspace "social"
     open-maximized-to-edges false
 }
@@ -191,6 +193,17 @@ window-rule {
 window-rule {
     match app-id="org.gnome.World.PikaBackup"
     open-on-workspace "system"
+}
+window-rule {
+    match app-id="dev.deedles.Trayscale"
+    open-on-workspace "system"
+    open-floating true
+    default-column-width {
+        fixed 520
+    }
+    default-window-height {
+        fixed 620
+    }
 }
 window-rule {
     match app-id="steam"
