@@ -1,11 +1,11 @@
 [Unit]
-Description=MATE PolicyKit authentication agent for Niri
+Description=Xfce PolicyKit authentication agent for Niri
 PartOf=graphical-session.target
 After=graphical-session.target
 Requisite=graphical-session.target
 
 [Service]
-ExecStart=/usr/libexec/polkit-mate-authentication-agent-1
+ExecStart=/usr/libexec/xfce-polkit
 Restart=on-failure
 
 [Install]
