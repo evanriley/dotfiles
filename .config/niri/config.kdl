@@ -171,6 +171,12 @@ window-rule {
     // Apply to all windows
     opacity 0.95
 }
+// Niri can detect individual-window screencasts. Keep the shared target fully
+// opaque so screen shares and recordings do not inherit cosmetic transparency.
+window-rule {
+    match is-window-cast-target=true
+    opacity 1.0
+}
 // Open the Firefox picture-in-picture player as floating by default.
 window-rule {
     match app-id="firefox$" title="^Picture-in-Picture$"
@@ -289,7 +295,7 @@ window-rule {
     opacity 1.0
 }
 window-rule {
-    match app-id="([fF]irefox|zen|librewolf|firefox-bin)"
+    match app-id="([fF]irefox|firefox-bin|org\\.mozilla\\.firefox|zen|app\\.zen_browser\\.zen|librewolf|io\\.gitlab\\.librewolf-community)"
     opacity 1.0
 }
 window-rule {
