@@ -16,7 +16,7 @@ export HISTCONTROL=ignoreboth:erasedups # Ignore spaces and duplicates
 shopt -s histappend # Append to history, don't overwrite
 
 # This replaces standard Ctrl+R with a fuzzy search window
-[ -f /usr/share/fzf/key-bindings.bash ] && source /usr/share/fzf/key-bindings.bash
+[ -f /usr/share/fzf/shell/key-bindings.bash ] && source /usr/share/fzf/shell/key-bindings.bash
 [ -f /usr/share/bash-completion/bash_completion ] && source /usr/share/bash-completion/bash_completion
 
 set_bash_prompt() {

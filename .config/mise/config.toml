@@ -1,7 +1,7 @@
 [tools]
 go = "latest"
 janet = "latest"
-protonge = "latest"
+node = "latest"
 python = "latest"
 zig = "latest"
 zls = "latest"
