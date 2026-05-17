@@ -1,0 +1,15 @@
+layout_uv() {
+    if [ ! -d .venv ]; then
+        uv venv
+    fi
+
+    source .venv/bin/activate
+}
+
+dotenv_if_exists() {
+    local file="${1:-.env.local}"
+
+    if [ -f "$file" ]; then
+        dotenv "$file"
+    fi
+}

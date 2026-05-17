@@ -15,6 +15,13 @@
   "modules-center": ["clock"],
 
   "modules-right": [
+    "network#wifi-dl",
+    "network#wifi-ul",
+    "cpu",
+    "memory",
+    "disk",
+    "wireplumber#sink",
+    "idle_inhibitor",
     "tray"
   ],
 
@@ -69,6 +76,7 @@
   "network#wifi-dl": {
     "interval": 1,
     "format-wifi": "{bandwidthDownBytes:>} ↓",
+    "format-ethernet": "{bandwidthDownBytes:>} ↓",
     "format-linked": "≏ No IP",
     "format-disconnected": "⌽",
     "tooltip": false,
@@ -77,6 +85,7 @@
   "network#wifi-ul": {
     "interval": 1,
     "format-wifi": "{bandwidthUpBytes:>} ↑",
+    "format-ethernet": "{bandwidthUpBytes:>} ↑",
     "format-linked": "",
     "format-disconnected": "",
     "tooltip": false,
@@ -154,6 +163,14 @@
     "format": "☀ {percent}%",
     "format-alt": "☀ {percent}% {icon}",
     "format-icons": ["[-]", "[=]", "[≡]", "[≣]"],
+  },
+
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "awake",
+      "deactivated": "idle",
+    },
   },
 
   "wireplumber#sink": {

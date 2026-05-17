@@ -94,7 +94,7 @@ button:hover {
 #keyboard-state,
 #bluetooth,
 #custom-vpn,
-#mpd
+#mpd,
 #tray {
   background: transparent;
   border: none;
@@ -201,4 +201,3 @@ tooltip {
   background-color: #090e13;
   color: #f2f2f2;
 }
-

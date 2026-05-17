@@ -88,6 +88,18 @@ alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 alias ip='ip -c'
+alias ll='ls -lah'
+alias la='ls -A'
+alias l='ls -CF'
+
+mkcd() {
+    mkdir -p "$1" && cd "$1" || return
+}
+
+serve() {
+    local port="${1:-8000}"
+    python3 -m http.server "$port"
+}
 
 # Distrobox
 alias db='distrobox'
@@ -128,12 +140,39 @@ devbox() {
     distrobox enter "$name"
 }
 
+devbox-bootstrap() {
+    if [ -f /etc/fedora-release ]; then
+        sudo dnf install -y \
+            bash-completion bat direnv eza fd-find fzf gcc git git-delta go \
+            just make neovim nodejs npm pkgconf python3 python3-pip ripgrep \
+            rust cargo shellcheck shfmt uv
+    elif command -v apt &>/dev/null; then
+        sudo apt update
+        sudo apt install -y \
+            bash-completion bat direnv fd-find fzf gcc git golang-go just make \
+            neovim nodejs npm pkg-config python3 python3-pip ripgrep rustc \
+            cargo shellcheck shfmt
+    elif command -v pacman &>/dev/null; then
+        sudo pacman -Syu --needed \
+            bash-completion bat direnv eza fd fzf gcc git git-delta go just \
+            make neovim nodejs npm pkgconf python python-pip ripgrep rust \
+            shellcheck shfmt uv
+    else
+        echo "devbox-bootstrap: unsupported distro" >&2
+        return 1
+    fi
+}
+
 # Clojure REPL
 alias clj-repl='clj "-J-Dclojure.server.repl={:port 5555 :accept clojure.core.server/repl :server-daemon false}"'
 
 if command -v zoxide &> /dev/null; then
     eval "$(zoxide init bash)"
     alias cd='z'
+fi
+
+if command -v direnv &> /dev/null; then
+    eval "$(direnv hook bash)"
 fi
 
 if command -v mise &> /dev/null; then

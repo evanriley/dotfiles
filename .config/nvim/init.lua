@@ -11,12 +11,15 @@ vim.o.shiftwidth = 2
 vim.o.tabstop = 2
 vim.o.smartindent = true
 vim.o.wrap = false
+vim.o.linebreak = true
 vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.undofile = true
 vim.o.splitright = true
 vim.o.splitbelow = true
 vim.o.termguicolors = true
+vim.o.confirm = true
+vim.o.inccommand = 'split'
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
 vim.o.completeopt = 'menuone,noselect,popup'
@@ -24,6 +27,8 @@ vim.o.pumheight = 10
 vim.o.scrolloff = 8
 vim.o.sidescrolloff = 8
 vim.o.mouse = 'a'
+vim.o.list = true
+vim.opt.listchars = { tab = '  ', trail = '.', nbsp = '+' }
 -- OSC 52 clipboard (works over SSH/tmux)
 vim.g.clipboard = {
   name = 'OSC 52',
@@ -38,9 +43,8 @@ vim.g.clipboard = {
 }
 vim.o.clipboard = 'unnamedplus'
 vim.o.showmode = false
-vim.o.showtabline = 0
+vim.o.showtabline = 2
 vim.o.laststatus = 3
-vim.o.statusline = ' %f %m%r%h%w%=%y %l:%c '
 
 vim.g['conjure#filetypes'] = { 'clojure' }
 
@@ -141,6 +145,14 @@ vim.keymap.set('n', '<leader><leader>l', require('smart-splits').swap_buf_right)
 setup('mini.pairs')
 setup('mini.surround')
 setup('mini.diff')
+setup('mini.comment')
+setup('mini.statusline', { use_icons = true })
+setup('mini.tabline')
+setup('mini.notify')
+vim.notify = require('mini.notify').make_notify()
+setup('mini.trailspace')
+setup('mini.jump')
+setup('mini.jump2d')
 
 local ok_snip, mini_snippets = pcall(require, 'mini.snippets')
 if ok_snip then
@@ -156,6 +168,7 @@ setup('mini.completion', {
   mappings = { force_twostep = '<C-Space>', force_fallback = '<M-Space>' },
 })
 setup('mini.pick')
+setup('mini.extra')
 setup('mini.git')
 setup('mini.ai')
 setup('mini.bracketed')
@@ -299,6 +312,13 @@ if ok_pick then
   vim.keymap.set('n', '<leader>/', pick.builtin.grep_live, { desc = 'Live grep' })
   vim.keymap.set('n', '<leader>b', pick.builtin.buffers, { desc = 'Buffers' })
   vim.keymap.set('n', '<leader>h', pick.builtin.help, { desc = 'Help' })
+  vim.keymap.set('n', '<leader>r', pick.builtin.resume, { desc = 'Resume picker' })
+  local ok_extra, extra = pcall(require, 'mini.extra')
+  if ok_extra then
+    vim.keymap.set('n', '<leader>o', extra.pickers.oldfiles, { desc = 'Recent files' })
+    vim.keymap.set('n', '<leader>g', extra.pickers.git_files, { desc = 'Git files' })
+    vim.keymap.set('n', '<leader>q', extra.pickers.list, { desc = 'Lists' })
+  end
 end
 
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
@@ -306,6 +326,8 @@ vim.keymap.set('n', '<Esc>', '<Cmd>nohlsearch<CR>', { desc = 'Clear search highl
 vim.keymap.set('n', '<leader>w', '<Cmd>w<CR>', { desc = 'Save file' })
 vim.keymap.set('n', '<leader>xd', vim.diagnostic.setqflist, { desc = 'Diagnostics to quickfix' })
 vim.keymap.set('n', '<leader>u', '<Cmd>UndotreeToggle<CR>', { desc = 'Toggle undotree' })
+vim.keymap.set('n', '<leader>cw', '<Cmd>lua MiniTrailspace.trim()<CR>', { desc = 'Trim trailing whitespace' })
+vim.keymap.set('n', '<leader>gg', '<Cmd>botright 15split | terminal lazygit<CR>', { desc = 'Lazygit' })
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('yank-highlight', {}),

@@ -365,7 +365,10 @@ binds {
         spawn-sh "~/.config/scripts/ns.py -id scratch_btop"
     }
     MOD+CTRL+N {
-        spawn "swaync-client -t"
+        spawn "swaync-client" "-t"
+    }
+    MOD+ALT+V hotkey-overlay-title="Clipboard History: rofi" {
+        spawn-sh "~/.config/scripts/cliphist-rofi"
     }
     MOD+B {
         spawn-sh "killall -SIGUSR1 waybar"
