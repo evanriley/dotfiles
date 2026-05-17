@@ -76,7 +76,7 @@ shuffle_local_music() {
 
 # Main function for playing online music
 play_online_music() {
-  choice=$(printf "%s\n" "${!online_music[@]}" | rofi -i -dmenu -config ~/.config/rofi/custom-rofi/config-rofi-theme.rasi -p "🎵 Online Music")
+  choice=$(printf "%s\n" "${!online_music[@]}" | rofi -i -dmenu -config ~/.config/rofi/custom-rofi/config-rofi-Beats.rasi -p "🎵 Online Music")
 
   if [ -z "$choice" ]; then
     exit 1

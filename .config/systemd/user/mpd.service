@@ -1,0 +1,15 @@
+[Unit]
+Description=Music Player Daemon
+PartOf=graphical-session.target
+After=graphical-session.target pipewire.service wireplumber.service
+Requisite=graphical-session.target
+ConditionPathIsDirectory=%h/.config/mpd
+ConditionPathIsDirectory=/mnt/Media/Music
+
+[Service]
+ExecStartPre=/usr/bin/mkdir -p %h/.config/mpd/playlists
+ExecStart=/usr/bin/mpd --no-daemon %h/.config/mpd/mpd.conf
+Restart=on-failure
+
+[Install]
+WantedBy=niri.service

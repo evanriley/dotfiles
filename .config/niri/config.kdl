@@ -101,7 +101,7 @@ layout {
 }
 spawn-at-startup "kitty" "--class" "scratch_rmpc" "-e" "rmpc"
 spawn-at-startup "kitty" "--class" "scratch_btop" "-e" "btop"
-spawn-at-startup "firefox"
+spawn-at-startup "flatpak" "run" "com.brave.Browser"
 spawn-at-startup "flatpak" "run" "org.gnome.World.PikaBackup"
 spawn-at-startup "flatpak" "run" "dev.deedles.Trayscale"
 spawn-at-startup "flatpak" "run" "com.discordapp.Discord" "--start-minimized"
@@ -178,6 +178,11 @@ window-rule {
 }
 window-rule {
     match app-id="firefox"
+    open-on-workspace "web"
+    open-maximized-to-edges false
+}
+window-rule {
+    match app-id="(com\\.brave\\.Browser|brave-browser|Brave-browser)"
     open-on-workspace "web"
     open-maximized-to-edges false
 }
@@ -280,7 +285,7 @@ window-rule {
     opacity 1.0
 }
 window-rule {
-    match app-id="((google-)?[cC]hrom(e|ium)|[bB]rave-browser|[mM]icrosoft-edge|Vivaldi-stable|helium)"
+    match app-id="((google-)?[cC]hrom(e|ium)|com\\.brave\\.Browser|[bB]rave-browser|[mM]icrosoft-edge|Vivaldi-stable|helium)"
     opacity 1.0
 }
 window-rule {
