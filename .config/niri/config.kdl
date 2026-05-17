@@ -101,6 +101,9 @@ layout {
 }
 spawn-at-startup "kitty" "--class" "scratch_rmpc" "-e" "rmpc"
 spawn-at-startup "kitty" "--class" "scratch_btop" "-e" "btop"
+spawn-at-startup "firefox"
+spawn-at-startup "flatpak" "run" "org.gnome.World.PikaBackup"
+spawn-at-startup "flatpak" "run" "dev.deedles.Trayscale"
 hotkey-overlay {
     skip-at-startup
 }
