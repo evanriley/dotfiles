@@ -73,7 +73,6 @@ button:hover {
 }
 
 #clock,
-#battery,
 #cpu,
 #memory,
 #disk,
@@ -128,7 +127,6 @@ button:hover {
 }
 
 #clock:hover,
-#battery:hover,
 #cpu:hover,
 #memory:hover,
 #disk:hover,
@@ -170,11 +168,6 @@ button:hover {
   margin: 5px;
 }
 
-#battery.charging,
-#battery.plugged {
-  color: @activegreen;
-}
-
 label:focus {
   background-color: @bg;
 }
@@ -191,7 +184,6 @@ label:focus {
 
 #network.disconnected,
 #pulseaudio.muted,
-#battery.critical:not(.charging),
 #wireplumber.muted {
   color: @alert;
 }

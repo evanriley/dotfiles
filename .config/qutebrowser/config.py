@@ -8,7 +8,7 @@ c.url.searchengines = {
     'DEFAULT': 'https://kagi.com/search?q={}',
     'g':  'https://google.com/search?q={}',
     'aw': 'https://wiki.archlinux.org/?search={}',
-    'gw': 'https://wiki.gentoo.org/?search-mr=1&search={}',
+    'fw': 'https://docs.fedoraproject.org/en-US/search/?q={}',
     'yt': 'https://www.youtube.com/results?search_query={}',
     'gh': 'https://github.com/search?q={}'
 }
