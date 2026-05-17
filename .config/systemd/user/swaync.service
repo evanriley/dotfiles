@@ -5,6 +5,7 @@ After=graphical-session.target
 Requisite=graphical-session.target
 
 [Service]
+ExecStartPre=-/usr/bin/pkill -xu %u mako
 ExecStart=/usr/bin/env swaync
 Restart=on-failure
 
