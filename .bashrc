@@ -89,6 +89,45 @@ alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 alias ip='ip -c'
 
+# Distrobox
+alias db='distrobox'
+alias dbe='distrobox enter'
+alias dbl='distrobox list'
+alias dbc='distrobox create'
+alias dbs='distrobox stop'
+alias dbr='distrobox rm'
+
+_distrobox_exists() {
+    local name="$1"
+    distrobox list --no-color 2>/dev/null \
+        | awk -F'|' 'NR > 1 { gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2 }' \
+        | grep -Fxq "$name"
+}
+
+devbox() {
+    local name="${1:-dev}"
+    local image="${2:-fedora:latest}"
+    local box_home="$HOME/.local/share/distrobox-homes/$name"
+    local extra_flags=()
+
+    if ! command -v distrobox &>/dev/null; then
+        echo "devbox: distrobox is not installed" >&2
+        return 127
+    fi
+
+    if ! _distrobox_exists "$name"; then
+        mkdir -p "$box_home"
+
+        if [ -d "$HOME/Developer" ]; then
+            extra_flags=(--additional-flags "--volume $HOME/Developer:$HOME/Developer:rslave")
+        fi
+
+        distrobox create --name "$name" --image "$image" --home "$box_home" "${extra_flags[@]}" || return
+    fi
+
+    distrobox enter "$name"
+}
+
 # Clojure REPL
 alias clj-repl='clj "-J-Dclojure.server.repl={:port 5555 :accept clojure.core.server/repl :server-daemon false}"'
 
