@@ -101,7 +101,7 @@ layout {
 }
 spawn-at-startup "kitty" "--class" "scratch_rmpc" "-e" "rmpc"
 spawn-at-startup "kitty" "--class" "scratch_btop" "-e" "btop"
-spawn-at-startup "flatpak" "run" "com.brave.Browser"
+spawn-at-startup "firefox"
 spawn-at-startup "flatpak" "run" "org.gnome.World.PikaBackup"
 spawn-at-startup "flatpak" "run" "dev.deedles.Trayscale"
 spawn-at-startup "flatpak" "run" "com.discordapp.Discord" "--start-minimized"
