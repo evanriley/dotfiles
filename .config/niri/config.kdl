@@ -295,7 +295,7 @@ window-rule {
     }
 }
 window-rule {
-    match app-id="org\\.kde\\.polkit-kde-authentication-agent-1"
+    match app-id="polkit-mate-authentication-agent-1"
     open-floating true
     default-column-width {
         fixed 520
