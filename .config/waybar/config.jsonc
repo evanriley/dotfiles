@@ -58,7 +58,6 @@
       },
     },
     "actions": {
-      "on-click-left": "kitty -e calcure",
       "on-click-right": "mode",
       "on-click-forward": "tz_up",
       "on-click-backward": "tz_down",
@@ -114,7 +113,7 @@
       "[⣿]",
     ],
     "tooltip": true,
-    "on-click-right": "$XDG_BIN_HOME/launchers/launchers-btop.sh",
+    "on-click-right": "kitty --class scratch_btop -e btop",
   },
 
   "memory": {
@@ -144,7 +143,7 @@
     "format-alt": "⬢ {free} / {total}",
     "tooltip": true,
     "tooltip-format": "⬢ Disk Storage\n━━━━━━━━━━━━━━━━━━\n• Usage ⟶ {used} / {total} ({percentage_used}%)\n• Available ⟶ {free} ({percentage_free}%)\n• Mount Point ⟶ {path}",
-    "on-click-right": "thunar /",
+    "on-click-right": "nautilus /",
     "states": {
       "warning": 70,
       "critical": 85,
@@ -162,7 +161,7 @@
     "format": "∿ {volume}%",
     "format-muted": "∅ {volume}%",
     "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
-    "on-click-right": "helvum",
+    "on-click-right": "flatpak run org.pulseaudio.pavucontrol",
     "scroll-step": 1,
     "states": {
       "warning": 75,
@@ -178,7 +177,7 @@
     "format-muted": "◌ {volume}% [⌽]",
     "format-icons": ["[-]", "[=]", "[≡]", "[≣]"],
     "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
-    "on-click-right": "helvum",
+    "on-click-right": "flatpak run org.pulseaudio.pavucontrol",
     "scroll-step": 1,
     "states": {
       "warning": 75,
