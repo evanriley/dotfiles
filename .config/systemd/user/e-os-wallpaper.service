@@ -1,0 +1,13 @@
+[Unit]
+Description=Set Niri wallpaper
+PartOf=graphical-session.target
+After=graphical-session.target awww-daemon.service
+Requisite=graphical-session.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/sh -lc 'awww img "%h/Pictures/wallpapers/nebula.png" || { sleep 1; awww img "%h/Pictures/wallpapers/nebula.png"; }'
+
+[Install]
+WantedBy=niri.service

@@ -99,29 +99,8 @@ layout {
         bottom 0
     }
 }
-spawn-at-startup "/usr/libexec/polkit-mate-authentication-agent-1"
-spawn-at-startup "pipewire"
-spawn-at-startup "pipewire-pulse"
-spawn-at-startup "wireplumber"
-spawn-at-startup "awww-daemon"
-spawn-at-startup "awww" "img" "/home/evan/Pictures/wallpapers/nebula.png"
-spawn-at-startup "waybar"
-spawn-at-startup "swaync"
-spawn-at-startup "hypridle"
-spawn-at-startup "swayosd-server"
 spawn-at-startup "kitty" "--class" "scratch_rmpc" "-e" "rmpc"
 spawn-at-startup "kitty" "--class" "scratch_btop" "-e" "btop"
-spawn-at-startup "firefox"
-spawn-at-startup "discord"
-spawn-at-startup "steam"
-spawn-at-startup "nicotine"
-spawn-at-startup "mpd"
-spawn-at-startup "syncthing" "--no-browser"
-spawn-at-startup "/home/evan/.local/share/mise/installs/go/1.25.6/bin/goimapnotify" "--conf" "/home/evan/.config/goimapnotify/goimapnotify.yaml"
-//hacky fix because it otherwise won't start in the correct order
-spawn-at-startup "sh" "-c" "sleep 2 && mpd-mpris"
-spawn-at-startup "sh" "-c" "sleep 2 && /home/evan/.cargo/bin/listenbrainz-mpd"
-spawn-at-startup "sh" "-c" "sleep 2 && /home/evan/.cargo/bin/mpd-discord-rpc"
 hotkey-overlay {
     skip-at-startup
 }
@@ -173,7 +152,7 @@ animations {
     }
 }
 layer-rule {
-    match namespace="^swww-daemon$"
+    match namespace="^awww-daemon$"
     place-within-backdrop true
 }
 // Transparency and blur
@@ -193,7 +172,7 @@ window-rule {
     open-floating true
 }
 window-rule {
-    match at-startup=true app-id="firefox"
+    match app-id="firefox"
     open-on-workspace "web"
     open-maximized-to-edges false
 }
@@ -203,15 +182,15 @@ window-rule {
     open-maximized-to-edges false
 }
 window-rule {
-    match at-startup=true app-id="org.mozilla.Thunderbird"
+    match app-id="org.mozilla.Thunderbird"
     open-on-workspace "social"
 }
 window-rule {
-    match at-startup=true app-id="org.gnome.World.PikaBackup"
+    match app-id="org.gnome.World.PikaBackup"
     open-on-workspace "system"
 }
 window-rule {
-    match at-startup=true app-id="steam"
+    match app-id="steam"
     open-on-workspace "game"
 }
 window-rule {
@@ -330,8 +309,8 @@ binds {
     MOD+RETURN hotkey-overlay-title="Open Terminal: foot" {
         spawn "foot"
     }
-    Mod+SPACE hotkey-overlay-title="Run an Application: fuzzel" {
-        spawn "fuzzel"
+    Mod+SPACE hotkey-overlay-title="Run an Application: rofi" {
+        spawn "rofi" "-show" "drun"
     }
     Mod+P {
         spawn-sh "~/.config/scripts/powermenu"

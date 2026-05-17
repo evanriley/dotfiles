@@ -7,7 +7,7 @@ configuration {
     disable-history: false;
     hide-scrollbar: true;
     sidebar-mode: false;
-    terminal: "ghostty";
+    terminal: "foot";
     font: "Berkeley Mono 11";
 }
 

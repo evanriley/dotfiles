@@ -20,6 +20,6 @@ case "$choice" in
   loginctl suspend
   ;;
 "Logout")
-  hyprctl dispatch exit || loginctl terminate-user "$USER"
+  niri msg action quit --skip-confirmation || loginctl terminate-user "$USER"
   ;;
 esac

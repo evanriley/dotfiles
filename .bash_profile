@@ -5,14 +5,3 @@
 if [[ -f ~/.bashrc ]] ; then
 	. ~/.bashrc
 fi
-
-export LIBVA_DRIVER_NAME=radeonsi
-export VDPAU_DRIVER=radeonsi
-
-export XDG_SESSION_TYPE=wayland
-export XDG_CURRENT_DESKTOP=Hyprland
-export XDG_SESSION_DESKTOP=Hyprland
-
-export QT_QPA_PLATFORM="wayland;xcb"
-export GDK_BACKEND=wayland,x11
-export CLUTTER_BACKEND=wayland

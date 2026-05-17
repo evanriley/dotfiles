@@ -1,12 +1,12 @@
 #!/bin/bash
 
-SELECTION="$(printf "Suspend\nLog out\nReboot\nShutdown" | fuzzel --dmenu -l 4 -p "Power Menu: ")"
+SELECTION="$(printf "Suspend\nLog out\nReboot\nShutdown" | rofi -dmenu -p "Power Menu: ")"
 
 case $SELECTION in
 	*"Suspend")
 		systemctl suspend;;
 	*"Log out")
-		swaymsg exit;;
+		niri msg action quit --skip-confirmation;;
 	*"Reboot")
 		systemctl reboot;;
 	*"Shutdown")
