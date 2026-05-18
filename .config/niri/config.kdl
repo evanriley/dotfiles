@@ -29,7 +29,7 @@ input {
     focus-follows-mouse max-scroll-amount="90%"
     workspace-auto-back-and-forth
 }
-output "DP-1" {
+output "DP-2" {
     mode "5120x1440@119.979"
     scale 1
     transform "normal"
