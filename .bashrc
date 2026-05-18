@@ -1,6 +1,7 @@
 [[ $- != *i* ]] && return
 
-export EDITOR="nvim"
+export EDITOR="e --tty --wait"
+export VISUAL="e --wait"
 export XDG_CONFIG_HOME="$HOME/.config"
 export PATH="$HOME/bin:$HOME/.local/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"
 
@@ -75,8 +76,8 @@ PROMPT_COMMAND=set_bash_prompt
 alias fastfetch='fastfetch --config ~/.config/fastfetch/config.jsonc'
 
 alias dots='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias emacs='emacsclient -c -a ""'
 alias vim='nvim'
-#alias emacs='emacsclient'
 
 alias ..='cd ..'
 alias ...='cd ../../'

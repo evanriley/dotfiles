@@ -1,0 +1,15 @@
+[Unit]
+Description=Emacs text editor daemon
+Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
+ConditionPathExists=%h/.emacs.d/init.el
+
+[Service]
+Type=notify
+Environment=COLORTERM=truecolor
+Environment=DOOMDIR=%h/.config/doom
+ExecStart=/usr/bin/emacs --fg-daemon
+ExecStop=/usr/bin/emacsclient --eval "(kill-emacs)"
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

@@ -1,7 +1,11 @@
-#+title: Doom Emacs Configuration
+#+title: Evan's Literate Doom Emacs Configuration
 #+author: Evan Riley
 #+property: header-args :tangle config.el
 #+startup: fold
+
+This is the source of truth for my Emacs setup on =cinderace=.  The generated
+=config.el=, Doom's =init.el=, and =packages.el= remain tracked so the setup can
+bootstrap cleanly, but changes should start here.
 
 * General Configuration
 ** User Information
@@ -9,7 +13,7 @@
 (setq user-full-name "Evan Riley"
       user-real-login-name "Evan Riley"
       user-login-name "evan"
-      user-mail-address (rot13 "rina@rinaevyrl.pbz"))
+      user-mail-address "evan@evanriley.com")
 #+end_src
 
 ** System & Defaults
@@ -687,8 +691,13 @@ Disabled for now — mxroute CalDAV requires Digest auth which has issues with E
 (use-package! org-ol-tree
   :commands org-ol-tree)
 
-(setq org-directory "~/cloud/org/")
-(setq org-agenda-files (list org-directory))
+(setq org-directory (file-name-as-directory (expand-file-name "~/sync/org")))
+(setq org-agenda-files
+      (when (file-directory-p org-directory)
+        (directory-files-recursively org-directory "\\.org\\'")))
+(defun my/org-file (name)
+  "Return NAME inside `org-directory'."
+  (expand-file-name name org-directory))
 (add-hook! 'org-mode-hook #'visual-line-mode)
 
 (after! org
@@ -792,8 +801,8 @@ Disabled for now — mxroute CalDAV requires Digest auth which has issues with E
 (use-package! doct :commands doct)
 
 (after! org-capture
-  (defvar +org-capture-todo-file (concat org-directory "todo.org"))
-  (defvar +org-capture-notes-file (concat org-directory "notes.org"))
+  (defvar +org-capture-todo-file (my/org-file "todo.org"))
+  (defvar +org-capture-notes-file (my/org-file "notes.org"))
 
   (setq org-capture-templates
         (doct `(("Personal todo" :keys "t"
@@ -823,7 +832,7 @@ Disabled for now — mxroute CalDAV requires Digest auth which has issues with E
 
 ** Roam
 #+begin_src emacs-lisp
-(setq org-roam-directory (concat (file-name-as-directory org-directory) "Notes/"))
+(setq org-roam-directory (file-name-as-directory (my/org-file "Notes")))
 (setq org-roam-db-location (concat doom-cache-dir "org-roam.db"))
 (setq org-roam-db-update-method 'immediate)
 
@@ -920,7 +929,7 @@ Import and display content from other org files inline.
 ** Org Journal
 #+begin_src emacs-lisp
 (after! org-journal
-  (setq org-journal-dir (concat org-directory "journal/")
+  (setq org-journal-dir (file-name-as-directory (my/org-file "journal"))
         org-journal-date-prefix "#+title: "
         org-journal-time-prefix "* "
         org-journal-date-format "%Y-%m-%d %A"
@@ -972,8 +981,8 @@ Import and display content from other org files inline.
   (setq dirvish-quick-access-entries
         '(("h" "~/"                          "Home")
           ("d" "~/Downloads/"                "Downloads")
-          ("c" "~/Code/"                     "Code")
-          ("o" "~/cloud/org/"                "Org")
+          ("c" "~/Developer/"                "Developer")
+          ("o" "~/sync/org/"                 "Org")
           ("p" "~/Pictures/"                 "Pictures")
           ("t" "/tmp/"                       "Temp")))
   (dirvish-override-dired-mode))
@@ -1116,15 +1125,36 @@ Import and display content from other org files inline.
 Configuration for running Emacs as a daemon/server.
 ** Daemon Initialization
 #+begin_src emacs-lisp
+(defun my/mail-ready-p ()
+  "Return non-nil when local mail state is available."
+  (and (file-directory-p (expand-file-name "~/.mail"))
+       (fboundp 'mu4e)))
+
+(defun my/open-mail ()
+  "Open mu4e when local mail is configured."
+  (interactive)
+  (if (my/mail-ready-p)
+      (mu4e)
+    (user-error "mu4e is not ready; expected ~/.mail and mu4e to be available")))
+
+(defun my/open-elfeed ()
+  "Open Elfeed when available."
+  (interactive)
+  (if (fboundp 'elfeed)
+      (elfeed)
+    (user-error "Elfeed is not available")))
+
 (when (daemonp)
-  ;; Start mu4e in the background after daemon starts
+  ;; Start mu4e in the background only when local mail exists.
   (add-hook 'server-after-make-frame-hook
             (lambda ()
-              (unless (get-buffer " *mu4e-main*")
+              (when (and (my/mail-ready-p)
+                         (not (get-buffer " *mu4e-main*")))
                 (mu4e t))))
 
-  ;; Update elfeed periodically in daemon mode
-  (run-with-timer 0 (* 8 60 60) #'elfeed-update)
+  ;; Update elfeed periodically in daemon mode once loaded.
+  (with-eval-after-load 'elfeed
+    (run-with-timer 0 (* 8 60 60) #'elfeed-update))
 
   ;; New frames open to dashboard
   (add-hook 'server-after-make-frame-hook
@@ -1135,38 +1165,41 @@ Configuration for running Emacs as a daemon/server.
 #+end_src
 
 ** Systemd Service
-To use Emacs as a daemon, create =~/.config/systemd/user/emacs.service=:
+Tracked as =~/.config/systemd/user/emacs.service=:
 #+begin_example
 [Unit]
-Description=Emacs text editor (daemon)
+Description=Emacs text editor daemon
 Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
+ConditionPathExists=%h/.emacs.d/init.el
 
 [Service]
 Type=notify
+Environment=COLORTERM=truecolor
+Environment=DOOMDIR=%h/.config/doom
 ExecStart=/usr/bin/emacs --fg-daemon
 ExecStop=/usr/bin/emacsclient --eval "(kill-emacs)"
 Restart=on-failure
-Environment=COLORTERM=truecolor
 
 [Install]
 WantedBy=default.target
 #+end_example
 
-Then enable with: =systemctl --user enable --now emacs=
+Bootstrap Doom with =doom-bootstrap=, then enable with
+=systemctl --user enable --now emacs.service=.
 
 ** Desktop Entry
-Create =~/.local/share/applications/emacsclient.desktop=:
+Tracked as =~/.local/share/applications/emacsclient.desktop=:
 #+begin_example
 [Desktop Entry]
 Name=Emacs Client
 GenericName=Text Editor
 Comment=Edit text
-MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-org;
-Exec=emacsclient -c -a "" %F
+MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;text/x-org;application/x-shellscript;
+Exec=/var/home/evan/bin/e --wait %F
 Icon=emacs
 Type=Application
 Terminal=false
-Categories=Development;TextEditor;Utility;
+Categories=Utility;TextEditor;
 StartupWMClass=Emacs
 Keywords=Text;Editor;
 #+end_example
@@ -1209,11 +1242,12 @@ Keywords=Text;Editor;
       :n "N" #'my/dashboard-goto-notes
       :n "J" #'org-journal-new-entry
       :n "A" #'org-agenda
-      :n "M" #'mu4e
-      :n "E" #'elfeed)
+      :n "M" #'my/open-mail
+      :n "E" #'my/open-elfeed)
 
 (map! :leader
-      :desc "Elfeed" "o e" #'elfeed)
+      :desc "Elfeed" "o e" #'my/open-elfeed
+      :desc "Mail" "o m" #'my/open-mail)
 
 (setq +doom-dashboard-menu-sections
       '(("Open org-agenda"
@@ -1227,13 +1261,13 @@ Keywords=Text;Editor;
          :when (fboundp 'elfeed)
          :face (:inherit (doom-dashboard-menu-title bold))
          :key "SPC o e"
-         :action elfeed)
+         :action my/open-elfeed)
         ("Open mu4e"
          :icon (nerd-icons-mdicon "nf-md-email" :face 'doom-dashboard-menu-title)
-         :when (fboundp 'mu4e)
+         :when (my/mail-ready-p)
          :face (:inherit (doom-dashboard-menu-title bold))
          :key "SPC o m"
-         :action mu4e)
+         :action my/open-mail)
         ("Recently opened files"
          :icon (nerd-icons-faicon "nf-fa-file_text" :face 'doom-dashboard-menu-title)
          :face (:inherit (doom-dashboard-menu-title bold))

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+tty=false
+wait=false
+args=()
+
+while (($#)); do
+    case "$1" in
+        -t|--tty|--terminal)
+            tty=true
+            ;;
+        -w|--wait)
+            wait=true
+            ;;
+        --)
+            shift
+            args+=("$@")
+            break
+            ;;
+        *)
+            args+=("$1")
+            ;;
+    esac
+    shift
+done
+
+if [[ ${#args[@]} -eq 1 && "${args[0]}" == "-" ]]; then
+    tmp="$(mktemp --suffix=.txt)"
+    cat > "$tmp"
+    args=("$tmp")
+fi
+
+cmd=(emacsclient --alternate-editor "")
+if [[ "$tty" == true ]]; then
+    cmd+=(--tty)
+else
+    cmd+=(--create-frame)
+fi
+
+if [[ "$wait" != true && "$tty" != true ]]; then
+    cmd+=(--no-wait)
+fi
+
+exec "${cmd[@]}" "${args[@]}"

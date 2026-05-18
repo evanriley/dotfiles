@@ -1,7 +1,7 @@
 (setq user-full-name "Evan Riley"
       user-real-login-name "Evan Riley"
       user-login-name "evan"
-      user-mail-address (rot13 "rina@rinaevyrl.pbz"))
+      user-mail-address "evan@evanriley.com")
 
 (setq auth-sources '("~/.authinfo.gpg")
       auth-source-cache-expiry nil)
@@ -554,8 +554,13 @@
 (use-package! org-ol-tree
   :commands org-ol-tree)
 
-(setq org-directory "~/cloud/org/")
-(setq org-agenda-files (list org-directory))
+(setq org-directory (file-name-as-directory (expand-file-name "~/sync/org")))
+(setq org-agenda-files
+      (when (file-directory-p org-directory)
+        (directory-files-recursively org-directory "\\.org\\'")))
+(defun my/org-file (name)
+  "Return NAME inside `org-directory'."
+  (expand-file-name name org-directory))
 (add-hook! 'org-mode-hook #'visual-line-mode)
 
 (after! org
@@ -650,8 +655,8 @@
 (use-package! doct :commands doct)
 
 (after! org-capture
-  (defvar +org-capture-todo-file (concat org-directory "todo.org"))
-  (defvar +org-capture-notes-file (concat org-directory "notes.org"))
+  (defvar +org-capture-todo-file (my/org-file "todo.org"))
+  (defvar +org-capture-notes-file (my/org-file "notes.org"))
 
   (setq org-capture-templates
         (doct `(("Personal todo" :keys "t"
@@ -678,7 +683,7 @@
                             "Send an email to %^{recipiant}"
                             "%U %i %a"))))))
 
-(setq org-roam-directory (concat (file-name-as-directory org-directory) "Notes/"))
+(setq org-roam-directory (file-name-as-directory (my/org-file "Notes")))
 (setq org-roam-db-location (concat doom-cache-dir "org-roam.db"))
 (setq org-roam-db-update-method 'immediate)
 
@@ -758,7 +763,7 @@
         org-html-html5-fancy t))
 
 (after! org-journal
-  (setq org-journal-dir (concat org-directory "journal/")
+  (setq org-journal-dir (file-name-as-directory (my/org-file "journal"))
         org-journal-date-prefix "#+title: "
         org-journal-time-prefix "* "
         org-journal-date-format "%Y-%m-%d %A"
@@ -804,8 +809,8 @@
   (setq dirvish-quick-access-entries
         '(("h" "~/"                          "Home")
           ("d" "~/Downloads/"                "Downloads")
-          ("c" "~/Code/"                     "Code")
-          ("o" "~/cloud/org/"                "Org")
+          ("c" "~/Developer/"                "Developer")
+          ("o" "~/sync/org/"                 "Org")
           ("p" "~/Pictures/"                 "Pictures")
           ("t" "/tmp/"                       "Temp")))
   (dirvish-override-dired-mode))
@@ -925,15 +930,36 @@
       :map org-agenda-mode-map
       "P" #'org-pomodoro)
 
+(defun my/mail-ready-p ()
+  "Return non-nil when local mail state is available."
+  (and (file-directory-p (expand-file-name "~/.mail"))
+       (fboundp 'mu4e)))
+
+(defun my/open-mail ()
+  "Open mu4e when local mail is configured."
+  (interactive)
+  (if (my/mail-ready-p)
+      (mu4e)
+    (user-error "mu4e is not ready; expected ~/.mail and mu4e to be available")))
+
+(defun my/open-elfeed ()
+  "Open Elfeed when available."
+  (interactive)
+  (if (fboundp 'elfeed)
+      (elfeed)
+    (user-error "Elfeed is not available")))
+
 (when (daemonp)
-  ;; Start mu4e in the background after daemon starts
+  ;; Start mu4e in the background only when local mail exists.
   (add-hook 'server-after-make-frame-hook
             (lambda ()
-              (unless (get-buffer " *mu4e-main*")
+              (when (and (my/mail-ready-p)
+                         (not (get-buffer " *mu4e-main*")))
                 (mu4e t))))
 
-  ;; Update elfeed periodically in daemon mode
-  (run-with-timer 0 (* 8 60 60) #'elfeed-update)
+  ;; Update elfeed periodically in daemon mode once loaded.
+  (with-eval-after-load 'elfeed
+    (run-with-timer 0 (* 8 60 60) #'elfeed-update))
 
   ;; New frames open to dashboard
   (add-hook 'server-after-make-frame-hook
@@ -978,11 +1004,12 @@
       :n "N" #'my/dashboard-goto-notes
       :n "J" #'org-journal-new-entry
       :n "A" #'org-agenda
-      :n "M" #'mu4e
-      :n "E" #'elfeed)
+      :n "M" #'my/open-mail
+      :n "E" #'my/open-elfeed)
 
 (map! :leader
-      :desc "Elfeed" "o e" #'elfeed)
+      :desc "Elfeed" "o e" #'my/open-elfeed
+      :desc "Mail" "o m" #'my/open-mail)
 
 (setq +doom-dashboard-menu-sections
       '(("Open org-agenda"
@@ -996,13 +1023,13 @@
          :when (fboundp 'elfeed)
          :face (:inherit (doom-dashboard-menu-title bold))
          :key "SPC o e"
-         :action elfeed)
+         :action my/open-elfeed)
         ("Open mu4e"
          :icon (nerd-icons-mdicon "nf-md-email" :face 'doom-dashboard-menu-title)
-         :when (fboundp 'mu4e)
+         :when (my/mail-ready-p)
          :face (:inherit (doom-dashboard-menu-title bold))
          :key "SPC o m"
-         :action mu4e)
+         :action my/open-mail)
         ("Recently opened files"
          :icon (nerd-icons-faicon "nf-fa-file_text" :face 'doom-dashboard-menu-title)
          :face (:inherit (doom-dashboard-menu-title bold))
