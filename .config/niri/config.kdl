@@ -33,7 +33,6 @@ output "DP-2" {
     mode "5120x1440@119.979"
     scale 1
     transform "normal"
-    variable-refresh-rate
 }
 cursor {
     xcursor-theme "Bibata-Original-Classic"
@@ -102,7 +101,6 @@ layout {
 spawn-at-startup "kitty" "--class" "scratch_rmpc" "-e" "rmpc"
 spawn-at-startup "kitty" "--class" "scratch_btop" "-e" "btop"
 spawn-at-startup "firefox"
-spawn-at-startup "flatpak" "run" "org.gnome.World.PikaBackup"
 spawn-at-startup "flatpak" "run" "dev.deedles.Trayscale"
 spawn-at-startup "flatpak" "run" "com.discordapp.Discord" "--start-minimized"
 spawn-at-startup "steam" "-silent"
