@@ -12,6 +12,7 @@ shares so foreground desktop and gaming workloads stay favored.
 - Prowlarr: <http://127.0.0.1:9696>
 - SABnzbd: <http://127.0.0.1:8080>
 - slskd: <http://127.0.0.1:5030>
+- Soularr: <http://127.0.0.1:8265>
 
 ## Paths
 
@@ -30,3 +31,7 @@ Inside the containers, use these paths:
 
 In SABnzbd, use `/downloads/incomplete` for temporary downloads and
 `/downloads/complete` for completed downloads.
+
+Soularr connects Lidarr to slskd and watches Lidarr wanted albums every 300
+seconds. Its secret config lives at `~/.local/share/media-stack/soularr` and
+is intentionally not tracked in dotfiles.
