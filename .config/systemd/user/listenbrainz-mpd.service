@@ -1,0 +1,17 @@
+[Unit]
+Description=ListenBrainz MPD scrobbler
+PartOf=graphical-session.target
+After=graphical-session.target mpd.service
+Requires=mpd.service
+Requisite=graphical-session.target
+ConditionPathExists=%h/.config/listenbrainz-mpd/config.toml
+
+[Service]
+EnvironmentFile=-%h/.config/listenbrainz-mpd/env
+ExecCondition=/usr/bin/bash -lc '[[ -n "${LISTENBRAINZ_TOKEN:-}" ]] || grep -Eq '\''^[[:space:]]*token[[:space:]]*=[[:space:]]*"[^"]+"'\'' "$HOME/.config/listenbrainz-mpd/config.toml" || grep -Eq '\''^[[:space:]]*token_file[[:space:]]*='\'' "$HOME/.config/listenbrainz-mpd/config.toml"'
+ExecStart=/usr/bin/listenbrainz-mpd --config %h/.config/listenbrainz-mpd/config.toml
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=niri.service
