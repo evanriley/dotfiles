@@ -4,6 +4,10 @@
         href: http://127.0.0.1:8686
         description: Music library
         icon: lidarr.png
+    - Roon:
+        href: http://127.0.0.1:9100
+        description: Multiroom music server
+        icon: roon.png
     - Radarr:
         href: http://127.0.0.1:7878
         description: Movies
@@ -36,4 +40,3 @@
         href: http://127.0.0.1:8384
         description: File sync
         icon: syncthing.png
-

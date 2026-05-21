@@ -1,0 +1,27 @@
+[Unit]
+Description=Roon Server
+Wants=network-online.target
+After=network-online.target
+ConditionPathIsDirectory=/mnt/Media/Music
+
+[Container]
+ContainerName=roonserver
+Image=ghcr.io/roonlabs/roonserver:latest
+Pull=newer
+Network=host
+UserNS=keep-id
+Environment=TZ=America/New_York
+Volume=/var/home/evan/.local/share/media-stack/roon:/Roon:Z
+Volume=/mnt/Media/Music:/Music:z
+Volume=/var/home/evan/.local/share/media-stack/roon-backups:/RoonBackups:Z
+
+[Service]
+Restart=on-failure
+RestartSec=30
+Nice=10
+CPUWeight=20
+IOWeight=20
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=default.target
