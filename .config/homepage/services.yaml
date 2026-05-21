@@ -1,0 +1,39 @@
+---
+- Media:
+    - Lidarr:
+        href: http://127.0.0.1:8686
+        description: Music library
+        icon: lidarr.png
+    - Radarr:
+        href: http://127.0.0.1:7878
+        description: Movies
+        icon: radarr.png
+    - Sonarr:
+        href: http://127.0.0.1:8989
+        description: TV
+        icon: sonarr.png
+    - Prowlarr:
+        href: http://127.0.0.1:9696
+        description: Indexers
+        icon: prowlarr.png
+
+- Downloads:
+    - SABnzbd:
+        href: http://127.0.0.1:8080
+        description: Usenet downloads
+        icon: sabnzbd.png
+    - slskd:
+        href: http://127.0.0.1:5030
+        description: Soulseek
+        icon: slskd.png
+    - Soularr:
+        href: http://127.0.0.1:8265
+        description: Lidarr to Soulseek bridge
+        icon: lidarr.png
+
+- System:
+    - Syncthing:
+        href: http://127.0.0.1:8384
+        description: File sync
+        icon: syncthing.png
+

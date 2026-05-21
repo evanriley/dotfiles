@@ -13,10 +13,12 @@ shares so foreground desktop and gaming workloads stay favored.
 - SABnzbd: <http://127.0.0.1:8080>
 - slskd: <http://127.0.0.1:5030>
 - Soularr: <http://127.0.0.1:8265>
+- Homepage: <http://127.0.0.1:3000>
 
 ## Paths
 
 - App config: `~/.local/share/media-stack`
+- Dashboard config: `~/.config/homepage`
 - Downloads: `/mnt/Media/Downloads`
 - Music: `/mnt/Media/Music`
 - Movies: `/mnt/Media/Movies`

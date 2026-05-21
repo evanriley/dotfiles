@@ -1,0 +1,12 @@
+---
+- Local:
+    - Media Drive:
+        - href: file:///mnt/Media
+          icon: folder.png
+    - Dotfiles:
+        - href: https://github.com/evanriley/dotfiles
+          icon: github.png
+    - e-os:
+        - href: https://github.com/evanriley/e-os
+          icon: github.png
+

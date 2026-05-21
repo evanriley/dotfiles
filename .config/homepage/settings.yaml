@@ -1,0 +1,16 @@
+---
+title: cinderace
+description: Local services
+language: en
+theme: dark
+color: slate
+target: _self
+headerStyle: boxedWidgets
+statusStyle: dot
+hideVersion: true
+disableUpdateCheck: true
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: false
+  provider: duckduckgo
+

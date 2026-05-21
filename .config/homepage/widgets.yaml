@@ -1,0 +1,11 @@
+---
+- search:
+    provider: duckduckgo
+    target: _self
+
+- datetime:
+    text_size: xl
+    format:
+      dateStyle: short
+      timeStyle: short
+
