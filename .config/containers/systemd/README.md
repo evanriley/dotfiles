@@ -1,6 +1,8 @@
 # Media Stack
 
 Rootless Podman Quadlet services for media automation on cinderace.
+The service units use `Nice=10`, idle IO scheduling, and lower Podman CPU
+shares so foreground desktop and gaming workloads stay favored.
 
 ## Services
 
@@ -28,4 +30,3 @@ Inside the containers, use these paths:
 
 In SABnzbd, use `/downloads/incomplete` for temporary downloads and
 `/downloads/complete` for completed downloads.
-

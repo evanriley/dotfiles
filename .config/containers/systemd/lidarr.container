@@ -8,6 +8,8 @@ ContainerName=lidarr
 Image=lscr.io/linuxserver/lidarr:latest
 Pull=newer
 Network=media-stack.network
+UserNS=keep-id
+PodmanArgs=--cpu-shares=256
 PublishPort=127.0.0.1:8686:8686
 Environment=PUID=1000
 Environment=PGID=1000
@@ -27,4 +29,3 @@ IOSchedulingClass=idle
 
 [Install]
 WantedBy=default.target
-

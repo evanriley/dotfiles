@@ -8,6 +8,8 @@ ContainerName=sabnzbd
 Image=lscr.io/linuxserver/sabnzbd:latest
 Pull=newer
 Network=media-stack.network
+UserNS=keep-id
+PodmanArgs=--cpu-shares=128
 PublishPort=127.0.0.1:8080:8080
 Environment=PUID=1000
 Environment=PGID=1000
@@ -26,4 +28,3 @@ IOSchedulingClass=idle
 
 [Install]
 WantedBy=default.target
-
