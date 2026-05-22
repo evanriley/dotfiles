@@ -194,6 +194,7 @@ window-rule {
     match app-id="(discord|com\\.discordapp\\.Discord)"
     open-on-workspace "social"
     open-maximized-to-edges false
+    opacity 1.0
 }
 window-rule {
     match app-id="org.mozilla.Thunderbird"
