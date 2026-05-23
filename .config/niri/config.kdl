@@ -369,6 +369,9 @@ binds {
     MOD+ALT+V hotkey-overlay-title="Clipboard History: rofi" {
         spawn-sh "~/.config/scripts/cliphist-rofi"
     }
+    MOD+ALT+M hotkey-overlay-title="Watch Media: rofi" {
+        spawn-sh "~/.config/scripts/watch-media"
+    }
     MOD+B {
         spawn-sh "killall -SIGUSR1 waybar"
     }

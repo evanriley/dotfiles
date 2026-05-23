@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+media_root="/mnt/Media"
+
+kind="$(
+    printf 'TV\nMovies\nAll\n' |
+        rofi -dmenu -i -p 'Watch'
+)"
+
+case "$kind" in
+    TV)
+        roots=("$media_root/TV")
+        ;;
+    Movies)
+        roots=("$media_root/Movies")
+        ;;
+    All)
+        roots=("$media_root/TV" "$media_root/Movies")
+        ;;
+    *)
+        exit 0
+        ;;
+esac
+
+selection="$(
+    fd --type f \
+        --extension mkv \
+        --extension mp4 \
+        --extension m4v \
+        --extension avi \
+        --extension webm \
+        . "${roots[@]}" |
+        sed "s#^$media_root/##" |
+        sort |
+        rofi -dmenu -i -p "$kind"
+)"
+
+[ -n "$selection" ] || exit 0
+
+flatpak run io.mpv.Mpv "$media_root/$selection" >/dev/null 2>&1 &
