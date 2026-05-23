@@ -1,0 +1,5 @@
+secrets.yml
+settings.yml
+state/
+logs/
+resources/

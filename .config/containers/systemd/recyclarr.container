@@ -1,0 +1,28 @@
+[Unit]
+Description=Recyclarr TRaSH Guides sync
+Wants=network-online.target
+After=network-online.target sonarr.service radarr.service
+
+[Container]
+ContainerName=recyclarr
+Image=ghcr.io/recyclarr/recyclarr:8
+Pull=newer
+Network=media-stack.network
+UserNS=keep-id
+PodmanArgs=--cpu-shares=64
+Environment=TZ=America/New_York
+Environment=CRON_SCHEDULE=@daily
+Environment=RECYCLARR_DATA_DIR=/data
+Volume=/var/home/evan/.config/recyclarr:/config:Z
+Volume=/var/home/evan/.local/share/media-stack/recyclarr:/data:Z
+
+[Service]
+Restart=on-failure
+RestartSec=30
+Nice=10
+CPUWeight=10
+IOWeight=10
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=default.target
