@@ -8,6 +8,10 @@
         href: http://127.0.0.1:9100
         description: Multiroom music server
         icon: roon.png
+    - Jellyfin:
+        href: http://127.0.0.1:8096
+        description: TV and movies
+        icon: jellyfin.png
     - Radarr:
         href: http://127.0.0.1:7878
         description: Movies
