@@ -2,40 +2,106 @@
 set -euo pipefail
 
 media_root="/mnt/Media"
+video_extensions=(mkv mp4 m4v avi webm)
+
+choose() {
+    local prompt="$1"
+    rofi -dmenu -i -p "$prompt"
+}
+
+list_dirs() {
+    local root="$1"
+    find "$root" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null | sort
+}
+
+list_videos() {
+    local root="$1"
+    local args=()
+
+    for ext in "${video_extensions[@]}"; do
+        args+=(-iname "*.$ext" -o)
+    done
+    unset 'args[${#args[@]}-1]'
+
+    find "$root" -type f \( "${args[@]}" \) -printf '%P\n' 2>/dev/null | sort
+}
+
+play() {
+    local file="$1"
+    [ -n "$file" ] || exit 0
+    flatpak run io.mpv.Mpv "$file" >/dev/null 2>&1 &
+}
+
+watch_tv() {
+    local show season episode
+
+    show="$(list_dirs "$media_root/TV" | choose 'Show')"
+    [ -n "$show" ] || exit 0
+
+    season="$(list_dirs "$media_root/TV/$show" | choose "$show")"
+    [ -n "$season" ] || exit 0
+
+    episode="$(list_videos "$media_root/TV/$show/$season" | choose "$season")"
+    play "$media_root/TV/$show/$season/$episode"
+}
+
+watch_movies() {
+    local movie file
+
+    movie="$(list_dirs "$media_root/Movies" | choose 'Movie')"
+    [ -n "$movie" ] || exit 0
+
+    file="$(list_videos "$media_root/Movies/$movie" | choose "$movie")"
+    play "$media_root/Movies/$movie/$file"
+}
+
+watch_all() {
+    local selection
+
+    selection="$(
+        {
+            list_dirs "$media_root/TV" | sed 's#^#TV/#'
+            list_dirs "$media_root/Movies" | sed 's#^#Movies/#'
+        } | choose 'Watch'
+    )"
+
+    case "$selection" in
+        TV/*)
+            local show="${selection#TV/}"
+            local season episode
+            season="$(list_dirs "$media_root/TV/$show" | choose "$show")"
+            [ -n "$season" ] || exit 0
+            episode="$(list_videos "$media_root/TV/$show/$season" | choose "$season")"
+            play "$media_root/TV/$show/$season/$episode"
+            ;;
+        Movies/*)
+            local movie="${selection#Movies/}"
+            local file
+            file="$(list_videos "$media_root/Movies/$movie" | choose "$movie")"
+            play "$media_root/Movies/$movie/$file"
+            ;;
+        *)
+            exit 0
+            ;;
+    esac
+}
 
 kind="$(
     printf 'TV\nMovies\nAll\n' |
-        rofi -dmenu -i -p 'Watch'
+        choose 'Watch'
 )"
 
 case "$kind" in
     TV)
-        roots=("$media_root/TV")
+        watch_tv
         ;;
     Movies)
-        roots=("$media_root/Movies")
+        watch_movies
         ;;
     All)
-        roots=("$media_root/TV" "$media_root/Movies")
+        watch_all
         ;;
     *)
         exit 0
         ;;
 esac
-
-selection="$(
-    fd --type f \
-        --extension mkv \
-        --extension mp4 \
-        --extension m4v \
-        --extension avi \
-        --extension webm \
-        . "${roots[@]}" |
-        sed "s#^$media_root/##" |
-        sort |
-        rofi -dmenu -i -p "$kind"
-)"
-
-[ -n "$selection" ] || exit 0
-
-flatpak run io.mpv.Mpv "$media_root/$selection" >/dev/null 2>&1 &
