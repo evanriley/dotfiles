@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$#" -lt 4 ]; then
+    echo "usage: keepalive-process exact|full PATTERN DELAY COMMAND [ARG...]" >&2
+    exit 2
+fi
+
+mode="$1"
+pattern="$2"
+delay="$3"
+shift 3
+
+is_running() {
+    case "$mode" in
+        exact)
+            pgrep -u "$UID" -x "$pattern" >/dev/null
+            ;;
+        full)
+            pgrep -u "$UID" -f "$pattern" | grep -v "^$$$" >/dev/null
+            ;;
+        *)
+            echo "unknown match mode: $mode" >&2
+            exit 2
+            ;;
+    esac
+}
+
+while true; do
+    if ! is_running; then
+        "$@" &
+    fi
+
+    while is_running; do
+        sleep "$delay"
+    done
+
+    sleep "$delay"
+done

@@ -102,8 +102,6 @@ spawn-at-startup "kitty" "--class" "scratch_rmpc" "-e" "rmpc"
 spawn-at-startup "kitty" "--class" "scratch_btop" "-e" "btop"
 spawn-at-startup "firefox"
 spawn-at-startup "flatpak" "run" "dev.deedles.Trayscale"
-spawn-at-startup "flatpak" "run" "com.discordapp.Discord" "--start-minimized"
-spawn-at-startup "steam" "-silent"
 hotkey-overlay {
     skip-at-startup
 }
