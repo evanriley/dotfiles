@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export INSTALL4J_JAVA_HOME_OVERRIDE="${INSTALL4J_JAVA_HOME_OVERRIDE:-$HOME/.local/share/mise/installs/java/zulu-21.50.19.0}"
+exec "$HOME/.local/opt/thinkorswim/thinkorswim" "$@"
