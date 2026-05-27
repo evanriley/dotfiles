@@ -30,6 +30,10 @@
         href: http://127.0.0.1:8080
         description: Usenet downloads
         icon: sabnzbd.png
+    - qBittorrent:
+        href: http://127.0.0.1:8081
+        description: Torrent downloads
+        icon: qbittorrent.png
     - slskd:
         href: http://127.0.0.1:5030
         description: Soulseek
