@@ -2,7 +2,7 @@
 
 {
   perSystem =
-    { system, ... }:
+    { pkgs, system, ... }:
     {
       checks =
         if system == "x86_64-linux" then
@@ -11,5 +11,16 @@
           }
         else
           { };
+
+      devShells.default = pkgs.mkShell {
+        packages = with pkgs; [
+          deadnix
+          git
+          nixfmt
+          statix
+        ];
+      };
+
+      formatter = pkgs.nixfmt;
     };
 }

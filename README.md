@@ -12,8 +12,12 @@ unlocking.
 - `nix/flake`: flake outputs and shared project options
 - `nix/hosts/cinderace`: NixOS modules for the desktop
 - `nix/home/evan`: Home Manager modules for Evan's account
+- `home/evan/files`: files linked into Evan's home by Home Manager
 - `secrets`: agenix notes and encrypted secrets
 - `docs`: detailed host runbooks
+
+This is a normal flake repository, not a bare home-directory checkout. Home
+files are installed declaratively by Home Manager.
 
 ## Fresh Install
 

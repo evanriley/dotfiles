@@ -2,6 +2,9 @@
   eos.homeModules.evan = [
     (
       { pkgs, ... }:
+      let
+        files = ../../../home/evan/files;
+      in
       {
         home.username = "evan";
         home.homeDirectory = "/home/evan";
@@ -55,17 +58,28 @@
         programs.zoxide.enable = false;
 
         home.file = {
-          ".bash_logout".source = ../../../.bash_logout;
-          ".bash_profile".source = ../../../.bash_profile;
-          ".bashrc".source = ../../../.bashrc;
-          ".gitconfig".source = ../../../.gitconfig;
-          ".inputrc".source = ../../../.inputrc;
+          ".bash_logout".source = files + "/.bash_logout";
+          ".bash_profile".source = files + "/.bash_profile";
+          ".bashrc".source = files + "/.bashrc";
+          ".gitconfig".source = files + "/.gitconfig";
+          ".inputrc".source = files + "/.inputrc";
 
-          "bin/e".source = ../../../bin/e;
-          "bin/dotinstall.sh".source = ../../../bin/dotinstall.sh;
-          "bin/doom-bootstrap".source = ../../../bin/doom-bootstrap;
+          "bin/e".source = files + "/bin/e";
+          "bin/doom-bootstrap".source = files + "/bin/doom-bootstrap";
 
-          "Pictures/wallpapers/nebula.png".source = ../../../Pictures/wallpapers/nebula.png;
+          ".local/bin/thinkorswim".source = files + "/.local/bin/thinkorswim";
+          ".local/share/applications/emacsclient.desktop".source =
+            files + "/.local/share/applications/emacsclient.desktop";
+          ".local/share/applications/thinkorswim.desktop".source =
+            files + "/.local/share/applications/thinkorswim.desktop";
+          ".local/share/flatpak/overrides/com.discordapp.Discord".source =
+            files + "/.local/share/flatpak/overrides/com.discordapp.Discord";
+          ".local/share/flatpak/overrides/io.mpv.Mpv".source =
+            files + "/.local/share/flatpak/overrides/io.mpv.Mpv";
+          ".local/share/fonts/material-design-iconic-font/Material-Design-Iconic-Font.ttf".source =
+            files + "/.local/share/fonts/material-design-iconic-font/Material-Design-Iconic-Font.ttf";
+
+          "Pictures/wallpapers/nebula.png".source = files + "/Pictures/wallpapers/nebula.png";
         };
       }
     )

@@ -31,10 +31,7 @@
         let
           entries = builtins.readDir dir;
           names = builtins.attrNames entries;
-          isModule =
-            name:
-            entries.${name} == "regular"
-            && lib.hasSuffix ".nix" name;
+          isModule = name: entries.${name} == "regular" && lib.hasSuffix ".nix" name;
           isDir = name: entries.${name} == "directory";
           files = map (name: dir + "/${name}") (builtins.filter isModule names);
           dirs = lib.concatMap (name: dendriticModules (dir + "/${name}")) (builtins.filter isDir names);
