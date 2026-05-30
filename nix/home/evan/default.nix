@@ -55,17 +55,17 @@
         programs.zoxide.enable = false;
 
         home.file = {
-          ".bash_logout".source = ../.bash_logout;
-          ".bash_profile".source = ../.bash_profile;
-          ".bashrc".source = ../.bashrc;
-          ".gitconfig".source = ../.gitconfig;
-          ".inputrc".source = ../.inputrc;
+          ".bash_logout".source = ../../../.bash_logout;
+          ".bash_profile".source = ../../../.bash_profile;
+          ".bashrc".source = ../../../.bashrc;
+          ".gitconfig".source = ../../../.gitconfig;
+          ".inputrc".source = ../../../.inputrc;
 
-          "bin/e".source = ../bin/e;
-          "bin/dotinstall.sh".source = ../bin/dotinstall.sh;
-          "bin/doom-bootstrap".source = ../bin/doom-bootstrap;
+          "bin/e".source = ../../../bin/e;
+          "bin/dotinstall.sh".source = ../../../bin/dotinstall.sh;
+          "bin/doom-bootstrap".source = ../../../bin/doom-bootstrap;
 
-          "Pictures/wallpapers/nebula.png".source = ../Pictures/wallpapers/nebula.png;
+          "Pictures/wallpapers/nebula.png".source = ../../../Pictures/wallpapers/nebula.png;
         };
       }
     )

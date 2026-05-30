@@ -23,8 +23,8 @@
 
         age = {
           identityPaths = [
-            "/etc/agenix/identities/yubikey-20477902.txt"
-            "/etc/agenix/identities/yubikey-20477782.txt"
+            "/etc/agenix/identities/yubikey-primary.txt"
+            "/etc/agenix/identities/yubikey-backup.txt"
           ];
         };
 

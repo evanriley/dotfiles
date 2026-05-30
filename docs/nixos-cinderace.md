@@ -7,8 +7,8 @@ This branch builds a fresh NixOS install for `cinderace`.
 - OS drive: `/dev/nvme1n1`, Samsung SSD 9100 PRO 2TB
 - Media: UUID `63b66b78-4f03-44ab-9a01-ddb98de974cf`, mounted at `/mnt/Media`
 - Games: UUID `ccc88ac2-f5bd-48da-b033-03bafbd2c110`, mounted at `/mnt/Games`
-- Primary YubiKey: 5C NFC serial `20477902`
-- Backup YubiKey: 5C NFC serial `20477782`
+- Primary YubiKey: YubiKey 5C NFC
+- Backup YubiKey: YubiKey 5C NFC
 
 ## Pre-Install Validation
 
@@ -45,7 +45,7 @@ The disko config wipes `/dev/nvme1n1`.
 From NixOS installer media:
 
 ```bash
-git clone --branch nixos-cinderace git@github.com:evanriley/dotfiles.git /tmp/dotfiles
+git clone --branch nixos-cinderace https://github.com/evanriley/dotfiles.git /tmp/dotfiles
 cd /tmp/dotfiles
 sudo nix --experimental-features 'nix-command flakes' run github:nix-community/disko -- --mode disko --flake .#cinderace
 sudo nixos-install --flake .#cinderace
@@ -64,7 +64,7 @@ sudo systemd-cryptenroll \
   /dev/disk/by-partlabel/nixos-cryptroot
 ```
 
-Repeat once for serial `20477902` and once for serial `20477782`.
+Repeat once for the daily YubiKey and once for the backup YubiKey.
 
 Keep a recovery passphrase in a separate slot:
 

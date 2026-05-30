@@ -4,23 +4,28 @@ This tree is reserved for agenix-encrypted secrets. Do not commit plaintext
 secrets, SSH private keys, GPG private keys, recovery codes, or Syncthing
 contents here.
 
-Confirmed YubiKeys:
-
-- Primary: YubiKey 5C NFC, serial `20477902`
-- Backup: YubiKey 5C NFC, serial `20477782`
-
-Generate each YubiKey age identity after `age-plugin-yubikey` is available:
+YubiKey serials are not secret credentials, but they are unnecessary public
+device identifiers. Keep exact serials out of committed docs and discover them
+locally when provisioning:
 
 ```bash
-age-plugin-yubikey --generate --serial 20477902 --name cinderace-primary --pin-policy never --touch-policy never > /tmp/yubikey-20477902.txt
-age-plugin-yubikey --generate --serial 20477782 --name cinderace-backup --pin-policy never --touch-policy never > /tmp/yubikey-20477782.txt
+ykman list
+```
+
+Generate each YubiKey age identity after `age-plugin-yubikey` is available.
+Plug in one key at a time and replace `<serial>` with the local serial shown by
+`ykman list`:
+
+```bash
+age-plugin-yubikey --generate --serial <serial> --name cinderace-primary --pin-policy never --touch-policy never > /tmp/yubikey-primary.txt
+age-plugin-yubikey --generate --serial <serial> --name cinderace-backup --pin-policy never --touch-policy never > /tmp/yubikey-backup.txt
 ```
 
 Install the identity files on cinderace:
 
 ```bash
-sudo install -D -m 0600 /tmp/yubikey-20477902.txt /etc/agenix/identities/yubikey-20477902.txt
-sudo install -D -m 0600 /tmp/yubikey-20477782.txt /etc/agenix/identities/yubikey-20477782.txt
+sudo install -D -m 0600 /tmp/yubikey-primary.txt /etc/agenix/identities/yubikey-primary.txt
+sudo install -D -m 0600 /tmp/yubikey-backup.txt /etc/agenix/identities/yubikey-backup.txt
 ```
 
 List recipients:
