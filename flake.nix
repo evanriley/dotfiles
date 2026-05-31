@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
+    import-tree.url = "github:vic/import-tree";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -23,23 +24,8 @@
 
   outputs =
     inputs@{ flake-parts, ... }:
-    let
-      lib = inputs.nixpkgs.lib;
-
-      dendriticModules =
-        dir:
-        let
-          entries = builtins.readDir dir;
-          names = builtins.attrNames entries;
-          isModule = name: entries.${name} == "regular" && lib.hasSuffix ".nix" name;
-          isDir = name: entries.${name} == "directory" && name != "files";
-          files = map (name: dir + "/${name}") (builtins.filter isModule names);
-          dirs = lib.concatMap (name: dendriticModules (dir + "/${name}")) (builtins.filter isDir names);
-        in
-        files ++ dirs;
-    in
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = dendriticModules ./flake ++ dendriticModules ./hosts ++ dendriticModules ./home;
+      imports = [ (import inputs.import-tree ./modules) ];
 
       systems = [
         "x86_64-linux"

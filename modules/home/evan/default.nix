@@ -3,7 +3,7 @@
     (
       { pkgs, ... }:
       let
-        files = ./files;
+        files = ../../../files/evan;
       in
       {
         home.username = "evan";

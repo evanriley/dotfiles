@@ -6,13 +6,13 @@
       { pkgs, ... }:
       let
         awwwPkg = if pkgs ? awww then pkgs.awww else null;
-        files = ./files;
+        files = ../../../files/evan;
         swayncPkg = pkgs.swaynotificationcenter;
         swayosdPkg = pkgs.swayosd;
       in
       {
         home.file = {
-          ".config/btop/btop.conf".source = files + "/.config/btop/btop.conf";
+          ".config/btop".source = files + "/.config/btop";
           ".config/direnv/direnvrc".text = ''
             layout_uv() {
                 if [ ! -d .venv ]; then

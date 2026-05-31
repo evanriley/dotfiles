@@ -9,10 +9,11 @@ unlocking.
 ## Layout
 
 - `flake.nix`: flake entry point with dendritic imports
-- `flake`: flake outputs and shared project options
-- `hosts/cinderace`: NixOS modules for the desktop
-- `home/evan`: Home Manager modules for Evan's account
-- `home/evan/files`: files linked into Evan's home by Home Manager
+- `modules`: dendritic flake-parts modules
+- `modules/flake`: flake outputs and shared project options
+- `modules/hosts/cinderace`: NixOS modules for the desktop
+- `modules/home/evan`: Home Manager modules for Evan's account
+- `files/evan`: files linked into Evan's home by Home Manager
 - `secrets`: agenix notes and encrypted secrets
 - `docs`: detailed host runbooks
 
