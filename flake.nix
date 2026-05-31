@@ -25,7 +25,11 @@
   outputs =
     inputs@{ flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [ (import inputs.import-tree ./modules) ];
+      imports = [
+        inputs.flake-parts.flakeModules.modules
+        inputs.home-manager.flakeModules.home-manager
+        (import inputs.import-tree ./modules)
+      ];
 
       systems = [
         "x86_64-linux"

@@ -55,44 +55,42 @@ let
     '';
 in
 {
-  eos.nixosModules.cinderace = [
-    {
-      virtualisation.podman = {
+  flake.modules.nixos.cinderaceMediaContainers = {
+    virtualisation.podman = {
+      enable = true;
+      dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
+      autoPrune = {
         enable = true;
-        dockerCompat = true;
-        defaultNetwork.settings.dns_enabled = true;
-        autoPrune = {
-          enable = true;
-          dates = "weekly";
-        };
+        dates = "weekly";
       };
+    };
 
-      users.users.evan = {
-        subUidRanges = [
-          {
-            startUid = 100000;
-            count = 65536;
-          }
-        ];
-        subGidRanges = [
-          {
-            startGid = 100000;
-            count = 65536;
-          }
-        ];
-      };
-    }
-  ];
+    users.users.evan = {
+      subUidRanges = [
+        {
+          startUid = 100000;
+          count = 65536;
+        }
+      ];
+      subGidRanges = [
+        {
+          startGid = 100000;
+          count = 65536;
+        }
+      ];
+    };
+  };
 
-  eos.homeModules.evan = [
-    (
-      { config, pkgs, ... }:
-      {
-        home.packages = with pkgs; [
+  flake.homeModules.evanMediaContainers =
+    { config, pkgs, ... }:
+    {
+      home = {
+        packages = with pkgs; [
           podman-compose
         ];
 
-        home.file = {
+        file = {
           ".config/homepage".source = files + "/.config/homepage";
           ".config/recyclarr".source = files + "/.config/recyclarr";
           ".config/containers/systemd/media-stack.network".text = ''
@@ -297,21 +295,22 @@ in
               };
             };
 
-        home.activation.createMediaStackDirs = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-          mkdir -p \
-            "$HOME/.config/containers/systemd" \
-            "$HOME/.local/share/media-stack"/{homepage,jellyfin/config,jellyfin/transcode,lidarr,prowlarr,qbittorrent,radarr,recyclarr,roon,roon-backups,sabnzbd,slskd,sonarr,soularr}
-        '';
+        activation = {
+          createMediaStackDirs = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+            mkdir -p \
+              "$HOME/.config/containers/systemd" \
+              "$HOME/.local/share/media-stack"/{homepage,jellyfin/config,jellyfin/transcode,lidarr,prowlarr,qbittorrent,radarr,recyclarr,roon,roon-backups,sabnzbd,slskd,sonarr,soularr}
+          '';
 
-        home.activation.enableMediaQuadlets = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-          if command -v systemctl >/dev/null 2>&1 && systemctl --user is-system-running >/dev/null 2>&1; then
-            systemctl --user daemon-reload || true
-            systemctl --user enable --now ${
-              lib.concatMapStringsSep " " (name: "${name}.service") mediaServices
-            } || true
-          fi
-        '';
-      }
-    )
-  ];
+          enableMediaQuadlets = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+            if command -v systemctl >/dev/null 2>&1 && systemctl --user is-system-running >/dev/null 2>&1; then
+              systemctl --user daemon-reload || true
+              systemctl --user enable --now ${
+                lib.concatMapStringsSep " " (name: "${name}.service") mediaServices
+              } || true
+            fi
+          '';
+        };
+      };
+    };
 }

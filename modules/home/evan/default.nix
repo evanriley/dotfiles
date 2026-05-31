@@ -1,17 +1,17 @@
 {
-  eos.homeModules.evan = [
-    (
-      { pkgs, ... }:
-      let
-        files = ../../../files/evan;
-      in
-      {
-        home.username = "evan";
-        home.homeDirectory = "/home/evan";
-        home.stateVersion = "26.05";
-        home.enableNixpkgsReleaseCheck = false;
+  flake.homeModules.evanBase =
+    { pkgs, ... }:
+    let
+      files = ../../../files/evan;
+    in
+    {
+      home = {
+        username = "evan";
+        homeDirectory = "/home/evan";
+        stateVersion = "26.05";
+        enableNixpkgsReleaseCheck = false;
 
-        home.sessionVariables = {
+        sessionVariables = {
           EDITOR = "e --tty --wait";
           VISUAL = "e --wait";
           XDG_CONFIG_HOME = "$HOME/.config";
@@ -19,14 +19,14 @@
           MOZ_ENABLE_WAYLAND = "1";
         };
 
-        home.sessionPath = [
+        sessionPath = [
           "$HOME/bin"
           "$HOME/.local/bin"
           "$HOME/go/bin"
           "$HOME/.cargo/bin"
         ];
 
-        home.packages = with pkgs; [
+        packages = with pkgs; [
           bash-completion
           btop
           cliphist
@@ -53,13 +53,7 @@
           yt-dlp
         ];
 
-        programs.home-manager.enable = true;
-        programs.git.enable = false;
-        programs.direnv.enable = false;
-        programs.bash.enable = false;
-        programs.zoxide.enable = false;
-
-        home.file = {
+        file = {
           ".bash_logout".text = ''
             clear
           '';
@@ -118,7 +112,14 @@
 
           "Pictures/wallpapers/nebula.png".source = files + "/Pictures/wallpapers/nebula.png";
         };
-      }
-    )
-  ];
+      };
+
+      programs = {
+        home-manager.enable = true;
+        git.enable = false;
+        direnv.enable = false;
+        bash.enable = false;
+        zoxide.enable = false;
+      };
+    };
 }

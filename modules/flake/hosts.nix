@@ -1,4 +1,4 @@
-{ config, inputs, ... }:
+{ inputs, ... }:
 
 {
   flake.nixosConfigurations.cinderace = inputs.nixpkgs.lib.nixosSystem {
@@ -16,13 +16,25 @@
             inputs.agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
           ];
 
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.backupFileExtension = "hm-backup";
-          home-manager.users.evan.imports = config.eos.homeModules.evan;
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            backupFileExtension = "hm-backup";
+            users.evan.imports = with inputs.self.homeModules; [
+              evanBase
+              evanDesktop
+              evanMediaContainers
+              evanMpd
+              evanSync
+            ];
+          };
         }
       )
-    ]
-    ++ config.eos.nixosModules.cinderace;
+      inputs.self.modules.nixos.cinderaceDesktop
+      inputs.self.modules.nixos.cinderaceDisko
+      inputs.self.modules.nixos.cinderaceMediaContainers
+      inputs.self.modules.nixos.cinderaceSecrets
+      inputs.self.modules.nixos.cinderaceSystem
+    ];
   };
 }
