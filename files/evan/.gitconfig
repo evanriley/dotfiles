@@ -1,12 +1,11 @@
 [user]
     name = Evan Riley
     email = evan@evanriley.net
-    signingkey = ~/.ssh/id_ed25519.pub # Used ~ for cross-platform safety
+    signingkey = ~/.ssh/id_ed25519.pub
 
 [core]
     excludesfile = ~/.gitignore
     pager = delta
-    # Performance & whitespace
     autocrlf = false
     safecrlf = false
     filemode = false
@@ -16,7 +15,6 @@
     defaultBranch = main
 
 [display]
-    # Moves the sort to a more global display logic if supported
     ui = auto
 
 [column]
@@ -31,7 +29,7 @@
 
 [push]
     default = tracking
-    autoSetupRemote = true # Automatically sets up tracking for new branches
+    autoSetupRemote = true
 
 [pull]
     rebase = true
@@ -54,7 +52,6 @@
     trustExitCode = true
 
 [difftool "kitty"]
-    # 'kitten diff' is the correct modern command
     cmd = kitten diff $LOCAL $REMOTE
 
 [delta]

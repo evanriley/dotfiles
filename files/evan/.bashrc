@@ -75,7 +75,6 @@ PROMPT_COMMAND=set_bash_prompt
 
 alias fastfetch='fastfetch --config ~/.config/fastfetch/config.jsonc'
 
-alias dots='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias emacs='emacsclient -c -a ""'
 alias vim='nvim'
 

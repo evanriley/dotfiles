@@ -14,6 +14,7 @@ unlocking.
 - `modules/hosts/cinderace`: NixOS modules for the desktop
 - `modules/home/evan`: Home Manager modules for Evan's account
 - `files/evan`: files linked into Evan's home by Home Manager
+- `themes`: shared palette data used by generated desktop config
 - `secrets`: agenix notes and encrypted secrets
 - `docs`: detailed host runbooks
 
@@ -24,6 +25,10 @@ named NixOS modules under `modules.nixos` and Home Manager modules under
 
 This is a normal flake repository, not a bare home-directory checkout. Home
 files are installed declaratively by Home Manager.
+
+The desktop theme starts from `themes/kanso-zen.nix`. Home Manager generates the
+Niri-adjacent app styling that should stay synchronized, including Ghostty,
+Foot, Waybar, gtklock, swaync, mpv, and Zathura.
 
 ## Daily Use
 

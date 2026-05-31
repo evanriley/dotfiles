@@ -82,7 +82,7 @@ require('mini.deps').setup({ path = { package = path_package } })
 
 local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
-add('miikanissi/modus-themes.nvim')
+add('pabloagn/kanso.nvim')
 add({ source = 'nvim-treesitter/nvim-treesitter', hooks = { post_checkout = function() vim.cmd('TSUpdate') end } })
 add('RRethy/nvim-treesitter-endwise')
 add('rafamadriz/friendly-snippets')
@@ -115,14 +115,18 @@ if ok_icons then
 end
 
 
-setup('modus-themes', {
-  line_nr_column_background = false,
-  styles = {
-    comments = { italic = false },
-    keywords = { italic = false },
+setup('kanso', {
+  bold = true,
+  italics = false,
+  transparent = false,
+  terminalColors = true,
+  theme = 'zen',
+  background = {
+    dark = 'zen',
+    light = 'pearl',
   },
 })
-local ok = pcall(vim.cmd.colorscheme, 'modus_vivendi')
+local ok = pcall(vim.cmd.colorscheme, 'kanso')
 if not ok then vim.cmd.colorscheme('default') end
 
 setup('smart-splits')
