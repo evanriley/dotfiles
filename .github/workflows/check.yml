@@ -1,0 +1,36 @@
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - nixos-cinderace
+  workflow_dispatch:
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  flake:
+    name: Flake check
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Check flake
+        run: nix flake check --show-trace
