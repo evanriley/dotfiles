@@ -31,6 +31,7 @@
           btop
           cliphist
           direnv
+          discord
           distrobox
           emacs-pgtk
           fastfetch
@@ -46,6 +47,7 @@
           qutebrowser
           rmpc
           slurp
+          trayscale
           wl-clipboard
           wl-clip-persist
           yt-dlp
@@ -109,12 +111,6 @@
             Terminal=false
             Categories=Finance;Office;
             StartupNotify=true
-          '';
-
-          ".local/share/flatpak/overrides/com.discordapp.Discord".text = ''
-            [Environment]
-            PULSE_LATENCY_MSEC=120
-            PIPEWIRE_LATENCY=1024/48000
           '';
 
           ".local/share/fonts/material-design-iconic-font/Material-Design-Iconic-Font.ttf".source =
