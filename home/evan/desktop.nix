@@ -6,29 +6,188 @@
       { pkgs, ... }:
       let
         awwwPkg = if pkgs ? awww then pkgs.awww else null;
-        files = ../../../home/evan/files;
+        files = ./files;
         swayncPkg = pkgs.swaynotificationcenter;
         swayosdPkg = pkgs.swayosd;
       in
       {
         home.file = {
           ".config/btop/btop.conf".source = files + "/.config/btop/btop.conf";
-          ".config/direnv/direnvrc".source = files + "/.config/direnv/direnvrc";
+          ".config/direnv/direnvrc".text = ''
+            layout_uv() {
+                if [ ! -d .venv ]; then
+                    uv venv
+                fi
+
+                source .venv/bin/activate
+            }
+
+            dotenv_if_exists() {
+                local file="''${1:-.env.local}"
+
+                if [ -f "$file" ]; then
+                    dotenv "$file"
+                fi
+            }
+          '';
           ".config/doom".source = files + "/.config/doom";
           ".config/fastfetch".source = files + "/.config/fastfetch";
-          ".config/foot/foot.ini".source = files + "/.config/foot/foot.ini";
-          ".config/ghostty/config".source = files + "/.config/ghostty/config";
-          ".config/gtk-3.0/settings.ini".source = files + "/.config/gtk-3.0/settings.ini";
-          ".config/gtk-4.0/settings.ini".source = files + "/.config/gtk-4.0/settings.ini";
-          ".config/gtklock".source = files + "/.config/gtklock";
+          ".config/foot/foot.ini".text = ''
+            [main]
+            shell=bash
+            font=Berkeley Mono:size=13:fontfeatures=-calt:-liga:-dlig, Symbols Nerd Font Mono:size=13
+            pad=8x8
+            [cursor]
+            style=block
+            blink=no
+            [mouse]
+            hide-when-typing=yes
+            [scrollback]
+            lines=10000
+            multiplier=3.0
+            indicator-position=relative
+            indicator-format=""
+
+            [colors-dark]
+            foreground=ffffff
+            background=000000
+            selection-foreground=ffffff
+            selection-background=7030af
+            urls=c6daff
+            cursor=ffffff 7030af
+
+            regular0=000000
+            regular1=ff5f59
+            regular2=44bc44
+            regular3=d0bc00
+            regular4=2fafff
+            regular5=feacd0
+            regular6=00d3d0
+            regular7=ffffff
+
+            bright0=1e1e1e
+            bright1=ff5f5f
+            bright2=44df44
+            bright3=efef00
+            bright4=338fff
+            bright5=ff66ff
+            bright6=00eff0
+            bright7=989898
+
+            16=fec43f
+            17=ff9580
+          '';
+          ".config/ghostty/config".text = ''
+            command = bash
+            working-directory = ~
+            custom-shader-animation = true
+            clipboard-read = allow
+            clipboard-write = allow
+            copy-on-select = false
+            window-new-tab-position = end
+            window-padding-balance = true
+            theme = no-clown-fiesta
+            font-size = 13
+            font-family = Berkeley Mono
+            font-family = Symbols Nerd Font Mono
+            font-feature = -calt, -liga, -dlig
+            macos-titlebar-style = transparent
+            background-opacity = 1
+            keybind = ctrl+t=new_tab
+            window-padding-x = 8
+            window-padding-y = 8
+            mouse-hide-while-typing = true
+            window-decoration = none
+          '';
+          ".config/ghostty/themes".source = files + "/.config/ghostty/themes";
+          ".config/gtk-3.0/settings.ini".text = ''
+            [Settings]
+            gtk-theme-name=adw-gtk3-dark
+            gtk-icon-theme-name=Papirus-Dark
+            gtk-cursor-theme-name=Bibata-Original-Classic
+            gtk-cursor-theme-size=24
+            gtk-application-prefer-dark-theme=1
+          '';
+          ".config/gtk-4.0/settings.ini".text = ''
+            [Settings]
+            gtk-theme-name=adw-gtk3-dark
+            gtk-icon-theme-name=Papirus-Dark
+            gtk-cursor-theme-name=Bibata-Original-Classic
+            gtk-cursor-theme-size=24
+            gtk-application-prefer-dark-theme=1
+          '';
+          ".config/gtklock/config.ini".text = ''
+            [main]
+            gtk-theme=adw-gtk3-dark
+            time-format=%H:%M
+            date-format=%A, %B %d
+            idle-hide=true
+            idle-timeout=20
+          '';
+          ".config/gtklock/style.css".source = files + "/.config/gtklock/style.css";
           ".config/kitty".source = files + "/.config/kitty";
           ".config/mimeapps.list".source = files + "/.config/mimeapps.list";
-          ".config/mise/config.toml".source = files + "/.config/mise/config.toml";
+          ".config/mise/config.toml".text = ''
+            [tools]
+            go = "latest"
+            janet = "latest"
+            node = "latest"
+            python = "latest"
+            zig = "latest"
+            zls = "latest"
+          '';
           ".config/mpd/mpd.conf".source = files + "/.config/mpd/mpd.conf";
-          ".config/mpv".source = files + "/.config/mpv";
+          ".config/mpv/input.conf".text = ''
+            WHEEL_UP      add volume 5
+            WHEEL_DOWN    add volume -5
+
+            l             seek  5
+            h             seek -5
+            L             seek  30
+            H             seek -30
+
+            q             quit
+            ESC           set fullscreen no
+          '';
+          ".config/mpv/mpv.conf".text = ''
+            vo=gpu-next
+            gpu-api=vulkan
+            hwdec=vaapi
+            profile=high-quality
+            scale=ewa_lanczossharp
+            cscale=ewa_lanczossharp
+            volume=50
+
+            keep-open=yes
+            save-position-on-quit=yes
+            force-window=immediate
+            window-scale=0.8
+            keepaspect-window=no
+
+            border=no
+            osd-bar=no
+            osd-font='Berkeley Mono'
+            osd-font-size=30
+            osd-color='#C5C9C7'
+            osd-border-color='#090E13'
+            osd-shadow-color='#090E13'
+            osd-border-size=2
+            osd-shadow-offset=1
+
+            screenshot-format=png
+            screenshot-directory=~/Pictures/Screenshots
+
+            ytdl-format="((bestvideo[vcodec^=vp9]/bestvideo)+(bestaudio[acodec=opus]/bestaudio[acodec=vorbis]/bestaudio[acodec=aac]/bestaudio))/best"
+          '';
+          ".config/mpv/scripts".source = files + "/.config/mpv/scripts";
           ".config/niri/config.kdl".source = files + "/.config/niri/config.kdl";
           ".config/nvim".source = files + "/.config/nvim";
-          ".config/pipewire".source = files + "/.config/pipewire";
+          ".config/pipewire/pipewire.conf.d/clock.rate.conf".text = ''
+            context.properties = {
+                default.clock.rate = 48000
+                default.clock.allowed-rates = [ 44100 48000 88200 96000 176400 192000 ]
+            }
+          '';
           ".config/qutebrowser".source = files + "/.config/qutebrowser";
           ".config/rmpc".source = files + "/.config/rmpc";
           ".config/rofi".source = files + "/.config/rofi";
@@ -38,15 +197,61 @@
           ".config/scripts/powermenu".source = files + "/.config/scripts/powermenu";
           ".config/scripts/watch-media".source = files + "/.config/scripts/watch-media";
           ".config/swaync".source = files + "/.config/swaync";
-          ".config/swayosd".source = files + "/.config/swayosd";
+          ".config/swayosd/config.toml".text = ''
+            [server]
+            show_percentage = true
+            max_volume = 100
+            style = "./style.css"
+          '';
+          ".config/swayosd/style.css".source = files + "/.config/swayosd/style.css";
           ".config/waybar".source = files + "/.config/waybar";
           ".config/wezterm".source = files + "/.config/wezterm";
-          ".config/wireplumber".source = files + "/.config/wireplumber";
+          ".config/wireplumber/wireplumber.conf.d/51-dx5ii.conf".text = ''
+            monitor.alsa.rules = [
+              {
+                matches = [
+                  {
+                    device.name = "~alsa_card.usb-Topping_DX5_II.*"
+                  }
+                ]
+                actions = {
+                  update-props = {
+                    device.nick = "Topping DX5 II"
+                    device.description = "Topping DX5 II"
+                    api.acp.auto-ports-wait = true
+                  }
+                }
+              }
+              {
+                matches = [
+                  {
+                    node.name = "~alsa_output.usb-Topping_DX5_II.*"
+                  }
+                ]
+                actions = {
+                  update-props = {
+                    node.nick = "Topping DX5 II"
+                    node.description = "Topping DX5 II"
+                    audio.rate = 0
+                    audio.allowed-rates = [ 44100 48000 88200 96000 176400 192000 ]
+                    api.alsa.multi-rate = true
+                  }
+                }
+              }
+            ]
+          '';
           ".config/wlogout".source = files + "/.config/wlogout";
-          ".config/xdg-desktop-portal/niri-portals.conf".source =
-            files + "/.config/xdg-desktop-portal/niri-portals.conf";
+          ".config/xdg-desktop-portal/niri-portals.conf".text = ''
+            [preferred]
+            default=gnome;gtk;
+            org.freedesktop.impl.portal.Access=gtk;
+            org.freedesktop.impl.portal.Notification=gtk;
+            org.freedesktop.impl.portal.Secret=gnome-keyring;
+          '';
           ".config/yazi".source = files + "/.config/yazi";
-          ".config/yt-dlp/config".source = files + "/.config/yt-dlp/config";
+          ".config/yt-dlp/config".text = ''
+            --sponsorblock-remove all
+          '';
           ".config/zathura/zathurarc".source = files + "/.config/zathura/zathurarc";
         };
 

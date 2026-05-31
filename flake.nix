@@ -32,14 +32,14 @@
           entries = builtins.readDir dir;
           names = builtins.attrNames entries;
           isModule = name: entries.${name} == "regular" && lib.hasSuffix ".nix" name;
-          isDir = name: entries.${name} == "directory";
+          isDir = name: entries.${name} == "directory" && name != "files";
           files = map (name: dir + "/${name}") (builtins.filter isModule names);
           dirs = lib.concatMap (name: dendriticModules (dir + "/${name}")) (builtins.filter isDir names);
         in
         files ++ dirs;
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = dendriticModules ./nix;
+      imports = dendriticModules ./flake ++ dendriticModules ./hosts ++ dendriticModules ./home;
 
       systems = [
         "x86_64-linux"

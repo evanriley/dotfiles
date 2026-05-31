@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=thinkorswim
-Comment=Trading platform
-Exec=/var/home/evan/.local/bin/thinkorswim
-Icon=/var/home/evan/.local/opt/thinkorswim/.install4j/thinkorswim.png
-Terminal=false
-Categories=Finance;Office;
-StartupNotify=true

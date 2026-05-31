@@ -1,7 +1,7 @@
 { lib, ... }:
 
 let
-  files = ../../../home/evan/files;
+  files = ./files;
 
   mediaServices = [
     "homepage"

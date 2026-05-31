@@ -3,7 +3,7 @@
     (
       { pkgs, ... }:
       let
-        files = ../../../home/evan/files;
+        files = ./files;
       in
       {
         home.username = "evan";
@@ -58,24 +58,65 @@
         programs.zoxide.enable = false;
 
         home.file = {
-          ".bash_logout".source = files + "/.bash_logout";
-          ".bash_profile".source = files + "/.bash_profile";
+          ".bash_logout".text = ''
+            clear
+          '';
+
+          ".bash_profile".text = ''
+            if [[ -f ~/.bashrc ]] ; then
+              . ~/.bashrc
+            fi
+          '';
+
           ".bashrc".source = files + "/.bashrc";
           ".gitconfig".source = files + "/.gitconfig";
-          ".inputrc".source = files + "/.inputrc";
+
+          ".inputrc".text = ''
+            "\e[A": history-search-backward
+            "\e[B": history-search-forward
+
+            set show-all-if-ambiguous on
+            set completion-ignore-case on
+          '';
 
           "bin/e".source = files + "/bin/e";
           "bin/doom-bootstrap".source = files + "/bin/doom-bootstrap";
 
           ".local/bin/thinkorswim".source = files + "/.local/bin/thinkorswim";
-          ".local/share/applications/emacsclient.desktop".source =
-            files + "/.local/share/applications/emacsclient.desktop";
-          ".local/share/applications/thinkorswim.desktop".source =
-            files + "/.local/share/applications/thinkorswim.desktop";
-          ".local/share/flatpak/overrides/com.discordapp.Discord".source =
-            files + "/.local/share/flatpak/overrides/com.discordapp.Discord";
-          ".local/share/flatpak/overrides/io.mpv.Mpv".source =
-            files + "/.local/share/flatpak/overrides/io.mpv.Mpv";
+
+          ".local/share/applications/emacsclient.desktop".text = ''
+            [Desktop Entry]
+            Name=Emacs Client
+            GenericName=Text Editor
+            Comment=Edit text
+            MimeType=text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;text/x-org;application/x-shellscript;
+            Exec=/home/evan/bin/e --wait %F
+            Icon=emacs
+            Type=Application
+            Terminal=false
+            Categories=Utility;TextEditor;
+            StartupWMClass=Emacs
+            Keywords=Text;Editor;
+          '';
+
+          ".local/share/applications/thinkorswim.desktop".text = ''
+            [Desktop Entry]
+            Type=Application
+            Name=thinkorswim
+            Comment=Trading platform
+            Exec=/home/evan/.local/bin/thinkorswim
+            Icon=/home/evan/.local/opt/thinkorswim/.install4j/thinkorswim.png
+            Terminal=false
+            Categories=Finance;Office;
+            StartupNotify=true
+          '';
+
+          ".local/share/flatpak/overrides/com.discordapp.Discord".text = ''
+            [Environment]
+            PULSE_LATENCY_MSEC=120
+            PIPEWIRE_LATENCY=1024/48000
+          '';
+
           ".local/share/fonts/material-design-iconic-font/Material-Design-Iconic-Font.ttf".source =
             files + "/.local/share/fonts/material-design-iconic-font/Material-Design-Iconic-Font.ttf";
 
