@@ -25,6 +25,36 @@ named NixOS modules under `modules.nixos` and Home Manager modules under
 This is a normal flake repository, not a bare home-directory checkout. Home
 files are installed declaratively by Home Manager.
 
+## Daily Use
+
+Enter the repo shell when editing:
+
+```bash
+nix develop
+```
+
+Format and check before committing:
+
+```bash
+nix fmt
+nix flake check
+```
+
+`flake check` builds the `cinderace` system closure and runs `deadnix`,
+`statix`, and `nixfmt --check`.
+
+Build without switching:
+
+```bash
+nix build .#nixosConfigurations.cinderace.config.system.build.toplevel
+```
+
+Apply on `cinderace`:
+
+```bash
+sudo nixos-rebuild switch --flake .#cinderace
+```
+
 ## Fresh Install
 
 These steps start from a blank machine booted into the NixOS installer.
