@@ -12,7 +12,10 @@
             nativeBuildInputs = with pkgs; [
               deadnix
               findutils
+              gnugrep
               nixfmt
+              python3
+              shellcheck
               statix
             ];
           }
@@ -36,6 +39,19 @@
             statix = lintCheck "statix" ''
               statix check .
             '';
+            shellcheck = lintCheck "shellcheck" ''
+              find files/evan -type f -perm -0100 -print0 \
+                | while IFS= read -r -d "" file; do
+                    if head -n 1 "$file" | grep -Eq '^#!.*(bash|/sh)'; then
+                      shellcheck "$file"
+                    fi
+                  done
+            '';
+            python-syntax = lintCheck "python-syntax" ''
+              export PYTHONPYCACHEPREFIX="$TMPDIR/pycache"
+              find files/evan -type f -name '*.py' -print0 \
+                | xargs -0 --no-run-if-empty python3 -m py_compile
+            '';
           }
         else
           { };
@@ -45,8 +61,10 @@
           deadnix
           findutils
           git
+          shellcheck
           nixfmt
           nixfmt-tree
+          python3
           statix
         ];
       };
