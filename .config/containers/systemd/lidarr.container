@@ -5,8 +5,7 @@ After=network-online.target
 
 [Container]
 ContainerName=lidarr
-Image=ghcr.io/hotio/lidarr:pr-plugins
-Pull=newer
+Image=lidarr.build
 Network=media-stack.network
 PodmanArgs=--cpu-shares=256
 PublishPort=127.0.0.1:8686:8686
@@ -15,6 +14,7 @@ Environment=PGID=0
 Environment=TZ=America/New_York
 Environment=UMASK=002
 Volume=/var/home/evan/.local/share/media-stack/lidarr:/config:Z
+Volume=/var/home/evan/.local/share/media-stack/lidarr-tidal:/data/tidal-config:Z
 Volume=/mnt/Media/Music:/music:z
 Volume=/mnt/Media/Downloads:/downloads:z
 
