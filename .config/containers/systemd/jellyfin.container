@@ -9,10 +9,8 @@ ConditionPathIsDirectory=/mnt/Media/TV
 ContainerName=jellyfin
 Image=lscr.io/linuxserver/jellyfin:latest
 Pull=newer
-Network=media-stack.network
+Network=host
 PodmanArgs=--cpu-shares=256
-PublishPort=8096:8096/tcp
-PublishPort=7359:7359/udp
 AddDevice=/dev/dri/renderD128:/dev/dri/renderD128:rwm
 Environment=PUID=1000
 Environment=PGID=1000
