@@ -1,0 +1,13 @@
+[Unit]
+Description=Route PS5 audio input to Topping DX5 II
+After=pipewire.service wireplumber.service
+BindsTo=pipewire.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/pw-loopback --name ps5-audio-loopback --latency 20 --capture alsa_input.usb-Generic_USB_Microphone_IM10000001-00.analog-stereo --playback alsa_output.usb-Topping_DX5_II-00.HiFi__Headphones__sink
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=pipewire.service
