@@ -44,6 +44,10 @@
         icon: lidarr.png
 
 - System:
+    - FreshRSS:
+        href: http://127.0.0.1:8082
+        description: Feed reader
+        icon: freshrss.png
     - Syncthing:
         href: http://127.0.0.1:8384
         description: File sync
