@@ -10,6 +10,7 @@ Pull=newer
 Network=media-stack.network
 PodmanArgs=--cpu-shares=128
 PublishPort=127.0.0.1:8082:80
+PublishPort=100.75.174.37:8082:80
 Environment=PUID=1000
 Environment=PGID=1000
 Environment=TZ=America/New_York
