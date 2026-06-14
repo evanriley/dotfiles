@@ -9,15 +9,34 @@
         networkmanager.enable = true;
         firewall = {
           enable = true;
+          trustedInterfaces = [ "tailscale0" ];
           allowedTCPPorts = [
             6881
             50300
             8096
+            22000
           ];
           allowedUDPPorts = [
             6881
             7359
+            21027
+            22000
           ];
+          interfaces.enp8s0 = {
+            # Roon uses host networking and dynamically allocated high ports.
+            allowedTCPPortRanges = [
+              {
+                from = 1025;
+                to = 65535;
+              }
+            ];
+            allowedUDPPortRanges = [
+              {
+                from = 1025;
+                to = 65535;
+              }
+            ];
+          };
         };
       };
       time.timeZone = "America/New_York";
@@ -50,6 +69,7 @@
           "audio"
           "input"
           "podman"
+          "render"
         ];
         shell = pkgs.bashInteractive;
       };
@@ -109,6 +129,7 @@
         smartd.enable = true;
         fwupd.enable = true;
         tailscale.enable = true;
+        hardware.bolt.enable = true;
         avahi = {
           enable = true;
           nssmdns4 = true;
@@ -122,6 +143,20 @@
       hardware.bluetooth = {
         enable = true;
         powerOnBoot = false;
+      };
+
+      programs = {
+        appimage = {
+          enable = true;
+          binfmt = true;
+        };
+        gamemode.enable = true;
+        gamescope.enable = true;
+      };
+
+      hardware.graphics = {
+        enable = true;
+        enable32Bit = true;
       };
 
       environment.sessionVariables = {

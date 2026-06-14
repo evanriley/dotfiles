@@ -4,7 +4,7 @@ This branch builds a fresh NixOS install for `cinderace`.
 
 ## Confirmed Hardware
 
-- OS drive: `/dev/nvme1n1`, Samsung SSD 9100 PRO 2TB
+- OS drive: `/dev/disk/by-path/pci-0000:04:00.0-nvme-1`, Samsung SSD 9100 PRO 2TB
 - Media: UUID `63b66b78-4f03-44ab-9a01-ddb98de974cf`, mounted at `/mnt/Media`
 - Games: UUID `ccc88ac2-f5bd-48da-b033-03bafbd2c110`, mounted at `/mnt/Games`
 - Primary YubiKey: YubiKey 5C NFC
@@ -36,11 +36,53 @@ Back up at least:
 - browser profile data if desired
 - any desired files under `~/sync`
 
-Do not wipe `/dev/nvme0n1` or `/dev/nvme2n1`.
+The current home directory is on the OS disk and will be erased. Make and
+verify a restorable backup of `/var/home/evan`, excluding reproducible caches
+and container image layers if desired.
+
+For a full same-machine migration backup, stop applications and containers,
+then copy the entire home directory to the Games disk:
+
+```bash
+backup=/mnt/Games/Backups/cinderace-pre-nixos
+mkdir -p "$backup"
+systemctl --user stop \
+  freshrss homepage jellyfin lidarr prowlarr qbittorrent radarr recyclarr \
+  roonserver sabnzbd slskd sonarr soularr e-os-syncthing
+sudo rsync -aAXH --numeric-ids --info=progress2 \
+  --exclude=.cache/ \
+  --exclude=.local/share/containers/storage/ \
+  /var/home/evan/ "$backup/home/"
+sudo rsync -aAXHn --numeric-ids --delete \
+  --exclude=.cache/ \
+  --exclude=.local/share/containers/storage/ \
+  /var/home/evan/ "$backup/home/"
+systemctl --user start \
+  freshrss homepage jellyfin lidarr prowlarr qbittorrent radarr recyclarr \
+  roonserver sabnzbd slskd sonarr soularr e-os-syncthing
+```
+
+The verification pass must report no files to copy or delete. Confirm the
+backup contains `home/.ssh`, `home/.local/share/keyrings`,
+`home/.local/share/media-stack`, browser profiles, Steam state, and
+`home/.var/app/org.gnome.World.PikaBackup`.
+
+Before running disko, verify the configured target resolves to the 2 TB 9100
+PRO and that the Media and Games UUIDs resolve to different disks:
+
+```bash
+readlink -f /dev/disk/by-path/pci-0000:04:00.0-nvme-1
+lsblk -o NAME,SIZE,MODEL,FSTYPE,UUID,MOUNTPOINTS
+findmnt --target /mnt/Media
+findmnt --target /mnt/Games
+```
+
+Do not continue unless the target is the existing OS disk. Never wipe either
+4 TB 990 EVO Plus disk.
 
 ## Disk Install
 
-The disko config wipes `/dev/nvme1n1`.
+The disko config wipes the 2 TB 9100 PRO at PCIe path `04:00.0`.
 
 From NixOS installer media:
 
@@ -49,6 +91,21 @@ git clone --branch nixos-cinderace https://github.com/evanriley/dotfiles.git /tm
 cd /tmp/dotfiles
 sudo nix --experimental-features 'nix-command flakes' run github:nix-community/disko -- --mode disko --flake .#cinderace
 sudo nixos-install --flake .#cinderace
+
+sudo mkdir -p /run/cinderace-backup
+sudo mount /dev/disk/by-uuid/ccc88ac2-f5bd-48da-b033-03bafbd2c110 /run/cinderace-backup
+sudo rsync -aAXH --numeric-ids --ignore-existing \
+  /run/cinderace-backup/Backups/cinderace-pre-nixos/home/ /mnt/home/evan/
+```
+
+Restoring after installation and using `--ignore-existing` preserves files
+managed by Home Manager while restoring application state and personal data.
+Podman images and overlay layers are excluded because the Quadlets recreate
+them; bind-mounted media application data remains in the backup.
+Set Evan's login and sudo password before rebooting:
+
+```bash
+sudo nixos-enter --root /mnt -c 'passwd evan'
 ```
 
 ## YubiKey LUKS Enrollment
@@ -89,9 +146,18 @@ without a touch or PIN prompt. The passphrase slot remains the recovery path.
 3. Boot with no YubiKey and verify recovery passphrase unlock.
 4. Install YubiKey age identity files into `/etc/agenix/identities`.
 5. Run `sudo nixos-rebuild switch --flake .#cinderace`.
-6. Restore `~/.local/share/media-stack` before starting media services if it
-   was not restored as part of the home directory.
+6. Authenticate Tailscale with `sudo tailscale up`.
 7. Verify Niri, Waybar, swaync, audio, Steam, Tailscale, and Syncthing.
+
+Home Manager migrates the old Flatpak Pika Backup configuration from
+`~/.var/app/org.gnome.World.PikaBackup/config/pika-backup` when the native
+configuration does not already exist. Verify its repository and schedule before
+relying on the first automatic backup.
+
+The initial native application set intentionally omits Bottles and Lutris. Their
+current `nixos-unstable` dependency closure fails to build; Steam, Heroic, and
+ProtonPlus cover the normal game workflow until that upstream package failure
+is resolved.
 
 Verify the persistent PS5 audio route:
 

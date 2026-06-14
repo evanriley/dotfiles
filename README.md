@@ -6,6 +6,10 @@ The first NixOS host is `cinderace`, a desktop workstation using Niri, GDM,
 GNOME fallback, Podman media services, and YubiKey-assisted disk and secret
 unlocking.
 
+Do not run the disk installation from this README alone. Use
+`docs/nixos-cinderace.md`; it contains the required disk verification and
+home-state backup/restore procedure.
+
 ## Layout
 
 - `flake.nix`: flake entry point with dendritic imports
@@ -90,7 +94,8 @@ Check the flake:
 nix --extra-experimental-features 'nix-command flakes' flake check
 ```
 
-Partition and format the OS disk. This wipes `/dev/nvme1n1`:
+Partition and format the OS disk. This wipes the 2 TB Samsung 9100 PRO at PCIe
+path `04:00.0`. Verify the target with the longer runbook before continuing:
 
 ```bash
 sudo nix --experimental-features 'nix-command flakes' run github:nix-community/disko -- \
@@ -101,6 +106,12 @@ Install NixOS:
 
 ```bash
 sudo nixos-install --flake .#cinderace
+```
+
+Set the user password before rebooting:
+
+```bash
+sudo nixos-enter --root /mnt -c 'passwd evan'
 ```
 
 Before rebooting, enroll disk unlock methods:

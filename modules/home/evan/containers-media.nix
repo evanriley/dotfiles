@@ -27,12 +27,17 @@ let
 
   quadlet =
     {
+      containerName,
       image,
       autoUpdate ? true,
       network ? "media-stack.network",
       ports ? [ ],
       volumes ? [ ],
       environment ? [ ],
+      devices ? [ ],
+      conditions ? [ ],
+      podmanArgs ? [ ],
+      usernsKeepId ? false,
       user ? null,
       group ? null,
     }:
@@ -40,11 +45,13 @@ let
       [Unit]
       Wants=network-online.target
       After=network-online.target
+      ${lineSection "ConditionPathIsDirectory" conditions}
 
       [Container]
+      ContainerName=${containerName}
       Image=${image}
-      ${lib.optionalString autoUpdate "AutoUpdate=registry\n"}Network=${network}
-      ${lineSection "PublishPort" ports}${lineSection "Volume" volumes}${lineSection "Environment" environment}${
+      ${lib.optionalString autoUpdate "Pull=newer\n"}Network=${network}
+      ${lib.optionalString usernsKeepId "UserNS=keep-id\n"}${lineSection "AddDevice" devices}${lineSection "PodmanArgs" podmanArgs}${lineSection "PublishPort" ports}${lineSection "Volume" volumes}${lineSection "Environment" environment}${
         lib.optionalString (user != null) "User=${user}\n"
       }${lib.optionalString (group != null) "Group=${group}\n"}
       [Service]
@@ -123,6 +130,7 @@ in
             })
             {
               freshrss = quadlet {
+                containerName = "freshrss";
                 image = "lscr.io/linuxserver/freshrss:latest";
                 ports = [
                   "127.0.0.1:8082:80"
@@ -139,6 +147,7 @@ in
               };
 
               homepage = quadlet {
+                containerName = "homepage";
                 image = "ghcr.io/gethomepage/homepage:latest";
                 ports = [ "127.0.0.1:3000:3000" ];
                 volumes = [ "${config.home.homeDirectory}/.config/homepage:/app/config:Z" ];
@@ -148,8 +157,14 @@ in
               };
 
               jellyfin = quadlet {
+                containerName = "jellyfin";
                 image = "lscr.io/linuxserver/jellyfin:latest";
                 network = "host";
+                conditions = [
+                  "/mnt/Media/Movies"
+                  "/mnt/Media/TV"
+                ];
+                devices = [ "/dev/dri/by-path/pci-0000:03:00.0-render:/dev/dri/renderD128" ];
                 volumes = [
                   "${config.home.homeDirectory}/.local/share/media-stack/jellyfin/config:/config:Z"
                   "${config.home.homeDirectory}/.local/share/media-stack/jellyfin/transcode:/transcode:Z"
@@ -165,6 +180,7 @@ in
               };
 
               lidarr = quadlet {
+                containerName = "lidarr";
                 image = "lidarr.build";
                 autoUpdate = false;
                 ports = [ "127.0.0.1:8686:8686" ];
@@ -183,7 +199,9 @@ in
               };
 
               prowlarr = quadlet {
+                containerName = "prowlarr";
                 image = "lscr.io/linuxserver/prowlarr:latest";
+                usernsKeepId = true;
                 ports = [ "127.0.0.1:9696:9696" ];
                 volumes = [ "${config.home.homeDirectory}/.local/share/media-stack/prowlarr:/config:Z" ];
                 environment = [
@@ -195,7 +213,9 @@ in
               };
 
               qbittorrent = quadlet {
+                containerName = "qbittorrent";
                 image = "lscr.io/linuxserver/qbittorrent:latest";
+                usernsKeepId = true;
                 ports = [
                   "127.0.0.1:8081:8081"
                   "0.0.0.0:6881:6881"
@@ -215,7 +235,9 @@ in
               };
 
               radarr = quadlet {
+                containerName = "radarr";
                 image = "lscr.io/linuxserver/radarr:latest";
+                usernsKeepId = true;
                 ports = [ "127.0.0.1:7878:7878" ];
                 volumes = [
                   "${config.home.homeDirectory}/.local/share/media-stack/radarr:/config:Z"
@@ -231,7 +253,9 @@ in
               };
 
               recyclarr = quadlet {
+                containerName = "recyclarr";
                 image = "ghcr.io/recyclarr/recyclarr:8";
+                usernsKeepId = true;
                 volumes = [
                   "${config.home.homeDirectory}/.config/recyclarr:/config:Z"
                   "${config.home.homeDirectory}/.local/share/media-stack/recyclarr:/data:Z"
@@ -246,8 +270,11 @@ in
               };
 
               roonserver = quadlet {
+                containerName = "roonserver";
                 image = "ghcr.io/roonlabs/roonserver:latest";
                 network = "host";
+                conditions = [ "/mnt/Media/Music" ];
+                usernsKeepId = true;
                 volumes = [
                   "${config.home.homeDirectory}/.local/share/media-stack/roon:/Roon:Z"
                   "${config.home.homeDirectory}/.local/share/media-stack/roon-backups:/RoonBackups:Z"
@@ -260,7 +287,9 @@ in
               };
 
               sabnzbd = quadlet {
+                containerName = "sabnzbd";
                 image = "lscr.io/linuxserver/sabnzbd:latest";
+                usernsKeepId = true;
                 ports = [ "127.0.0.1:8080:8080" ];
                 volumes = [
                   "${config.home.homeDirectory}/.local/share/media-stack/sabnzbd:/config:Z"
@@ -275,6 +304,7 @@ in
               };
 
               slskd = quadlet {
+                containerName = "slskd";
                 image = "docker.io/slskd/slskd:latest";
                 ports = [
                   "127.0.0.1:5030:5030"
@@ -295,7 +325,9 @@ in
               };
 
               sonarr = quadlet {
+                containerName = "sonarr";
                 image = "lscr.io/linuxserver/sonarr:latest";
+                usernsKeepId = true;
                 ports = [ "127.0.0.1:8989:8989" ];
                 volumes = [
                   "${config.home.homeDirectory}/.local/share/media-stack/sonarr:/config:Z"
@@ -311,7 +343,10 @@ in
               };
 
               soularr = quadlet {
+                containerName = "soularr";
                 image = "docker.io/mrusse08/soularr:latest";
+                podmanArgs = [ "--user=1000:1000" ];
+                usernsKeepId = true;
                 ports = [ "127.0.0.1:8265:8265" ];
                 volumes = [
                   "${config.home.homeDirectory}/.local/share/media-stack/soularr:/data:Z"

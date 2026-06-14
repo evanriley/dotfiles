@@ -1,6 +1,6 @@
 {
   flake.homeModules.evanBase =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     let
       files = ../../../files/evan;
     in
@@ -28,7 +28,10 @@
 
         packages = with pkgs; [
           bash-completion
+          bitwarden-desktop
           btop
+          brave
+          chatterino2
           cliphist
           direnv
           discord
@@ -38,16 +41,26 @@
           foot
           gamemode
           grim
+          heroic
           kitty
+          libreoffice-fresh
           mpc
+          mission-center
           mpd-discord-rpc
           mpv
           networkmanagerapplet
+          nicotine-plus
+          obs-studio
+          picard
+          pika-backup
           protontricks
+          protonplus
           qutebrowser
           qpwgraph
           rmpc
+          signal-desktop
           slurp
+          thunderbird
           trayscale
           wl-clipboard
           wl-clip-persist
@@ -122,5 +135,15 @@
         bash.enable = false;
         zoxide.enable = false;
       };
+
+      home.activation.migratePikaBackupConfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        source_dir="$HOME/.var/app/org.gnome.World.PikaBackup/config/pika-backup"
+        target_dir="$HOME/.config/pika-backup"
+
+        if [ -d "$source_dir" ] && [ ! -e "$target_dir/backup.json" ]; then
+          mkdir -p "$target_dir"
+          cp -a "$source_dir"/. "$target_dir"/
+        fi
+      '';
     };
 }

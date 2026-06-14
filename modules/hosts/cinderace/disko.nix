@@ -3,7 +3,9 @@
     disko.devices = {
       disk.main = {
         type = "disk";
-        device = "/dev/nvme1n1";
+        # The 2 TB 9100 PRO in PCIe slot 04:00.0 is cinderace's OS disk.
+        # Do not use /dev/nvmeXnY names here; their numbering is not stable.
+        device = "/dev/disk/by-path/pci-0000:04:00.0-nvme-1";
         content = {
           type = "gpt";
           partitions = {

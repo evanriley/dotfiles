@@ -850,6 +850,37 @@
       };
 
       systemd.user.services = {
+        mpris-proxy = {
+          Unit = {
+            Description = "Bluetooth MPRIS proxy";
+            PartOf = [ "graphical-session.target" ];
+            After = [
+              "bluetooth.target"
+              "graphical-session.target"
+            ];
+            Requisite = [ "graphical-session.target" ];
+          };
+          Service = {
+            ExecStart = "${pkgs.bluez}/bin/mpris-proxy";
+            Restart = "on-failure";
+          };
+          Install.WantedBy = [ "niri.service" ];
+        };
+
+        pika-backup-monitor = {
+          Unit = {
+            Description = "Pika Backup scheduled backup monitor";
+            PartOf = [ "graphical-session.target" ];
+            After = [ "graphical-session.target" ];
+            Requisite = [ "graphical-session.target" ];
+          };
+          Service = {
+            ExecStart = "${pkgs.pika-backup}/bin/pika-backup-monitor";
+            Restart = "on-failure";
+          };
+          Install.WantedBy = [ "niri.service" ];
+        };
+
         ps5-audio-loopback = {
           Unit = {
             Description = "Route PS5 audio input to Topping DX5 II";
