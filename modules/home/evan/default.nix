@@ -45,6 +45,7 @@
           networkmanagerapplet
           protontricks
           qutebrowser
+          qpwgraph
           rmpc
           slurp
           trayscale

@@ -27,7 +27,7 @@ nix build .#nixosConfigurations.cinderace.config.system.build.vm
 
 Back up at least:
 
-- `~/.local/share/media-stack`
+- `~/.local/share/media-stack`, including FreshRSS and Lidarr Tidal data
 - `~/.config/homepage`
 - `~/.config/recyclarr`
 - `~/.config/listenbrainz-mpd`
@@ -89,4 +89,31 @@ without a touch or PIN prompt. The passphrase slot remains the recovery path.
 3. Boot with no YubiKey and verify recovery passphrase unlock.
 4. Install YubiKey age identity files into `/etc/agenix/identities`.
 5. Run `sudo nixos-rebuild switch --flake .#cinderace`.
-6. Verify Niri, Waybar, swaync, audio, Steam, Tailscale, Syncthing, and media Quadlets.
+6. Restore `~/.local/share/media-stack` before starting media services if it
+   was not restored as part of the home directory.
+7. Verify Niri, Waybar, swaync, audio, Steam, Tailscale, and Syncthing.
+
+Verify the persistent PS5 audio route:
+
+```bash
+systemctl --user status ps5-audio-loopback.service
+```
+
+Verify the media services and local endpoints:
+
+```bash
+systemctl --user status jellyfin.service lidarr.service freshrss.service
+curl --fail http://127.0.0.1:8096/health
+curl --fail http://127.0.0.1:8686/ping
+curl --fail http://127.0.0.1:8082
+```
+
+Jellyfin uses host networking so LAN discovery can reach UDP port 7359. After
+restoring its configuration, ensure
+`~/.local/share/media-stack/jellyfin/config/config/network.xml` does not contain
+a stale loopback-only `LocalNetworkAddresses` override.
+
+Lidarr builds from `ghcr.io/hotio/lidarr:pr-plugins`, adds FFmpeg, and mounts
+the existing database at `~/.local/share/media-stack/lidarr`. Confirm that the
+Tidal plugin loads and that `/downloads/complete/torrents/music` exists inside
+the container.

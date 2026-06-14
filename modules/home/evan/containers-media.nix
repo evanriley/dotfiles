@@ -4,6 +4,7 @@ let
   files = ../../../files/evan;
 
   mediaServices = [
+    "freshrss"
     "homepage"
     "jellyfin"
     "lidarr"
@@ -80,6 +81,10 @@ in
         }
       ];
     };
+
+    systemd.tmpfiles.rules = [
+      "d /mnt/Media/Downloads/complete/torrents/music 0775 evan users -"
+    ];
   };
 
   flake.homeModules.evanMediaContainers =
@@ -98,6 +103,17 @@ in
             NetworkName=media-stack
             DisableDNS=false
           '';
+          ".config/containers/systemd/lidarr.Containerfile".text = ''
+            FROM ghcr.io/hotio/lidarr:pr-plugins
+
+            RUN apk add --no-cache ffmpeg
+          '';
+          ".config/containers/systemd/lidarr.build".text = ''
+            [Build]
+            ImageTag=localhost/lidarr:pr-plugins-ffmpeg
+            File=lidarr.Containerfile
+            SetWorkingDirectory=unit
+          '';
         }
         //
           lib.mapAttrs'
@@ -106,6 +122,22 @@ in
               value.text = text;
             })
             {
+              freshrss = quadlet {
+                image = "lscr.io/linuxserver/freshrss:latest";
+                ports = [
+                  "127.0.0.1:8082:80"
+                  "100.75.174.37:8082:80"
+                ];
+                volumes = [ "${config.home.homeDirectory}/.local/share/media-stack/freshrss:/config:Z" ];
+                environment = [
+                  "PUID=1000"
+                  "PGID=1000"
+                  "TZ=America/New_York"
+                  "UMASK=002"
+                  "CRON_MIN=1,31"
+                ];
+              };
+
               homepage = quadlet {
                 image = "ghcr.io/gethomepage/homepage:latest";
                 ports = [ "127.0.0.1:3000:3000" ];
@@ -117,10 +149,7 @@ in
 
               jellyfin = quadlet {
                 image = "lscr.io/linuxserver/jellyfin:latest";
-                ports = [
-                  "0.0.0.0:8096:8096"
-                  "0.0.0.0:7359:7359/udp"
-                ];
+                network = "host";
                 volumes = [
                   "${config.home.homeDirectory}/.local/share/media-stack/jellyfin/config:/config:Z"
                   "${config.home.homeDirectory}/.local/share/media-stack/jellyfin/transcode:/transcode:Z"
@@ -136,16 +165,18 @@ in
               };
 
               lidarr = quadlet {
-                image = "lscr.io/linuxserver/lidarr:latest";
+                image = "lidarr.build";
+                autoUpdate = false;
                 ports = [ "127.0.0.1:8686:8686" ];
                 volumes = [
                   "${config.home.homeDirectory}/.local/share/media-stack/lidarr:/config:Z"
+                  "${config.home.homeDirectory}/.local/share/media-stack/lidarr-tidal:/data/tidal-config:Z"
                   "/mnt/Media/Music:/music"
                   "/mnt/Media/Downloads:/downloads"
                 ];
                 environment = [
-                  "PUID=1000"
-                  "PGID=1000"
+                  "PUID=0"
+                  "PGID=0"
                   "TZ=America/New_York"
                   "UMASK=002"
                 ];
@@ -299,7 +330,7 @@ in
           createMediaStackDirs = config.lib.dag.entryAfter [ "writeBoundary" ] ''
             mkdir -p \
               "$HOME/.config/containers/systemd" \
-              "$HOME/.local/share/media-stack"/{homepage,jellyfin/config,jellyfin/transcode,lidarr,prowlarr,qbittorrent,radarr,recyclarr,roon,roon-backups,sabnzbd,slskd,sonarr,soularr}
+              "$HOME/.local/share/media-stack"/{freshrss,homepage,jellyfin/config,jellyfin/transcode,lidarr,lidarr-tidal,prowlarr,qbittorrent,radarr,recyclarr,roon,roon-backups,sabnzbd,slskd,sonarr,soularr}
           '';
 
           enableMediaQuadlets = config.lib.dag.entryAfter [ "writeBoundary" ] ''

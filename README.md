@@ -46,7 +46,7 @@ nix flake check
 ```
 
 `flake check` builds the `cinderace` system closure and runs `deadnix`,
-`statix`, and `nixfmt --check`.
+`statix`, `nixfmt --check`, ShellCheck, and Python syntax checks.
 
 Build without switching:
 
@@ -153,7 +153,8 @@ Check the desktop and services:
 
 ```bash
 systemctl --user status waybar.service swaync.service swayidle.service
-systemctl --user list-units 'podman-*.service'
+systemctl --user status ps5-audio-loopback.service
+systemctl --user status jellyfin.service lidarr.service freshrss.service
 ```
 
 The longer checklist is in `docs/nixos-cinderace.md`.
