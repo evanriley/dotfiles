@@ -37,10 +37,10 @@ hl.monitor({
 hl.config({
     general = {
         layout = "master",
-        gaps_in = 6,
-        gaps_out = 8,
-        border_size = 1,
-        resize_on_border = true,
+        gaps_in = 0,
+        gaps_out = 0,
+        border_size = 0,
+        resize_on_border = false,
         allow_tearing = false,
         col = {
             active_border = "rgb(596467)",
@@ -176,7 +176,6 @@ hl.bind(mod .. " + I", hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
-hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 hl.bind("Print", shell("hyprshot -m region -o ~/Pictures/Screenshots"))
 hl.bind("CTRL + Print", shell("hyprshot -m output -m active -o ~/Pictures/Screenshots"))
