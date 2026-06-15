@@ -140,7 +140,7 @@ hl.bind(mod .. " + CTRL + S", hl.dsp.workspace.toggle_special("rmpc"))
 hl.bind(mod .. " + CTRL + T", hl.dsp.workspace.toggle_special("btop"))
 hl.bind(mod .. " + CTRL + N", shell("swaync-client -t"))
 hl.bind(mod .. " + ALT + V", shell("~/.config/scripts/cliphist-rofi"))
-hl.bind(mod .. " + ALT + M", shell("~/.config/scripts/watch-media"))
+hl.bind(mod .. " + ALT + M", hl.dsp.exec_cmd(app_shell("~/.config/scripts/watch-media")))
 hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd(app("hyprpicker -a")))
 hl.bind(mod .. " + B", shell("pkill -SIGUSR1 waybar"))
 
@@ -255,6 +255,14 @@ hl.window_rule({
     name = "pika-workspace",
     match = { class = "org\\.gnome\\.World\\.PikaBackup" },
     workspace = "5 silent",
+})
+
+hl.window_rule({
+    name = "scratch-terminals",
+    match = { class = "(scratch_rmpc|scratch_btop)" },
+    float = true,
+    size = "1920 1080",
+    center = true,
 })
 
 hl.window_rule({
