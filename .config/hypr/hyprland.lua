@@ -22,7 +22,7 @@ end
 
 hl.monitor({
     output = "DP-2",
-    mode = "5120x1440@240",
+    mode = "5120x1440@119.979",
     position = "0x0",
     scale = 1,
 })
