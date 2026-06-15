@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+app() {
+  uwsm app -- "$@" >/dev/null 2>&1 &
+}
+
+start_app() {
+  local pattern="$1"
+  shift
+
+  pgrep -u "$UID" -f "$pattern" >/dev/null || app "$@"
+}
+
+dbus-update-activation-environment --systemd \
+  WAYLAND_DISPLAY \
+  XDG_CURRENT_DESKTOP \
+  XDG_SESSION_TYPE \
+  HYPRLAND_INSTANCE_SIGNATURE
+
+systemctl --user start \
+  hyprpolkitagent.service \
+  cliphist-store.service \
+  e-os-appearance.service \
+  mpd.service \
+  mpd-mpris.service \
+  listenbrainz-mpd.service \
+  mpd-discord-rpc.service \
+  swayosd.service
+
+start_app '[h]ypridle' hypridle
+start_app '[h]yprpaper' hyprpaper
+start_app '[w]aybar' "$HOME/.config/scripts/hypr-waybar"
+start_app '[s]waync' swaync
+start_app '[f]irefox' firefox
+start_app 'dev.deedles.Trayscale' flatpak run dev.deedles.Trayscale
+start_app 'com.discordapp.Discord' flatpak run com.discordapp.Discord --start-minimized
+start_app '[s]team -silent' steam -silent
+start_app 'org.nicotine_plus.Nicotine' flatpak run org.nicotine_plus.Nicotine
+
+# The XDG autostart entry starts only Pika's background monitor. Open the UI too.
+app flatpak run org.gnome.World.PikaBackup

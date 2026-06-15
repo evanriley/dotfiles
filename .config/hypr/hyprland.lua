@@ -1,5 +1,13 @@
 local mod = "SUPER"
 
+local workspaces = {
+    { id = 1, name = "web" },
+    { id = 2, name = "social" },
+    { id = 3, name = "game" },
+    { id = 4, name = "misc" },
+    { id = 5, name = "system" },
+}
+
 local function app(command)
     return "uwsm app -- " .. command
 end
@@ -14,7 +22,7 @@ end
 
 hl.monitor({
     output = "DP-2",
-    mode = "5120x1440@119.979",
+    mode = "5120x1440@240",
     position = "0x0",
     scale = 1,
 })
@@ -28,25 +36,22 @@ hl.monitor({
 
 hl.config({
     general = {
-        layout = "dwindle",
+        layout = "master",
         gaps_in = 6,
         gaps_out = 8,
-        border_size = 2,
+        border_size = 1,
         resize_on_border = true,
         allow_tearing = false,
         col = {
-            active_border = {
-                colors = { "rgb(c4b28a)", "rgb(c4746e)" },
-                angle = 45,
-            },
-            inactive_border = "rgb(090d12)",
+            active_border = "rgb(596467)",
+            inactive_border = "rgb(20272b)",
         },
     },
     decoration = {
         rounding = 6,
         rounding_power = 2,
-        active_opacity = 0.97,
-        inactive_opacity = 0.94,
+        active_opacity = 1,
+        inactive_opacity = 1,
         shadow = {
             enabled = true,
             range = 14,
@@ -54,18 +59,20 @@ hl.config({
             color = "rgba(090d12b0)",
         },
         blur = {
-            enabled = true,
-            size = 6,
-            passes = 2,
-            vibrancy = 0.12,
+            enabled = false,
         },
     },
     animations = {
-        enabled = true,
+        enabled = false,
     },
-    dwindle = {
-        preserve_split = true,
-        smart_split = true,
+    master = {
+        orientation = "center",
+        slave_count_for_center_master = 0,
+        center_master_fallback = "left",
+        mfact = 0.5,
+        new_status = "slave",
+        new_on_active = "after",
+        smart_resizing = true,
     },
     input = {
         kb_layout = "us",
@@ -96,29 +103,23 @@ hl.config({
     },
 })
 
-hl.curve("kansoOut", {
-    type = "bezier",
-    points = { { 0.16, 1 }, { 0.3, 1 } },
-})
-hl.curve("kansoLinear", {
-    type = "bezier",
-    points = { { 0, 0 }, { 1, 1 } },
-})
-hl.curve("kansoSpring", {
-    type = "spring",
-    mass = 1,
-    stiffness = 190,
-    dampening = 24,
+for _, workspace in ipairs(workspaces) do
+    hl.workspace_rule({
+        workspace = tostring(workspace.id),
+        default_name = workspace.name,
+        persistent = true,
+    })
+end
+
+hl.workspace_rule({
+    workspace = "special:rmpc",
+    on_created_empty = "foot --app-id scratch_rmpc -e rmpc",
 })
 
-hl.animation({ leaf = "global", enabled = true, speed = 9, bezier = "kansoOut" })
-hl.animation({ leaf = "windows", enabled = true, speed = 5, spring = "kansoSpring" })
-hl.animation({ leaf = "windowsIn", enabled = true, speed = 5, spring = "kansoSpring", style = "popin 92%" })
-hl.animation({ leaf = "windowsOut", enabled = true, speed = 4, bezier = "kansoLinear", style = "popin 94%" })
-hl.animation({ leaf = "fade", enabled = true, speed = 5, bezier = "kansoOut" })
-hl.animation({ leaf = "border", enabled = true, speed = 7, bezier = "kansoOut" })
-hl.animation({ leaf = "workspaces", enabled = true, speed = 6, spring = "kansoSpring", style = "slidefade 12%" })
-hl.animation({ leaf = "layers", enabled = true, speed = 5, bezier = "kansoOut", style = "fade" })
+hl.workspace_rule({
+    workspace = "special:btop",
+    on_created_empty = "foot --app-id scratch_btop -e btop",
+})
 
 hl.gesture({
     fingers = 3,
@@ -127,26 +128,7 @@ hl.gesture({
 })
 
 hl.on("hyprland.start", function()
-    hl.exec_cmd("dbus-update-activation-environment --systemd --all")
-    hl.exec_cmd(
-        "systemctl --user start "
-            .. "hyprpolkitagent.service "
-            .. "cliphist-store.service "
-            .. "e-os-appearance.service "
-            .. "mpd.service "
-            .. "mpd-mpris.service "
-            .. "listenbrainz-mpd.service "
-            .. "mpd-discord-rpc.service "
-            .. "swayosd.service"
-    )
-    hl.exec_cmd(app("hypridle"))
-    hl.exec_cmd(app("hyprpaper"))
-    hl.exec_cmd(app_shell("~/.config/scripts/hypr-waybar"))
-    hl.exec_cmd(app("swaync"))
-    hl.exec_cmd(app("firefox"))
-    hl.exec_cmd(app("flatpak run dev.deedles.Trayscale"))
-    hl.exec_cmd(app("flatpak run com.discordapp.Discord --start-minimized"))
-    hl.exec_cmd(app("steam -silent"))
+    hl.exec_cmd(app_shell("~/.config/scripts/hypr-autostart"))
 end)
 
 hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd(app("foot")))
@@ -154,8 +136,8 @@ hl.bind(mod .. " + SPACE", hl.dsp.exec_cmd(app("hyprlauncher")))
 hl.bind(mod .. " + P", hl.dsp.exec_cmd(app("wlogout")))
 hl.bind(mod .. " + ALT + L", hl.dsp.exec_cmd(app("hyprlock")), { locked = true })
 hl.bind(mod .. " + E", hl.dsp.exec_cmd(app("nautilus")))
-hl.bind(mod .. " + CTRL + S", shell("~/.config/scripts/hypr-scratch rmpc"))
-hl.bind(mod .. " + CTRL + T", shell("~/.config/scripts/hypr-scratch btop"))
+hl.bind(mod .. " + CTRL + S", hl.dsp.workspace.toggle_special("rmpc"))
+hl.bind(mod .. " + CTRL + T", hl.dsp.workspace.toggle_special("btop"))
 hl.bind(mod .. " + CTRL + N", shell("swaync-client -t"))
 hl.bind(mod .. " + ALT + V", shell("~/.config/scripts/cliphist-rofi"))
 hl.bind(mod .. " + ALT + M", shell("~/.config/scripts/watch-media"))
@@ -165,22 +147,23 @@ hl.bind(mod .. " + B", shell("pkill -SIGUSR1 waybar"))
 hl.bind(mod .. " + Q", hl.dsp.window.close())
 hl.bind(mod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mod .. " + W", hl.dsp.group.toggle())
-hl.bind(mod .. " + F", shell("hyprctl dispatch fullscreen 1"))
-hl.bind(mod .. " + SHIFT + F", shell("hyprctl dispatch fullscreen 0"))
-hl.bind(mod .. " + C", shell("hyprctl dispatch centerwindow"))
+hl.bind(mod .. " + M", hl.dsp.layout("swapwithmaster master"))
+hl.bind(mod .. " + F", hl.dsp.window.fullscreen({ mode = "maximized" }))
+hl.bind(mod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
+hl.bind(mod .. " + C", hl.dsp.window.center())
 
 local directions = {
-    H = "left",
-    J = "down",
-    K = "up",
-    L = "right",
+    H = "l",
+    J = "d",
+    K = "u",
+    L = "r",
 }
 
 for key, direction in pairs(directions) do
     hl.bind(mod .. " + " .. key, hl.dsp.focus({ direction = direction }))
-    hl.bind(mod .. " + SHIFT + " .. key, shell("hyprctl dispatch movewindow " .. direction))
-    hl.bind(mod .. " + CTRL + " .. key, shell("hyprctl dispatch focusmonitor " .. direction))
-    hl.bind(mod .. " + CTRL + SHIFT + " .. key, shell("hyprctl dispatch movecurrentworkspacetomonitor " .. direction))
+    hl.bind(mod .. " + SHIFT + " .. key, hl.dsp.window.move({ direction = direction }))
+    hl.bind(mod .. " + CTRL + " .. key, hl.dsp.focus({ monitor = direction }))
+    hl.bind(mod .. " + CTRL + SHIFT + " .. key, hl.dsp.workspace.move({ monitor = direction }))
 end
 
 for workspace = 1, 9 do
@@ -227,9 +210,67 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    name = "web-workspace",
+    match = {
+        class = "([fF]irefox|firefox-bin|org\\.mozilla\\.firefox|zen|app\\.zen_browser\\.zen|librewolf|io\\.gitlab\\.librewolf-community|com\\.brave\\.Browser|brave-browser|Brave-browser)",
+    },
+    workspace = "1 silent",
+})
+
+hl.window_rule({
+    name = "discord-workspace",
+    match = { class = "(discord|com\\.discordapp\\.Discord)" },
+    workspace = "2 silent",
+    opacity = "1.0 override 1.0 override",
+})
+
+hl.window_rule({
+    name = "thunderbird-workspace",
+    match = { class = "org\\.mozilla\\.Thunderbird" },
+    workspace = "2 silent",
+})
+
+hl.window_rule({
+    name = "steam-workspace",
+    match = { class = "steam" },
+    workspace = "3 silent",
+})
+
+hl.window_rule({
+    name = "steam-friends-workspace",
+    match = { title = "Friends List" },
+    workspace = "3 silent",
+    float = true,
+    size = "600 700",
+    center = true,
+})
+
+hl.window_rule({
+    name = "nicotine-workspace",
+    match = { class = "org\\.nicotine_plus\\.Nicotine" },
+    workspace = "4 silent",
+})
+
+hl.window_rule({
+    name = "pika-workspace",
+    match = { class = "org\\.gnome\\.World\\.PikaBackup" },
+    workspace = "5 silent",
+})
+
+hl.window_rule({
     name = "media-opacity",
     match = { class = "(mpv|steam_app_.*|bg3)" },
     opacity = "1.0 override 1.0 override",
+})
+
+hl.window_rule({
+    name = "mpv-capture",
+    match = { class = "(mpv|io\\.mpv\\.Mpv)" },
+    opacity = "1.0 override 1.0 override",
+    border_size = 0,
+    rounding = 0,
+    decorate = false,
+    no_shadow = true,
 })
 
 hl.window_rule({
@@ -252,6 +293,7 @@ hl.window_rule({
 hl.window_rule({
     name = "trayscale",
     match = { class = "dev\\.deedles\\.Trayscale" },
+    workspace = "5 silent",
     float = true,
     size = "520 620",
     center = true,
