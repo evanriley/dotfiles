@@ -18,5 +18,6 @@ export DOOMDIR="$doom_dir"
 
 if command -v systemctl >/dev/null 2>&1 && systemctl --user show-environment >/dev/null 2>&1; then
     systemctl --user daemon-reload
-    systemctl --user enable --now emacs.service
+    systemctl --user enable emacs.service
+    systemctl --user restart emacs.service
 fi

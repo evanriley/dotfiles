@@ -1,6 +1,7 @@
 [Unit]
 Description=Emacs text editor daemon
 Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
+ConditionPathExists=%h/.emacs.d/init.el
 ConditionPathExists=%h/.config/doom/init.el
 ConditionFileIsExecutable=/usr/bin/emacs
 

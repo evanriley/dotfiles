@@ -1171,6 +1171,8 @@ Tracked as =~/.config/systemd/user/emacs.service=:
 Description=Emacs text editor daemon
 Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
 ConditionPathExists=%h/.emacs.d/init.el
+ConditionPathExists=%h/.config/doom/init.el
+ConditionFileIsExecutable=/usr/bin/emacs
 
 [Service]
 Type=notify
@@ -1184,8 +1186,8 @@ Restart=on-failure
 WantedBy=default.target
 #+end_example
 
-Bootstrap Doom with =doom-bootstrap=, then enable with
-=systemctl --user enable --now emacs.service=.
+Run =doom-bootstrap= after installing Emacs. It installs Doom, synchronizes the
+configuration, and restarts the enabled user service.
 
 ** Desktop Entry
 Tracked as =~/.local/share/applications/emacsclient.desktop=:
