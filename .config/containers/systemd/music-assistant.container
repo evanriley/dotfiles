@@ -1,0 +1,26 @@
+[Unit]
+Description=Music Assistant server
+Wants=network-online.target
+After=network-online.target
+ConditionPathIsDirectory=/mnt/Media/Music
+
+[Container]
+ContainerName=music-assistant
+Image=ghcr.io/music-assistant/server:latest
+Pull=newer
+Network=host
+PodmanArgs=--cpu-shares=256
+Environment=LOG_LEVEL=info
+Volume=/var/home/evan/.local/share/media-stack/music-assistant:/data:Z
+Volume=/mnt/Media/Music:/music:ro,z
+
+[Service]
+Restart=on-failure
+RestartSec=30
+Nice=10
+CPUWeight=20
+IOWeight=20
+IOSchedulingClass=idle
+
+[Install]
+WantedBy=default.target
