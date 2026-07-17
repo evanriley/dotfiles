@@ -1,0 +1,22 @@
+[Unit]
+Description=NewsBlur self-hosted feed reader
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/home/evan/.local/share/media-stack/newsblur/app
+ExecStartPre=/var/home/evan/.config/newsblur/apply-selfhost-patch
+ExecStart=/usr/bin/podman-compose -f /var/home/evan/.config/newsblur/compose.yml up --remove-orphans
+ExecStop=/usr/bin/podman-compose -f /var/home/evan/.config/newsblur/compose.yml down --timeout 30
+Restart=on-failure
+RestartSec=30
+Nice=10
+CPUWeight=20
+IOWeight=20
+IOSchedulingClass=idle
+TimeoutStartSec=600
+TimeoutStopSec=120
+
+[Install]
+WantedBy=default.target

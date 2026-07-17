@@ -14,7 +14,7 @@ shares so foreground desktop and gaming workloads stay favored.
 - qBittorrent: <http://127.0.0.1:8081>
 - slskd: <http://127.0.0.1:5030>
 - Soularr: <http://127.0.0.1:8265>
-- FreshRSS: <http://127.0.0.1:8082>
+- NewsBlur: <http://127.0.0.1:8082>
 - Music Assistant: <http://127.0.0.1:8095>
 - Homepage: <http://127.0.0.1:3000>
 
