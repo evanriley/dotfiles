@@ -13,6 +13,18 @@ index 5b9c8f9..61c097e 100644
              new_user.profile.activate_premium()
          elif getattr(settings, "AUTO_ENABLE_NEW_USERS", False):
              new_user.profile.activate_free()
+diff --git a/apps/static/views.py b/apps/static/views.py
+--- a/apps/static/views.py
++++ b/apps/static/views.py
+@@ -249,7 +249,7 @@ def mongo_check(request):
+ 
+ def elasticsearch_check(request):
+     client = SearchFeed.ES()
+-    if client.indices.exists_index(SearchFeed.index_name()):
++    if client.indices.exists(index=SearchFeed.index_name()):
+         return HttpResponse(SearchFeed.index_name())
+     assert False, "Cannot read from elasticsearch database"
+ 
 diff --git a/apps/reader/views.py b/apps/reader/views.py
 index 77ae8d0..053ff22 100644
 --- a/apps/reader/views.py
