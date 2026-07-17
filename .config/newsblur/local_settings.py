@@ -1,6 +1,7 @@
 import os
 
 NEWSBLUR_URL = os.getenv("NEWSBLUR_URL", "https://cinderace.tailfe05b.ts.net")
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SESSION_COOKIE_DOMAIN = None
 SECRET_KEY = os.environ["NEWSBLUR_SECRET_KEY"]
 MCP_OAUTH_CLIENT_SECRET = os.environ["MCP_OAUTH_CLIENT_SECRET"]

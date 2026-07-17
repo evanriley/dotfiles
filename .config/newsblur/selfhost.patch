@@ -13,6 +13,20 @@ index 5b9c8f9..61c097e 100644
              new_user.profile.activate_premium()
          elif getattr(settings, "AUTO_ENABLE_NEW_USERS", False):
              new_user.profile.activate_free()
+diff --git a/apps/reader/views.py b/apps/reader/views.py
+index 77ae8d0..053ff22 100644
+--- a/apps/reader/views.py
++++ b/apps/reader/views.py
+@@ -180,6 +180,9 @@ RIVER_SLOWDOWN_USERS = []
+ 
+ def get_subdomain(request):
+     host = request.META.get("HTTP_HOST")
++    canonical_host = urllib.parse.urlparse(settings.NEWSBLUR_URL).hostname
++    if host and host.split(":", 1)[0].lower() == canonical_host:
++        return None
+     if host and host.count(".") >= 2:
+         return host.split(".")[0]
+     else:
 diff --git a/docker/haproxy/haproxy.docker-compose.cfg b/docker/haproxy/haproxy.docker-compose.cfg
 index f3d98b7..bb3cdae 100644
 --- a/docker/haproxy/haproxy.docker-compose.cfg
@@ -26,7 +40,7 @@ index f3d98b7..bb3cdae 100644
      resolve_retries 3
      timeout resolve 1s
      timeout retry 1s
-@@ -46,14 +46,11 @@ defaults
+@@ -46,14 +46,12 @@ defaults
      errorfile 504 /srv/newsblur/templates/502.http
  
  frontend public
@@ -35,6 +49,7 @@ index f3d98b7..bb3cdae 100644
 -    http-response add-header Strict-Transport-Security max-age=31536000;\ includeSubDomains
 +    bind :8082
      http-request set-header X-Request-Start %[date()]%[date_us()]
++    http-request set-header X-Forwarded-Proto https
      option http-server-close
  
 -    # Redirect all HTTP traffic to HTTPS
@@ -43,7 +58,7 @@ index f3d98b7..bb3cdae 100644
      
      # Block vulnerability scanners before they reach Gunicorn workers
      acl is_scanner_path path_end .php .cgi .asp .aspx .env
-@@ -130,7 +127,7 @@ backend nginx
+@@ -130,7 +128,7 @@ backend nginx
  backend gunicorn
      balance roundrobin
      # option httpchk GET /_haproxychk
@@ -52,7 +67,7 @@ index f3d98b7..bb3cdae 100644
  
  backend postgres
      server db_postgres newsblur_db_postgres:5432 check inter 2000ms resolvers docker init-addr last,libc,none
-@@ -160,7 +157,7 @@ backend mcp
+@@ -160,7 +158,7 @@ backend mcp
      server newsblur_mcp newsblur_mcp:8099 check inter 3000ms resolvers docker init-addr last,libc,none
  
  listen stats
