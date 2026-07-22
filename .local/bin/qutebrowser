@@ -2,4 +2,5 @@
 
 # QtWebEngine's native GBM path flickers on some Wayland/AMD combinations.
 export QTWEBENGINE_FORCE_USE_GBM=0
+export PATH="$HOME/.local/bin:$PATH"
 exec /usr/bin/qutebrowser "$@"
