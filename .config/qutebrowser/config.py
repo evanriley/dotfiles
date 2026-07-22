@@ -111,29 +111,20 @@ c.content.blocking.adblock.lists = [
     "https://easylist.to/easylist/fanboy-social.txt"
 ]
 
-c.qt.args = [
-    '--enable-gpu-rasterization',
-    '--enable-features=VaapiVideoDecodeLinuxGL',
-    '--ignore-gpu-blocklist',
-    '--enable-zero-copy',
-    '--enable-smooth-scrolling',
-    '--use-gl=egl'
-]
-
 ua_chrome = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 config.set('content.headers.user_agent', ua_chrome, 'accounts.google.com')
 config.set('content.headers.user_agent', ua_chrome, 'https://accounts.google.com/*')
 
 c.content.tls.certificate_errors = 'block' # This might be bad but I'm too annoyed to care
 
-# RBW (Bitwarden)
-config.bind('<Space>pl', 'spawn --userscript qute-rbw')
-config.bind('<Space>pu', 'spawn --userscript qute-rbw --target username')
-config.bind('<Space>po', 'spawn --userscript qute-rbw --target totp')
+# Bitwarden
+config.bind('<Space>pl', 'spawn --userscript qute-bitwarden')
+config.bind('<Space>pu', 'spawn --userscript qute-bitwarden --username-only')
+config.bind('<Space>po', 'spawn --userscript qute-bitwarden --totp-only')
 
 # MPV
-config.bind('M', 'hint links spawn mpv {hint-url}')
-config.bind('xm', 'spawn mpv {url}')
+config.bind('M', 'hint links spawn flatpak run io.mpv.Mpv {hint-url}')
+config.bind('xm', 'spawn flatpak run io.mpv.Mpv {url}')
 
 # Editor (Ctrl+E)
 c.editor.command = ["kitty", "--class", "dotfiles-floating", "-e", "nvim", "-f", "{file}", "-c", "normal {line}G{column0}l"]
