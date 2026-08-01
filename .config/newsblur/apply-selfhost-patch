@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 set -euo pipefail
 
-app=/var/home/evan/.local/share/media-stack/newsblur/app
-patch=/var/home/evan/.config/newsblur/selfhost.patch
+app=/home/evan/.local/share/media-stack/newsblur/app
+patch=/home/evan/.config/newsblur/selfhost.patch
 
 if git -C "$app" apply --reverse --check "$patch" 2>/dev/null; then
     exit 0

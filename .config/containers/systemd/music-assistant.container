@@ -11,7 +11,7 @@ Pull=newer
 Network=host
 PodmanArgs=--cpu-shares=256
 Environment=LOG_LEVEL=info
-Volume=/var/home/evan/.local/share/media-stack/music-assistant:/data:Z
+Volume=/home/evan/.local/share/media-stack/music-assistant:/data:Z
 Volume=/mnt/Media/Music:/music:ro,z
 
 [Service]

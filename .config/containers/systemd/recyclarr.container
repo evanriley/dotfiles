@@ -13,8 +13,8 @@ PodmanArgs=--cpu-shares=64
 Environment=TZ=America/New_York
 Environment=CRON_SCHEDULE=@daily
 Environment=RECYCLARR_DATA_DIR=/data
-Volume=/var/home/evan/.config/recyclarr:/config:Z
-Volume=/var/home/evan/.local/share/media-stack/recyclarr:/data:Z
+Volume=/home/evan/.config/recyclarr:/config:Z
+Volume=/home/evan/.local/share/media-stack/recyclarr:/data:Z
 
 [Service]
 Restart=on-failure

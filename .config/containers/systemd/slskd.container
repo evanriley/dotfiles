@@ -12,7 +12,7 @@ PublishPort=127.0.0.1:5030:5030
 PublishPort=127.0.0.1:5031:5031
 PublishPort=50300:50300
 Environment=SLSKD_REMOTE_CONFIGURATION=true
-Volume=/var/home/evan/.local/share/media-stack/slskd:/app:Z
+Volume=/home/evan/.local/share/media-stack/slskd:/app:Z
 Volume=/mnt/Media/Music:/music:z
 Volume=/mnt/Media/Downloads:/downloads:z
 

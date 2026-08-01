@@ -16,8 +16,8 @@ Environment=PUID=1000
 Environment=PGID=1000
 Environment=TZ=America/New_York
 Environment=UMASK=002
-Volume=/var/home/evan/.local/share/media-stack/jellyfin/config:/config:Z
-Volume=/var/home/evan/.local/share/media-stack/jellyfin/transcode:/transcode:Z
+Volume=/home/evan/.local/share/media-stack/jellyfin/config:/config:Z
+Volume=/home/evan/.local/share/media-stack/jellyfin/transcode:/transcode:Z
 Volume=/mnt/Media/Movies:/data/movies:ro,z
 Volume=/mnt/Media/TV:/data/tvshows:ro,z
 

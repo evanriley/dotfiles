@@ -18,7 +18,7 @@ Environment=PGID=1000
 Environment=TZ=America/New_York
 Environment=UMASK=002
 Environment=WEBUI_PORT=8081
-Volume=/var/home/evan/.local/share/media-stack/qbittorrent:/config:Z
+Volume=/home/evan/.local/share/media-stack/qbittorrent:/config:Z
 Volume=/mnt/Media/Downloads:/downloads:z
 
 [Service]

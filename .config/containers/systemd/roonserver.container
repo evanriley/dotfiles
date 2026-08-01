@@ -11,9 +11,9 @@ Pull=newer
 Network=host
 UserNS=keep-id
 Environment=TZ=America/New_York
-Volume=/var/home/evan/.local/share/media-stack/roon:/Roon:Z
+Volume=/home/evan/.local/share/media-stack/roon:/Roon:Z
 Volume=/mnt/Media/Music:/Music:z
-Volume=/var/home/evan/.local/share/media-stack/roon-backups:/RoonBackups:Z
+Volume=/home/evan/.local/share/media-stack/roon-backups:/RoonBackups:Z
 
 [Service]
 Restart=on-failure

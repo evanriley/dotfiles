@@ -1,2 +1,2 @@
 [Context]
-filesystems=!xdg-config/mpv;/var/home/evan/.config/mpv:ro;
+filesystems=!xdg-config/mpv;/home/evan/.config/mpv:ro;

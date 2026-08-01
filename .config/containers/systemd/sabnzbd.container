@@ -15,7 +15,7 @@ Environment=PUID=1000
 Environment=PGID=1000
 Environment=TZ=America/New_York
 Environment=UMASK=002
-Volume=/var/home/evan/.local/share/media-stack/sabnzbd:/config:Z
+Volume=/home/evan/.local/share/media-stack/sabnzbd:/config:Z
 Volume=/mnt/Media/Downloads:/downloads:z
 
 [Service]

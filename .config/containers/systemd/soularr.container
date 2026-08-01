@@ -15,7 +15,7 @@ Environment=PUID=1000
 Environment=PGID=1000
 Environment=TZ=America/New_York
 Environment=SCRIPT_INTERVAL=300
-Volume=/var/home/evan/.local/share/media-stack/soularr:/data:Z
+Volume=/home/evan/.local/share/media-stack/soularr:/data:Z
 Volume=/mnt/Media/Downloads:/downloads:z
 
 [Service]

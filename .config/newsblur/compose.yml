@@ -6,7 +6,7 @@ services:
     environment:
       DOCKERBUILD: "True"
       RUNWITHMAKEBUILD: "False"
-    env_file: /var/home/evan/.local/share/media-stack/newsblur/newsblur.env
+    env_file: /home/evan/.local/share/media-stack/newsblur/newsblur.env
     entrypoint: /bin/sh -c newsblur_web/entrypoint.sh
     depends_on:
       - newsblur_db_mongo
@@ -20,8 +20,8 @@ services:
         soft: 10000
         hard: 10000
     volumes:
-      - /var/home/evan/.local/share/media-stack/newsblur/app:/srv/newsblur:z
-      - /var/home/evan/.config/newsblur/local_settings.py:/srv/newsblur/newsblur_web/local_settings.py:ro,z
+      - /home/evan/.local/share/media-stack/newsblur/app:/srv/newsblur:z
+      - /home/evan/.config/newsblur/local_settings.py:/srv/newsblur/newsblur_web/local_settings.py:ro,z
     networks:
       newsblur:
         ipv4_address: 10.89.50.10
@@ -41,7 +41,7 @@ services:
       - newsblur_db_postgres
       - newsblur_db_redis
     volumes:
-      - /var/home/evan/.local/share/media-stack/newsblur/app/node:/srv:z
+      - /home/evan/.local/share/media-stack/newsblur/app/node:/srv:z
     networks:
       newsblur:
         ipv4_address: 10.89.50.11
@@ -53,7 +53,7 @@ services:
     entrypoint: /app/imageproxy -addr 0.0.0.0:8088 -cache /tmp/imageproxy -verbose
     restart: unless-stopped
     volumes:
-      - /var/home/evan/.local/share/media-stack/newsblur/data/imageproxy:/tmp/imageproxy:Z
+      - /home/evan/.local/share/media-stack/newsblur/data/imageproxy:/tmp/imageproxy:Z
     networks:
       newsblur:
         ipv4_address: 10.89.50.12
@@ -68,8 +68,8 @@ services:
       - newsblur_web
       - newsblur_node
     volumes:
-      - /var/home/evan/.local/share/media-stack/newsblur/app/docker/nginx/nginx.local.conf:/etc/nginx/conf.d/nginx.conf:ro,z
-      - /var/home/evan/.local/share/media-stack/newsblur/app:/srv/newsblur:z
+      - /home/evan/.local/share/media-stack/newsblur/app/docker/nginx/nginx.local.conf:/etc/nginx/conf.d/nginx.conf:ro,z
+      - /home/evan/.local/share/media-stack/newsblur/app:/srv/newsblur:z
     networks:
       newsblur:
         ipv4_address: 10.89.50.13
@@ -82,7 +82,7 @@ services:
       POSTGRES_PASSWORD: newsblur
     restart: unless-stopped
     volumes:
-      - /var/home/evan/.local/share/media-stack/newsblur/data/postgres:/var/lib/postgresql/data:Z
+      - /home/evan/.local/share/media-stack/newsblur/data/postgres:/var/lib/postgresql/data:Z
     networks:
       newsblur:
         ipv4_address: 10.89.50.20
@@ -93,9 +93,9 @@ services:
     command: redis-server /etc/redis/redis.conf --port 6579
     restart: unless-stopped
     volumes:
-      - /var/home/evan/.local/share/media-stack/newsblur/app/docker/redis/redis.conf:/etc/redis/redis.conf:ro,z
-      - /var/home/evan/.local/share/media-stack/newsblur/app/docker/redis/redis_server.conf:/usr/local/etc/redis/redis_replica.conf:ro,z
-      - /var/home/evan/.local/share/media-stack/newsblur/data/redis:/data:Z
+      - /home/evan/.local/share/media-stack/newsblur/app/docker/redis/redis.conf:/etc/redis/redis.conf:ro,z
+      - /home/evan/.local/share/media-stack/newsblur/app/docker/redis/redis_server.conf:/usr/local/etc/redis/redis_replica.conf:ro,z
+      - /home/evan/.local/share/media-stack/newsblur/data/redis:/data:Z
     networks:
       newsblur:
         ipv4_address: 10.89.50.21
@@ -113,8 +113,8 @@ services:
       indices.breaker.total.use_real_memory: "false"
     restart: unless-stopped
     volumes:
-      - /var/home/evan/.local/share/media-stack/newsblur/data/elasticsearch:/usr/share/elasticsearch/data:Z
-      - /var/home/evan/.local/share/media-stack/newsblur/app/config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,z
+      - /home/evan/.local/share/media-stack/newsblur/data/elasticsearch:/usr/share/elasticsearch/data:Z
+      - /home/evan/.local/share/media-stack/newsblur/app/config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro,z
     networks:
       newsblur:
         ipv4_address: 10.89.50.22
@@ -125,7 +125,7 @@ services:
     command: mongod --port 29019 --wiredTigerEngineConfigString=checkpoint=(wait=60),file_manager=(close_idle_time=0)
     restart: unless-stopped
     volumes:
-      - /var/home/evan/.local/share/media-stack/newsblur/data/mongo:/data/db:Z
+      - /home/evan/.local/share/media-stack/newsblur/data/mongo:/data/db:Z
     networks:
       newsblur:
         ipv4_address: 10.89.50.23
@@ -136,7 +136,7 @@ services:
     command: celery worker -A newsblur_web -B --loglevel=INFO
     environment:
       DOCKERBUILD: "True"
-    env_file: /var/home/evan/.local/share/media-stack/newsblur/newsblur.env
+    env_file: /home/evan/.local/share/media-stack/newsblur/newsblur.env
     restart: unless-stopped
     depends_on:
       - newsblur_db_mongo
@@ -144,8 +144,8 @@ services:
       - newsblur_db_redis
       - newsblur_db_elasticsearch
     volumes:
-      - /var/home/evan/.local/share/media-stack/newsblur/app:/srv/newsblur:z
-      - /var/home/evan/.config/newsblur/local_settings.py:/srv/newsblur/newsblur_web/local_settings.py:ro,z
+      - /home/evan/.local/share/media-stack/newsblur/app:/srv/newsblur:z
+      - /home/evan/.config/newsblur/local_settings.py:/srv/newsblur/newsblur_web/local_settings.py:ro,z
     networks:
       newsblur:
         ipv4_address: 10.89.50.30
@@ -163,7 +163,7 @@ services:
       MCP_OAUTH_UPSTREAM_URL: https://cinderace.tailfe05b.ts.net
       MCP_OAUTH_INTERNAL_URL: http://newsblur_web:8000
       MCP_REDIS_URL: redis://newsblur_db_redis:6579/5
-    env_file: /var/home/evan/.local/share/media-stack/newsblur/newsblur.env
+    env_file: /home/evan/.local/share/media-stack/newsblur/newsblur.env
     restart: unless-stopped
     depends_on:
       - newsblur_web
@@ -185,8 +185,8 @@ services:
     ports:
       - 127.0.0.1:8082:8082
     volumes:
-      - /var/home/evan/.local/share/media-stack/newsblur/app/docker/haproxy/haproxy.docker-compose.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro,z
-      - /var/home/evan/.local/share/media-stack/newsblur/app:/srv/newsblur:z
+      - /home/evan/.local/share/media-stack/newsblur/app/docker/haproxy/haproxy.docker-compose.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro,z
+      - /home/evan/.local/share/media-stack/newsblur/app:/srv/newsblur:z
     networks:
       newsblur:
         ipv4_address: 10.89.50.40

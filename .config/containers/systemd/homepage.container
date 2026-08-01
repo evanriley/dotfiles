@@ -11,7 +11,7 @@ Network=media-stack.network
 PublishPort=127.0.0.1:3000:3000
 Environment=HOMEPAGE_ALLOWED_HOSTS=127.0.0.1:3000,localhost:3000,cinderace:3000
 Environment=LOG_TARGETS=stdout
-Volume=/var/home/evan/.config/homepage:/app/config:Z
+Volume=/home/evan/.config/homepage:/app/config:Z
 
 [Service]
 Restart=on-failure
