@@ -1,7 +1,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ','
 
--- Options
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.signcolumn = 'yes'
@@ -17,19 +16,22 @@ vim.o.smartcase = true
 vim.o.undofile = true
 vim.o.splitright = true
 vim.o.splitbelow = true
+vim.o.splitkeep = 'screen'
 vim.o.termguicolors = true
+vim.o.winborder = 'rounded'
+vim.o.smoothscroll = true
 vim.o.confirm = true
 vim.o.inccommand = 'split'
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
-vim.o.completeopt = 'menuone,noselect,popup'
+vim.o.completeopt = 'menuone,noselect,popup,fuzzy'
 vim.o.pumheight = 10
 vim.o.scrolloff = 8
 vim.o.sidescrolloff = 8
 vim.o.mouse = 'a'
 vim.o.list = true
 vim.opt.listchars = { tab = '  ', trail = '.', nbsp = '+' }
--- OSC 52 clipboard (works over SSH/tmux)
+vim.opt.jumpoptions:append('view')
 vim.g.clipboard = {
   name = 'OSC 52',
   copy = {
@@ -48,118 +50,75 @@ vim.o.laststatus = 3
 
 vim.g['conjure#filetypes'] = { 'clojure' }
 
--- Commented out for nvim 0.12 nightly - re-enable when 0.12 releases
--- vim.pack.add({
---   'https://github.com/aktersnurra/no-clown-fiesta.nvim',
---   'https://github.com/nvim-treesitter/nvim-treesitter',
---   'https://github.com/RRethy/nvim-treesitter-endwise',
---   'https://github.com/echasnovski/mini.nvim',
---   'https://github.com/rafamadriz/friendly-snippets',
---   'https://github.com/stevearc/oil.nvim',
---   'https://github.com/zk-org/zk-nvim',
---   'https://github.com/Olical/conjure',
---   'https://github.com/gpanders/nvim-parinfer',
---   'https://github.com/zbirenbaum/copilot.lua',
---   'https://github.com/MeanderingProgrammer/render-markdown.nvim',
---   'https://github.com/mbbill/undotree',
---   'https://github.com/christoomey/vim-tmux-navigator',
--- })
+vim.api.nvim_create_autocmd('PackChanged', {
+  callback = function(ev)
+    if ev.data.kind ~= 'install' and ev.data.kind ~= 'update' then return end
 
--- mini.deps plugin manager
-local path_package = vim.fn.stdpath('data') .. '/site/'
-local mini_path = path_package .. 'pack/deps/start/mini.nvim'
-if not vim.uv.fs_stat(mini_path) then
-  vim.cmd('echo "Installing `mini.nvim`" | redraw')
-  local clone_cmd = {
-    'git', 'clone', '--filter=blob:none',
-    'https://github.com/echasnovski/mini.nvim', mini_path
-  }
-  vim.fn.system(clone_cmd)
-  vim.cmd('packadd mini.nvim | helptags ALL')
-  vim.cmd('echo "Installed `mini.nvim`" | redraw')
-end
-require('mini.deps').setup({ path = { package = path_package } })
+    local name = ev.data.spec.name
+    if name == 'nvim-treesitter' then
+      if not ev.data.active then vim.cmd.packadd('nvim-treesitter') end
+      vim.cmd('TSUpdate')
+    elseif name == 'smart-splits.nvim' then
+      vim.system({ './kitty/install-kittens.bash' }, { cwd = ev.data.path }):wait()
+    end
+  end,
+})
 
-local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
-
-add('miikanissi/modus-themes.nvim')
-add({ source = 'nvim-treesitter/nvim-treesitter', hooks = { post_checkout = function() vim.cmd('TSUpdate') end } })
-add('RRethy/nvim-treesitter-endwise')
-add('rafamadriz/friendly-snippets')
-add('stevearc/oil.nvim')
-add('zk-org/zk-nvim')
-add('Olical/conjure')
-add('gpanders/nvim-parinfer')
-add('zbirenbaum/copilot.lua')
-add('MeanderingProgrammer/render-markdown.nvim')
-add('mbbill/undotree')
-add('christoomey/vim-tmux-navigator')
-add({
-  source = 'mrjones2014/smart-splits.nvim',
-  hooks = {
-    post_checkout = function(args)
-      vim.fn.system('cd ' .. args.path .. ' && ./kitty/install-kittens.bash')
-    end,
-  }
+vim.pack.add({
+  'https://github.com/WTFox/luna.nvim',
+  'https://github.com/nvim-treesitter/nvim-treesitter',
+  'https://github.com/RRethy/nvim-treesitter-endwise',
+  'https://github.com/nvim-mini/mini.nvim',
+  'https://github.com/neovim/nvim-lspconfig',
+  'https://github.com/rafamadriz/friendly-snippets',
+  'https://github.com/stevearc/oil.nvim',
+  'https://github.com/Olical/conjure',
+  'https://github.com/gpanders/nvim-parinfer',
+  'https://github.com/MeanderingProgrammer/render-markdown.nvim',
+  'https://github.com/mbbill/undotree',
+  'https://github.com/mrjones2014/smart-splits.nvim',
+}, {
+  confirm = false,
 })
 
 local function setup(name, opts)
-  local ok, mod = pcall(require, name)
-  if ok and mod.setup then mod.setup(opts or {}) end
+  require(name).setup(opts or {})
 end
 
-local ok_icons, mini_icons = pcall(require, 'mini.icons')
-if ok_icons then
-  mini_icons.setup()
-  mini_icons.tweak_lsp_kind()
-end
-
-
-setup('modus-themes', {
-  line_nr_column_background = false,
-  styles = {
-    comments = { italic = false },
-    keywords = { italic = false },
-  },
-})
-local ok = pcall(vim.cmd.colorscheme, 'modus_vivendi')
-if not ok then vim.cmd.colorscheme('default') end
+setup('luna')
+vim.cmd.colorscheme('luna')
 
 setup('smart-splits')
-vim.keymap.set('n', '<A-h>', require('smart-splits').resize_left)
-vim.keymap.set('n', '<A-j>', require('smart-splits').resize_down)
-vim.keymap.set('n', '<A-k>', require('smart-splits').resize_up)
-vim.keymap.set('n', '<A-l>', require('smart-splits').resize_right)
--- moving between splits
-vim.keymap.set('n', '<C-h>', require('smart-splits').move_cursor_left)
-vim.keymap.set('n', '<C-j>', require('smart-splits').move_cursor_down)
-vim.keymap.set('n', '<C-k>', require('smart-splits').move_cursor_up)
-vim.keymap.set('n', '<C-l>', require('smart-splits').move_cursor_right)
-vim.keymap.set('n', '<C-\\>', require('smart-splits').move_cursor_previous)
--- swapping buffers between windows
-vim.keymap.set('n', '<leader><leader>h', require('smart-splits').swap_buf_left)
-vim.keymap.set('n', '<leader><leader>j', require('smart-splits').swap_buf_down)
-vim.keymap.set('n', '<leader><leader>k', require('smart-splits').swap_buf_up)
-vim.keymap.set('n', '<leader><leader>l', require('smart-splits').swap_buf_right)
+setup('oil', { default_file_explorer = true })
+setup('render-markdown')
 
-setup('mini.pairs')
-setup('mini.surround')
+setup('mini.ai')
+setup('mini.bracketed')
+setup('mini.bufremove')
 setup('mini.diff')
-setup('mini.comment')
-setup('mini.statusline', { use_icons = true })
-setup('mini.tabline')
-setup('mini.notify')
-vim.notify = require('mini.notify').make_notify()
-setup('mini.trailspace')
+setup('mini.extra')
+setup('mini.git')
 setup('mini.jump')
 setup('mini.jump2d')
+setup('mini.move')
+setup('mini.notify')
+setup('mini.pairs')
+setup('mini.pick')
+setup('mini.statusline', { use_icons = true })
+setup('mini.surround')
+setup('mini.tabline')
+setup('mini.trailspace')
 
-local ok_snip, mini_snippets = pcall(require, 'mini.snippets')
-if ok_snip then
-  mini_snippets.setup({
-    snippets = { mini_snippets.gen_loader.from_lang() },
-  })
-end
+local icons = require('mini.icons')
+icons.setup()
+icons.tweak_lsp_kind()
+
+vim.notify = require('mini.notify').make_notify()
+
+local snippets = require('mini.snippets')
+snippets.setup({
+  snippets = { snippets.gen_loader.from_lang() },
+})
 
 setup('mini.completion', {
   delay = { completion = 50, info = 100, signature = 50 },
@@ -167,44 +126,44 @@ setup('mini.completion', {
   fallback_action = '<C-n>',
   mappings = { force_twostep = '<C-Space>', force_fallback = '<M-Space>' },
 })
-setup('mini.pick')
-setup('mini.extra')
-setup('mini.git')
-setup('mini.ai')
-setup('mini.bracketed')
-setup('mini.move')
-setup('oil', { default_file_explorer = true })
-setup('zk', { picker = 'select' })
-setup('render-markdown')
-vim.keymap.set('n', '<leader>m', '<Cmd>RenderMarkdown toggle<CR>', { desc = 'Toggle markdown render' })
-
-setup('copilot', {
-  suggestion = {
-    auto_trigger = true,
-    keymap = { accept = '<M-l>', next = '<M-]>', prev = '<M-[>', dismiss = '<M-h>' },
-  },
-  panel = { enabled = false },
-  filetypes = { markdown = true, yaml = true },
-})
 
 vim.g.parinfer_filetypes = { 'clojure' }
 
+local smart_splits = require('smart-splits')
+local pick = require('mini.pick')
+local extra = require('mini.extra')
+
+vim.keymap.set('n', '<A-h>', smart_splits.resize_left)
+vim.keymap.set('n', '<A-j>', smart_splits.resize_down)
+vim.keymap.set('n', '<A-k>', smart_splits.resize_up)
+vim.keymap.set('n', '<A-l>', smart_splits.resize_right)
+vim.keymap.set('n', '<C-h>', smart_splits.move_cursor_left)
+vim.keymap.set('n', '<C-j>', smart_splits.move_cursor_down)
+vim.keymap.set('n', '<C-k>', smart_splits.move_cursor_up)
+vim.keymap.set('n', '<C-l>', smart_splits.move_cursor_right)
+vim.keymap.set('n', '<C-\\>', smart_splits.move_cursor_previous)
+vim.keymap.set('n', '<leader><leader>h', smart_splits.swap_buf_left)
+vim.keymap.set('n', '<leader><leader>j', smart_splits.swap_buf_down)
+vim.keymap.set('n', '<leader><leader>k', smart_splits.swap_buf_up)
+vim.keymap.set('n', '<leader><leader>l', smart_splits.swap_buf_right)
+
+vim.keymap.set('n', '<leader>m', '<Cmd>RenderMarkdown toggle<CR>', { desc = 'Toggle markdown render' })
+
 vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 
-local ok, ts = pcall(require, 'nvim-treesitter.configs')
-if ok then
-  ts.setup({
-    ensure_installed = { 'rust', 'python', 'lua', 'zig', 'c', 'cpp', 'clojure', 'markdown', 'markdown_inline', 'vimdoc' },
-    highlight = { enable = true },
-    indent = { enable = true },
-    endwise = { enable = true },
-  })
-end
-
+local treesitter = require('nvim-treesitter')
+local treesitter_languages = {
+  'bash', 'c', 'clojure', 'cpp', 'lua', 'markdown', 'markdown_inline', 'python', 'rust', 'vimdoc', 'zig',
+}
+treesitter.setup()
+treesitter.install(treesitter_languages)
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'lua',
+  pattern = { 'bash', 'c', 'clojure', 'cpp', 'help', 'lua', 'markdown', 'python', 'rust', 'zig' },
   callback = function()
-    vim.treesitter.stop()
+    vim.treesitter.start()
+    if vim.bo.filetype ~= 'clojure' and vim.bo.filetype ~= 'help' then
+      vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    end
   end,
 })
 
@@ -232,13 +191,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
       vim.keymap.set(mode, lhs, rhs, { buffer = buf, desc = desc })
     end
     map('n', 'gd', vim.lsp.buf.definition, 'Go to definition')
-    map('n', 'gr', vim.lsp.buf.references, 'Go to references')
-    map('n', 'grn', vim.lsp.buf.rename, 'Rename symbol')
-    map('n', 'gra', vim.lsp.buf.code_action, 'Code action')
     map('n', '<leader>f', function() vim.lsp.buf.format({ async = true }) end, 'Format buffer')
     map('n', '<leader>e', vim.diagnostic.open_float, 'Show diagnostic')
-    map('n', '[d', function() vim.diagnostic.jump({ count = -1 }) end, 'Prev diagnostic')
-    map('n', ']d', function() vim.diagnostic.jump({ count = 1 }) end, 'Next diagnostic')
   end,
 })
 
@@ -266,7 +220,6 @@ vim.keymap.set('i', '<CR>', function()
   if vim.fn.pumvisible() == 1 and vim.fn.complete_info().selected ~= -1 then
     return '<C-y>'
   end
-  -- Handle pair expansion: {|} -> {\n  |\n}
   local line = vim.api.nvim_get_current_line()
   local col = vim.api.nvim_win_get_cursor(0)[2]
   local before = line:sub(col, col)
@@ -306,24 +259,19 @@ local function toggle_terminal()
 end
 vim.keymap.set({ 'n', 't' }, '<leader>t', toggle_terminal, { desc = 'Toggle terminal' })
 
-local ok_pick, pick = pcall(require, 'mini.pick')
-if ok_pick then
-  vim.keymap.set('n', '<leader><leader>', pick.builtin.files, { desc = 'Find files' })
-  vim.keymap.set('n', '<leader>/', pick.builtin.grep_live, { desc = 'Live grep' })
-  vim.keymap.set('n', '<leader>b', pick.builtin.buffers, { desc = 'Buffers' })
-  vim.keymap.set('n', '<leader>h', pick.builtin.help, { desc = 'Help' })
-  vim.keymap.set('n', '<leader>r', pick.builtin.resume, { desc = 'Resume picker' })
-  local ok_extra, extra = pcall(require, 'mini.extra')
-  if ok_extra then
-    vim.keymap.set('n', '<leader>o', extra.pickers.oldfiles, { desc = 'Recent files' })
-    vim.keymap.set('n', '<leader>g', extra.pickers.git_files, { desc = 'Git files' })
-    vim.keymap.set('n', '<leader>q', extra.pickers.list, { desc = 'Lists' })
-  end
-end
+vim.keymap.set('n', '<leader><leader>', pick.builtin.files, { desc = 'Find files' })
+vim.keymap.set('n', '<leader>/', pick.builtin.grep_live, { desc = 'Live grep' })
+vim.keymap.set('n', '<leader>b', pick.builtin.buffers, { desc = 'Buffers' })
+vim.keymap.set('n', '<leader>h', pick.builtin.help, { desc = 'Help' })
+vim.keymap.set('n', '<leader>r', pick.builtin.resume, { desc = 'Resume picker' })
+vim.keymap.set('n', '<leader>o', extra.pickers.oldfiles, { desc = 'Recent files' })
+vim.keymap.set('n', '<leader>g', extra.pickers.git_files, { desc = 'Git files' })
+vim.keymap.set('n', '<leader>q', extra.pickers.list, { desc = 'Lists' })
 
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.keymap.set('n', '<Esc>', '<Cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
 vim.keymap.set('n', '<leader>w', '<Cmd>w<CR>', { desc = 'Save file' })
+vim.keymap.set('n', '<leader>bd', function() MiniBufremove.delete(0, false) end, { desc = 'Delete buffer' })
 vim.keymap.set('n', '<leader>xd', vim.diagnostic.setqflist, { desc = 'Diagnostics to quickfix' })
 vim.keymap.set('n', '<leader>u', '<Cmd>UndotreeToggle<CR>', { desc = 'Toggle undotree' })
 vim.keymap.set('n', '<leader>cw', '<Cmd>lua MiniTrailspace.trim()<CR>', { desc = 'Trim trailing whitespace' })
@@ -332,4 +280,30 @@ vim.keymap.set('n', '<leader>gg', '<Cmd>botright 15split | terminal lazygit<CR>'
 vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('yank-highlight', {}),
   callback = function() vim.hl.on_yank({ timeout = 200 }) end,
+})
+
+local clue = require('mini.clue')
+clue.setup({
+  triggers = {
+    { mode = { 'n', 'x' }, keys = '<Leader>' },
+    { mode = 'n', keys = '[' },
+    { mode = 'n', keys = ']' },
+    { mode = 'i', keys = '<C-x>' },
+    { mode = { 'n', 'x' }, keys = 'g' },
+    { mode = { 'n', 'x' }, keys = "'" },
+    { mode = { 'n', 'x' }, keys = '`' },
+    { mode = { 'n', 'x' }, keys = '"' },
+    { mode = { 'i', 'c' }, keys = '<C-r>' },
+    { mode = 'n', keys = '<C-w>' },
+    { mode = { 'n', 'x' }, keys = 'z' },
+  },
+  clues = {
+    clue.gen_clues.square_brackets(),
+    clue.gen_clues.builtin_completion(),
+    clue.gen_clues.g(),
+    clue.gen_clues.marks(),
+    clue.gen_clues.registers(),
+    clue.gen_clues.windows(),
+    clue.gen_clues.z(),
+  },
 })
