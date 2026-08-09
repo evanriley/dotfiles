@@ -1,7 +1,5 @@
 [[ $- != *i* ]] && return
 
-export EDITOR="e --tty --wait"
-export VISUAL="e --wait"
 export XDG_CONFIG_HOME="$HOME/.config"
 export PATH="$HOME/bin:$HOME/.local/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"
 
@@ -76,7 +74,6 @@ PROMPT_COMMAND=set_bash_prompt
 alias fastfetch='fastfetch --config ~/.config/fastfetch/config.jsonc'
 
 alias dots='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-alias emacs='emacsclient -c -a ""'
 alias vim='nvim'
 
 alias ..='cd ..'
@@ -84,7 +81,6 @@ alias ...='cd ../../'
 alias ....='cd ../../../'
 alias .....='cd ../../../..'
 
-# Standard Utils (Colorized)
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
@@ -100,68 +96,6 @@ mkcd() {
 serve() {
     local port="${1:-8000}"
     python3 -m http.server "$port"
-}
-
-# Distrobox
-alias db='distrobox'
-alias dbe='distrobox enter'
-alias dbl='distrobox list'
-alias dbc='distrobox create'
-alias dbs='distrobox stop'
-alias dbr='distrobox rm'
-
-_distrobox_exists() {
-    local name="$1"
-    distrobox list --no-color 2>/dev/null \
-        | awk -F'|' 'NR > 1 { gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2 }' \
-        | grep -Fxq "$name"
-}
-
-devbox() {
-    local name="${1:-dev}"
-    local image="${2:-fedora:latest}"
-    local box_home="$HOME/.local/share/distrobox-homes/$name"
-    local extra_flags=()
-
-    if ! command -v distrobox &>/dev/null; then
-        echo "devbox: distrobox is not installed" >&2
-        return 127
-    fi
-
-    if ! _distrobox_exists "$name"; then
-        mkdir -p "$box_home"
-
-        if [ -d "$HOME/Developer" ]; then
-            extra_flags=(--additional-flags "--volume $HOME/Developer:$HOME/Developer:rslave")
-        fi
-
-        distrobox create --name "$name" --image "$image" --home "$box_home" "${extra_flags[@]}" || return
-    fi
-
-    distrobox enter "$name"
-}
-
-devbox-bootstrap() {
-    if [ -f /etc/fedora-release ]; then
-        sudo dnf install -y \
-            bash-completion bat direnv eza fd-find fzf gcc git git-delta go \
-            just make neovim nodejs npm pkgconf python3 python3-pip ripgrep \
-            rust cargo shellcheck shfmt uv
-    elif command -v apt &>/dev/null; then
-        sudo apt update
-        sudo apt install -y \
-            bash-completion bat direnv fd-find fzf gcc git golang-go just make \
-            neovim nodejs npm pkg-config python3 python3-pip ripgrep rustc \
-            cargo shellcheck shfmt
-    elif command -v pacman &>/dev/null; then
-        sudo pacman -Syu --needed \
-            bash-completion bat direnv eza fd fzf gcc git git-delta go just \
-            make neovim nodejs npm pkgconf python python-pip ripgrep rust \
-            shellcheck shfmt uv
-    else
-        echo "devbox-bootstrap: unsupported distro" >&2
-        return 1
-    fi
 }
 
 # Clojure REPL
