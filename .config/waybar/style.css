@@ -16,13 +16,13 @@ window#waybar {
 }
 
 tooltip {
-  background: black;
+  background: @surface_container_low;
   font-family: "Noto Sans";
   border-radius: 10px;
 }
 
 tooltip label {
-  background: black;
+  background: @surface_container_low;
   color: @on_background;
   font-family: "Noto Sans";
 }
@@ -141,7 +141,7 @@ tooltip label {
 
 #tray menu {
   color: @primary;
-  background: black;
+  background: @surface_container_low;
   transition: 0.2s;
   border-radius: 10px;
 }
