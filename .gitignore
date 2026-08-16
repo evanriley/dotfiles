@@ -1,0 +1,12 @@
+# Runtime/state files
+.config/mpd/database
+.config/mpd/log
+.config/mpd/pid
+.config/mpd/state
+.config/mpd/playlists/
+
+# Editor/runtime junk
+*.swp
+*.swo
+*~
+.DS_Store
