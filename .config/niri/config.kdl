@@ -6,6 +6,7 @@ workspace "system"
 workspace "scratch"
 environment {
     QT_QPA_PLATFORMTHEME "gtk3"
+    PATH "/home/evan/bin:/home/evan/.local/bin:/home/evan/go/bin:/home/evan/.cargo/bin:/home/evan/.zvm/bin:/home/evan/.zvm/self:/usr/local/bin:/usr/bin:/bin"
 }
 input {
     keyboard {
@@ -109,6 +110,8 @@ spawn-at-startup "swayidle" "-w" \
 
 spawn-at-startup "waybar"
 spawn-at-startup "swaync"
+spawn-at-startup "/home/evan/.local/bin/swayosd-server"
+spawn-at-startup "/home/evan/.local/bin/scapectl"
 
 spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
 spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
@@ -191,6 +194,24 @@ window-rule {
 window-rule {
     match is-window-cast-target=true
     opacity 1.0
+
+    // Luna error red: conspicuous without introducing a color outside the theme.
+    focus-ring {
+        on
+        width 3
+        active-color "#e08585"
+        inactive-color "#e08585"
+    }
+
+    shadow {
+        color "#e0858570"
+        inactive-color "#e0858570"
+    }
+
+    tab-indicator {
+        active-color "#e08585"
+        inactive-color "#e08585"
+    }
 }
 // Open the Firefox picture-in-picture player as floating by default.
 window-rule {
@@ -363,6 +384,15 @@ window-rule {
     opacity 1.0
 }
 binds {
+    Mod+Shift+C hotkey-overlay-title="Screencast: Pick Window" repeat=false {
+        spawn-sh "niri msg action set-dynamic-cast-window --id $(niri msg --json pick-window | jq -r .id)"
+    }
+    Mod+Shift+Ctrl+C hotkey-overlay-title="Screencast: Set Focused Window" repeat=false {
+        set-dynamic-cast-window
+    }
+    Mod+Shift+Alt+C hotkey-overlay-title="Screencast: Clear Target" repeat=false {
+        clear-dynamic-cast-target
+    }
     MOD+SHIFT+SLASH {
         show-hotkey-overlay
     }
@@ -400,28 +430,28 @@ binds {
         spawn-sh "killall -SIGUSR1 waybar"
     }
     XF86AudioRaiseVolume allow-when-locked=true {
-        spawn "wpctl" "set-volume" "-l" "1.0" "@DEFAULT_AUDIO_SINK@" "5%+"
+        spawn "/home/evan/.local/bin/swayosd-client" "--output-volume" "raise"
     }
     XF86AudioLowerVolume allow-when-locked=true {
-        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"
+        spawn "/home/evan/.local/bin/swayosd-client" "--output-volume" "lower"
     }
     XF86AudioMute allow-when-locked=true {
-        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"
+        spawn "/home/evan/.local/bin/swayosd-client" "--output-volume" "mute-toggle"
     }
     XF86AudioMicMute allow-when-locked=true {
-        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"
+        spawn "/home/evan/.local/bin/swayosd-client" "--input-volume" "mute-toggle"
     }
     XF86AudioPlay allow-when-locked=true {
-        spawn-sh "playerctl play-pause"
+        spawn "/home/evan/.local/bin/swayosd-client" "--playerctl" "play-pause"
     }
     XF86AudioStop allow-when-locked=true {
-        spawn-sh "playerctl stop"
+        spawn "/home/evan/.local/bin/swayosd-client" "--playerctl" "stop"
     }
     XF86AudioPrev allow-when-locked=true {
-        spawn-sh "playerctl previous"
+        spawn "/home/evan/.local/bin/swayosd-client" "--playerctl" "prev"
     }
     XF86AudioNext allow-when-locked=true {
-        spawn-sh "playerctl next"
+        spawn "/home/evan/.local/bin/swayosd-client" "--playerctl" "next"
     }
     Mod+O repeat=false {
         toggle-overview
