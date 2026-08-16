@@ -1,0 +1,6 @@
+#!/bin/sh
+
+exec /home/evan/.local/share/qutebrowser/userscripts/qute-bitwarden-local \
+    --dmenu-invocation 'fuzzel --dmenu --prompt=Bitwarden: --minimal-lines' \
+    --password-prompt-invocation 'fuzzel --dmenu --prompt-only="Master Password: " --password' \
+    "$@"

@@ -1,0 +1,16 @@
+/* Remove YouTube Shorts from navigation, feeds, search, and channel tabs. */
+ytd-reel-shelf-renderer,
+ytd-rich-shelf-renderer[is-shorts],
+ytd-rich-section-renderer:has(a[href*="/shorts/"]),
+ytd-rich-item-renderer:has(a[href*="/shorts/"]),
+ytd-video-renderer:has(a[href*="/shorts/"]),
+ytd-grid-video-renderer:has(a[href*="/shorts/"]),
+ytd-compact-video-renderer:has(a[href*="/shorts/"]),
+ytd-guide-entry-renderer:has(a[href*="/shorts"]),
+ytd-mini-guide-entry-renderer:has(a[href*="/shorts"]),
+a[title="Shorts"],
+yt-tab-shape[tab-title="Shorts"],
+ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"] {
+    display: none !important;
+}
+
