@@ -1,4 +1,0 @@
-[Build]
-ImageTag=localhost/lidarr:pr-plugins-ffmpeg
-File=lidarr.Containerfile
-SetWorkingDirectory=unit

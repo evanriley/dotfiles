@@ -1,14 +1,25 @@
-#!/bin/bash
+#!/bin/sh
 
-SELECTION="$(printf "Suspend\nLog out\nReboot\nShutdown" | rofi -dmenu -p "Power Menu: ")"
+choice="$(
+    printf '%s\n' \
+        'Lock' \
+        'Logout' \
+        'Reboot' \
+        'Power Off' |
+    fuzzel --dmenu --prompt='Power: '
+)"
 
-case $SELECTION in
-	*"Suspend")
-		systemctl suspend;;
-	*"Log out")
-		niri msg action quit --skip-confirmation;;
-	*"Reboot")
-		systemctl reboot;;
-	*"Shutdown")
-		systemctl poweroff;;
+case "$choice" in
+    'Lock')
+        swaylock -f
+        ;;
+    'Logout')
+        niri msg action quit
+        ;;
+    'Reboot')
+        reboot
+        ;;
+    'Power Off')
+        poweroff
+        ;;
 esac

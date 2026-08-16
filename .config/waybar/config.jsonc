@@ -1,233 +1,156 @@
+// -*- mode: jsonc -*-
 {
-  "layer": "overlay",
-  "position": "bottom",
+  "layer": "overlay", // Waybar at top layer
+  "position": "bottom", // Waybar position (top|bottom|left|right)
   "exclusive": false,
-  "height": 35,
-  "margin-left": 12,
-  "margin-right": 12,
-  "margin-top": 0,
-  "margin-bottom": 10,
-  "spacing": 1,
+  "height": 0,
+  "spacing": 0, // Gaps between modules (4px)
+  "margin-left": 1287,
+  "margin-right": 1287,
   "reload_style_on_change": true,
-
-  "modules-left": ["niri/workspaces"],
-
-  "modules-center": ["clock"],
-
+   "group/cpuntemp": {
+    "orientation": "horizontal",
+    "modules": ["cpu", "temperature#cpu"]
+  },
   "modules-right": [
-    "network#wifi-dl",
-    "network#wifi-ul",
-    "cpu",
-    "memory",
-    "disk",
-    "wireplumber#sink",
-    "idle_inhibitor",
-    "tray"
+    "mpd",
+    "tray",
+    "group/pulseaudionslider",
+    "network#ethernet",
+    "niri/workspaces"
   ],
-
-
-
-  "custom/separator": {
-    "format": " │ ",
-    "tooltip": false,
+  "modules-center": ["niri/window"],
+  "modules-left": [
+    "clock",
+    "group/cpuntemp",
+    "memory",
+    "disk"
+  ],
+   "group/pulseaudionslider": {
+    "orientation": "horizontal",
+    "modules": ["pulseaudio", "pulseaudio/slider"]
   },
-
-  "custom/bullet": {
-    "format": "•",
-    "tooltip": false,
-  },
-
-  "niri/workspaces": {
-    "format": "●",
-    "on-click": "activate",
-    "smooth-scrolling-threshold": 2.0,
-  },
-  "tray": {
-    "spacing": 5,
+  "mpd": {
+    "format": "{stateIcon} {artist} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ",
+    "format-disconnected": "Disconnected ",
+    "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped ",
+    "interval": 10,
+    "consume-icons": {
+      "on": " " // Icon shows only when "consume" is on
+    },
+    "random-icons": {
+      "off": "<span color=\"#f53c3c\"></span> ", // Icon grayed out when "random" is off
+      "on": " "
+    },
+    "repeat-icons": {
+      "on": " "
+    },
+    "single-icons": {
+      "on": "1 "
+    },
+    "state-icons": {
+      "paused": "",
+      "playing": ""
+    },
+    "tooltip-format": "MPD (connected)",
+    "tooltip-format-disconnected": "MPD (disconnected)"
   },
   "clock": {
+    "locale": "en_US.UTF-8",
+    "format": "{:%H:%M}",
     "interval": 1,
-    "format": "{0:%a %I:%M %p}",
-    "format-alt": "{:%A, %B %d, %Y | %R} ",
+    "format-alt": "{:L%H:%M:%S  │ %F │ %B │ %A}",
     "tooltip-format": "<tt><small>{calendar}</small></tt>",
     "calendar": {
       "mode": "year",
       "mode-mon-col": 3,
       "weeks-pos": "right",
       "on-scroll": 1,
-      "on-click-right": "mode",
       "format": {
-        "months": "<span color='#E6C384'><b>{}</b></span>",
-        "days": "<span color='#C5C9C7'><b>{}</b></span>",
-        "weeks": "<span color='#7AA89F'><b>W{}</b></span>",
-        "weekdays": "<span color='#c4b28a'><b>{}</b></span>",
-        "today": "<span color='#E46876'><b><u>{}</u></b></span>",
-      },
+        "months": "<span color='#e8e1dd'><b>{}</b></span>",
+        "days": "<span color='#e8e1dd'><b>{}</b></span>",
+        "weeks": "<span color='#efe0cf'><b>W{}</b></span>",
+        "weekdays": "<span color='#efe0cf'><b>{}</b></span>",
+        "today": "<span bgcolor='#efe0cf' color='#000000'><b>{}</b></span>"
+      }
     },
     "actions": {
-      "on-click-right": "mode",
+      "on-click-middle": "mode",
       "on-click-forward": "tz_up",
       "on-click-backward": "tz_down",
-      "on-scroll-up": "format-alt",
-      "on-scroll-down": "shift_down",
-    },
+      "on-scroll-up": "shift_up",
+      "on-scroll-down": "shift_down"
+    }
   },
-
-  "network#wifi-dl": {
-    "interval": 1,
-    "format-wifi": "{bandwidthDownBytes:>} ↓",
-    "format-ethernet": "{bandwidthDownBytes:>} ↓",
-    "format-linked": "≏ No IP",
-    "format-disconnected": "⌽",
-    "tooltip": false,
-  },
-
-  "network#wifi-ul": {
-    "interval": 1,
-    "format-wifi": "{bandwidthUpBytes:>} ↑",
-    "format-ethernet": "{bandwidthUpBytes:>} ↑",
-    "format-linked": "",
-    "format-disconnected": "",
-    "tooltip": false,
-  },
-
-  "bluetooth": {
-    "format": " {num_connections} {status}",
-    "format-disabled": "0 ▽",
-    "format-off": "0 ▼",
-    "format-on": "0 △",
-    "format-connected": "{num_connections} ▲",
-    "tooltip": true,
-    "tooltip-format": "⋊ Bluetooth\n━━━━━━━━━━━━━━━━━━\n• {controller_alias} ⟶ {controller_address}\n• {num_connections} connected",
-    "tooltip-format-connected": "⋊ Bluetooth\n━━━━━━━━━━━━━━━━━━\n• {controller_alias} ⟶ {controller_address}\n\n• {device_enumerate}",
-    "tooltip-format-enumerate-connected": "↳ {device_alias} [{device_address}]",
-    "tooltip-format-enumerate-connected-battery": "↳ {device_alias} [{device_address}] ⦚ {device_battery_percentage}%",
-    "on-click": "blueman-manager",
-    "on-click-right": "blueman-manager",
-  },
-
   "cpu": {
-    "interval": 1,
-    "format": "⚙ {usage}%",
-    "format-alt": "⚙ U {usage}% L {load}% AVG {avg_frequency}GHz MAX {max_frequency}GHz MIN {min_frequency}GHz",
-    "format-icons": [
-      "[⠀]",
-      "[⢀]",
-      "[⣀]",
-      "[⣠]",
-      "[⣤]",
-      "[⣴]",
-      "[⣶]",
-      "[⣾]",
-      "[⣿]",
-    ],
+    "interval": 2,
+    "format": " <span foreground=\"#e8e1dd\">{usage}%</span>",
+    "max-length": 10,
     "tooltip": true,
-    "on-click-right": "kitty --class scratch_btop -e btop",
   },
-
   "memory": {
     "interval": 2,
-    "format": "𝍖 {percentage}%",
-    "format-alt": "𝍖 {percentage}% {icon}",
-    "format-icons": [
-      "[⠀]",
-      "[⢀]",
-      "[⣀]",
-      "[⣠]",
-      "[⣤]",
-      "[⣴]",
-      "[⣶]",
-      "[⣾]",
-      "[⣿]",
-    ],
+    "format": " <span foreground=\"#e8e1dd\">{}%</span>",
     "tooltip": true,
-    "tooltip-format": "𝍖 RAM\n━━━━━━━━━━━━━━━━━━\n• Usage ⟶ {used} / {total} ({percentage}%)\n• Available ⟶ {avail}",
-    "on-click-right": "btop",
+    "tooltip-format": "{used:0.1f}GiB used\n{avail:0.1f}GiB available",
+    "max-length": 10
   },
-
+  "temperature#cpu": {
+    "hwmon-name": "k10temp",
+    "input-filename": "temp1_input",
+    "critical-threshold": 90,
+    "interval": 2,
+    "format-critical": " {temperatureC}°C",
+    "format": " <span foreground=\"#e8e1dd\">{temperatureC}°C</span>"
+  },
   "disk": {
-    "interval": 15,
-    "path": "/",
-    "format": "⬢ {percentage_used}%",
-    "format-alt": "⬢ {free} / {total}",
+    "interval": 60,
+    "format": "󰋊 <span foreground=\"#e8e1dd\">{percentage_used}%</span>",
     "tooltip": true,
-    "tooltip-format": "⬢ Disk Storage\n━━━━━━━━━━━━━━━━━━\n• Usage ⟶ {used} / {total} ({percentage_used}%)\n• Available ⟶ {free} ({percentage_free}%)\n• Mount Point ⟶ {path}",
-    "on-click-right": "nautilus /",
-    "states": {
-      "warning": 70,
-      "critical": 85,
-    },
+    "tooltip-format": "Free: {free} ({percentage_free}%)\nTotal: {total}",
+    "path": "/"
   },
-
-  "backlight": {
-    "format": "☀ {percent}%",
-    "format-alt": "☀ {percent}% {icon}",
-    "format-icons": ["[-]", "[=]", "[≡]", "[≣]"],
+  "network#ethernet": {
+    "interface": "enp*",
+    "interval": 2,
+    "format": "{ifname}",
+    "format-ethernet": "󰈁 <span foreground=\"#efe0cf\"></span> <span foreground=\"#e8e1dd\">{bandwidthDownBytes}</span>  <span foreground=\"#efe0cf\"></span> <span foreground=\"#e8e1dd\">{bandwidthUpBytes}</span>",
+    "format-disconnected": "", //An empty format will hide the module.
+    "tooltip-format": "{ifname} via {gwaddr} 󰊗",
+    "tooltip-format-wifi": "SSID: {essid}\nIP: {ipaddr}",
+    "tooltip-format-ethernet": "IP Address: {ipaddr}/{gwaddr}\nInterface: {ifname}",
+    "tooltip-format-disconnected": "",
+    "max-length": 50
   },
-
-  "idle_inhibitor": {
-    "format": "{icon}",
+  "pulseaudio": {
+    "format": "{volume} {icon}",
+    "format-bluetooth": "{volume} {icon}<span size='small'></span>",
+    "tooltip": true,
+    "tooltip-format": "{desc}",
+    "format-muted": "",
     "format-icons": {
-      "activated": "awake",
-      "deactivated": "idle",
+      "alsa_output.pci-0000_00_1f.3.analog-stereo": "",
+      "alsa_output.pci-0000_00_1f.3.analog-stereo-muted": "",
+      "headphone": "󰋋",
+      "hands-free": "󰋎",
+      "headset": "󰋎",
+      "phone": "",
+      "phone-muted": "",
+      "portable": "",
+      "car": "",
+      "default": ["󰕿", "󰖀", "󰕾"]
     },
-  },
-
-  "wireplumber#sink": {
-    "node-type": "Audio/Sink",
-    "format": "∿ {volume}%",
-    "format-muted": "∅ {volume}%",
-    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
-    "on-click-right": "flatpak run org.pulseaudio.pavucontrol",
     "scroll-step": 1,
-    "states": {
-      "warning": 75,
-      "critical": 100,
-    },
-    "tooltip": true,
-    "tooltip-format": "∿ Playback Device\n━━━━━━━━━━━━━━━━━━\n• Device ⟶ {node_name}\n• Volume ⟶ {volume}%",
+    "on-click-right": "pavucontrol",
+    "ignored-sinks": ["Easy Effects Sink"]
   },
-
-  "wireplumber#source": {
-    "node-type": "Audio/Source",
-    "format": "◌ {volume}% {icon}",
-    "format-muted": "◌ {volume}% [⌽]",
-    "format-icons": ["[-]", "[=]", "[≡]", "[≣]"],
-    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
-    "on-click-right": "flatpak run org.pulseaudio.pavucontrol",
-    "scroll-step": 1,
-    "states": {
-      "warning": 75,
-      "critical": 100,
-    },
-    "tooltip": true,
-    "tooltip-format": "Recording Device\n━━━━━━━━━━━━━━━━━━\n•Device ⟶ {node_name}\n• Volume ⟶ {volume}%",
+  "pulseaudio/slider": {
+    "min": 0,
+    "max": 120,
+    "orientation": "horizontal"
   },
-
-  "niri/language": {
-    "format": "{short}",
-    "format-alt": "{long}",
-  },
-
-  "keyboard-state#capslock": {
-    "numlock": false,
-    "capslock": true,
-    "scrolllock": false,
-    "format": "{icon}",
-    "format-icons": {
-      "locked": "⋢",
-      "unlocked": "⊑",
-    },
-  },
-
-  "keyboard-state#numlock": {
-    "numlock": true,
-    "capslock": false,
-    "scrolllock": false,
-    "format": "N [{icon}]",
-    "format-icons": {
-      "locked": "⌽",
-      "unlocked": "○",
-    },
-  },
+  "tray": {
+    "icon-size": 15,
+    "spacing": 10
+  }
 }

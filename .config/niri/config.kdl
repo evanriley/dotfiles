@@ -98,12 +98,33 @@ layout {
         bottom 0
     }
 }
-spawn-at-startup "kitty" "--class" "scratch_rmpc" "-e" "rmpc"
-spawn-at-startup "kitty" "--class" "scratch_btop" "-e" "btop"
+
+spawn-at-startup "/usr/lib/polkit-kde-authentication-agent-1"
+
+spawn-at-startup "swaybg" "-i" "/home/evan/Pictures/wallpapers/nebula.png" "-m" "fill"
+
+spawn-at-startup "swayidle" "-w" \
+    "timeout" "600" "swaylock -f" \
+    "timeout" "900" "niri msg action power-off-monitors"
+
+spawn-at-startup "waybar"
+spawn-at-startup "swaync"
+
+spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
+spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
+
+spawn-at-startup "foot" "--app-id=scratch_rmpc" "rmpc"
+spawn-at-startup "foot" "--app-id=scratch_btop" "btop"
+
 spawn-at-startup "firefox"
+
+spawn-at-startup "flatpak" "run" "com.valvesoftware.Steam" "-silent"
+
+
+spawn-at-startup "flatpak" "run" "com.discordapp.Discord"
+
 spawn-at-startup "flatpak" "run" "dev.deedles.Trayscale"
-spawn-at-startup "flatpak" "run" "com.discordapp.Discord" "--start-minimized"
-spawn-at-startup "steam" "-silent"
+
 hotkey-overlay {
     skip-at-startup
 }
@@ -153,10 +174,6 @@ animations {
     overview-open-close {
         spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
     }
-}
-layer-rule {
-    match namespace="^awww-daemon$"
-    place-within-backdrop true
 }
 // Transparency and blur
 window-rule {
@@ -245,12 +262,6 @@ window-rule {
     }
 }
 window-rule {
-    match app-id="com.mitchellh.ghostty"
-    default-column-width {
-        proportion 0.25
-    }
-}
-window-rule {
     match app-id="foot"
     default-column-width {
         proportion 0.25
@@ -331,19 +342,22 @@ window-rule {
     }
 }
 window-rule {
-    match app-id="xfce-polkit"
-    open-floating true
-    default-column-width {
-        fixed 520
-    }
-    default-window-height {
-        fixed 320
-    }
+    match app-id="^steam_app_\\d+$"
+    opacity 1.0
 }
 window-rule {
     match app-id="^steam_app_\\d+$"
     opacity 1.0
+
+    default-column-width {
+        fixed 2560
+    }
+
+    default-window-height {
+        fixed 1440
+    }
 }
+
 window-rule {
     match app-id="bg3"
     opacity 1.0
@@ -355,14 +369,14 @@ binds {
     MOD+RETURN hotkey-overlay-title="Open Terminal: foot" {
         spawn "foot"
     }
-    Mod+SPACE hotkey-overlay-title="Run an Application: rofi" {
-        spawn "rofi" "-show" "drun"
+    Mod+SPACE hotkey-overlay-title="Run an Application: fuzzel" {
+        spawn "fuzzel"
     }
-    Mod+P hotkey-overlay-title="Open Power Menu: wlogout" {
-        spawn "wlogout"
+    Mod+P hotkey-overlay-title="Open Power Menu: Power Menu" {
+        spawn-sh "~/.config/scripts/powermenu"
     }
-    MOD+ALT+L hotkey-overlay-title="Lock Screen: gtklock" allow-when-locked=true {
-        spawn "gtklock"
+    MOD+ALT+L hotkey-overlay-title="Lock Screen: swaylock" allow-when-locked=true {
+        spawn "swaylock" "-f"
     }
     MOD+E hotkey-overlay-title="File Manager: Nautilus" {
         spawn-sh "nautilus"
@@ -376,8 +390,8 @@ binds {
     MOD+CTRL+N {
         spawn-sh "swaync-client -t"
     }
-    MOD+ALT+V hotkey-overlay-title="Clipboard History: rofi" {
-        spawn-sh "~/.config/scripts/cliphist-rofi"
+    MOD+ALT+V hotkey-overlay-title="Clipboard History: fuzzel" {
+        spawn-sh "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
     }
     MOD+ALT+M hotkey-overlay-title="Watch Media: rofi" {
         spawn-sh "~/.config/scripts/watch-media"
@@ -386,13 +400,13 @@ binds {
         spawn-sh "killall -SIGUSR1 waybar"
     }
     XF86AudioRaiseVolume allow-when-locked=true {
-        spawn "swayosd-client" "--output-volume" "raise"
+        spawn "wpctl" "set-volume" "-l" "1.0" "@DEFAULT_AUDIO_SINK@" "5%+"
     }
     XF86AudioLowerVolume allow-when-locked=true {
-        spawn "swayosd-client" "--output-volume" "lower"
+        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"
     }
     XF86AudioMute allow-when-locked=true {
-        spawn "swayosd-client" "--output-volume" "mute-toggle"
+        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"
     }
     XF86AudioMicMute allow-when-locked=true {
         spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle"

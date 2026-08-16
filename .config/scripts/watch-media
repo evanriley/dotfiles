@@ -6,12 +6,18 @@ video_extensions=(mkv mp4 m4v avi webm)
 
 choose() {
     local prompt="$1"
-    rofi -dmenu -i -p "$prompt"
+    fuzzel --dmenu --prompt="$prompt: " --minimal-lines
 }
 
 list_dirs() {
     local root="$1"
-    find "$root" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null | sort
+
+    (
+        cd "$root"
+        find . -mindepth 1 -maxdepth 1 -type d -print 2>/dev/null |
+            sed 's#^\./##' |
+            sort
+    )
 }
 
 list_videos() {
@@ -23,13 +29,19 @@ list_videos() {
     done
     unset 'args[${#args[@]}-1]'
 
-    find "$root" -type f \( "${args[@]}" \) -printf '%P\n' 2>/dev/null | sort
+    (
+        cd "$root"
+        find . -type f \( "${args[@]}" \) -print 2>/dev/null |
+            sed 's#^\./##' |
+            sort
+    )
 }
 
 play() {
     local file="$1"
     [ -n "$file" ] || exit 0
-    flatpak run io.mpv.Mpv "$file" >/dev/null 2>&1 &
+
+    mpv "$file" >/dev/null 2>&1 &
 }
 
 watch_tv() {
@@ -42,6 +54,8 @@ watch_tv() {
     [ -n "$season" ] || exit 0
 
     episode="$(list_videos "$media_root/TV/$show/$season" | choose "$season")"
+    [ -n "$episode" ] || exit 0
+
     play "$media_root/TV/$show/$season/$episode"
 }
 
@@ -52,6 +66,8 @@ watch_movies() {
     [ -n "$movie" ] || exit 0
 
     file="$(list_videos "$media_root/Movies/$movie" | choose "$movie")"
+    [ -n "$file" ] || exit 0
+
     play "$media_root/Movies/$movie/$file"
 }
 
@@ -69,17 +85,26 @@ watch_all() {
         TV/*)
             local show="${selection#TV/}"
             local season episode
+
             season="$(list_dirs "$media_root/TV/$show" | choose "$show")"
             [ -n "$season" ] || exit 0
+
             episode="$(list_videos "$media_root/TV/$show/$season" | choose "$season")"
+            [ -n "$episode" ] || exit 0
+
             play "$media_root/TV/$show/$season/$episode"
             ;;
+
         Movies/*)
             local movie="${selection#Movies/}"
             local file
+
             file="$(list_videos "$media_root/Movies/$movie" | choose "$movie")"
+            [ -n "$file" ] || exit 0
+
             play "$media_root/Movies/$movie/$file"
             ;;
+
         *)
             exit 0
             ;;

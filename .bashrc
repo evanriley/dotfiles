@@ -1,7 +1,9 @@
 [[ $- != *i* ]] && return
 
 export XDG_CONFIG_HOME="$HOME/.config"
-export PATH="$HOME/bin:$HOME/.local/bin:$HOME/go/bin:$HOME/.cargo/bin:$PATH"
+
+export ZVM_INSTALL="$HOME/.zvm/self"
+export PATH="$HOME/bin:$HOME/.local/bin:$HOME/go/bin:$HOME/.cargo/bin:$HOME/.zvm/bin:$ZVM_INSTALL:$PATH"
 
 export FZF_DEFAULT_OPTS="
   --color=fg:#C5C9C7,bg:#090E13,hl:#c4746e
@@ -15,7 +17,7 @@ export HISTCONTROL=ignoreboth:erasedups # Ignore spaces and duplicates
 shopt -s histappend # Append to history, don't overwrite
 
 # This replaces standard Ctrl+R with a fuzzy search window
-[ -f /usr/share/fzf/shell/key-bindings.bash ] && source /usr/share/fzf/shell/key-bindings.bash
+[ -f /usr/share/fzf/key-bindings.bash ] && source /usr/share/fzf/key-bindings.bash
 [ -f /usr/share/bash-completion/bash_completion ] && source /usr/share/bash-completion/bash_completion
 
 set_bash_prompt() {
