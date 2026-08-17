@@ -8,6 +8,7 @@ environment {
     QT_QPA_PLATFORMTHEME "gtk3"
     PATH "/home/evan/bin:/home/evan/.local/bin:/home/evan/go/bin:/home/evan/.cargo/bin:/home/evan/.zvm/bin:/home/evan/.zvm/self:/usr/local/bin:/usr/bin:/bin"
 }
+
 input {
     keyboard {
         xkb {
@@ -30,6 +31,7 @@ input {
     focus-follows-mouse max-scroll-amount="90%"
     workspace-auto-back-and-forth
 }
+
 output "DP-2" {
     mode "5120x1440@119.979"
     scale 1
@@ -102,7 +104,7 @@ layout {
 
 spawn-at-startup "/usr/lib/polkit-kde-authentication-agent-1"
 
-spawn-at-startup "swaybg" "-i" "/home/evan/Pictures/wallpapers/nebula.png" "-m" "fill"
+spawn-at-startup "/home/evan/.local/share/darkman/set-wallpaper"
 
 spawn-at-startup "swayidle" "-w" \
     "timeout" "600" "swaylock -f" \
@@ -341,6 +343,17 @@ window-rule {
     }
     default-window-height {
         fixed 1080
+    }
+    opacity 1.0
+}
+window-rule {
+    match app-id="swayimg"
+    open-floating true
+    default-column-width {
+        fixed 1280
+    }
+    default-window-height {
+        fixed 800
     }
     opacity 1.0
 }
@@ -737,3 +750,7 @@ binds {
         quit
     }
 }
+
+// Keep this last: included values override the static fallback colors above.
+// Niri watches the generated file and live-reloads it after a mode transition.
+include "/home/evan/.cache/darkman/niri.kdl"

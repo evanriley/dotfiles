@@ -1,18 +1,16 @@
-/* Luna: https://github.com/WTFox/luna.nvim */
-@define-color background #060606;
-@define-color on_background #e4e4e8;
-@define-color on_surface #e4e4e8;
-@define-color on_surface_variant #a8a8a8;
-@define-color outline #7c7c7c;
-@define-color outline_variant #404040;
-@define-color primary #75a1c7;
-@define-color secondary #9eb38e;
-@define-color tertiary #c4a8d6;
-@define-color tertiary_fixed #c4a8d6;
-@define-color tertiary_fixed_dim #a8a8a8;
-@define-color error #e08585;
-@define-color surface_container_lowest #060606;
-@define-color surface_container_low #1c1c1c;
-@define-color surface_container #1f1f1f;
-@define-color surface_container_high #333333;
-@define-color surface_container_highest #404040;
+@import url("/home/evan/.cache/darkman/palette.css");
+
+@define-color on_background @foreground;
+@define-color on_surface @foreground;
+@define-color on_surface_variant @muted;
+@define-color outline @muted;
+@define-color outline_variant @border;
+@define-color secondary @success;
+@define-color tertiary @accent;
+@define-color tertiary_fixed @accent;
+@define-color tertiary_fixed_dim @muted;
+@define-color surface_container_lowest @background;
+@define-color surface_container_low @background_alt;
+@define-color surface_container @background_alt;
+@define-color surface_container_high @background_soft;
+@define-color surface_container_highest @border;

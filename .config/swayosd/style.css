@@ -1,10 +1,11 @@
-/* Luna: https://github.com/WTFox/luna.nvim */
+@import url("/home/evan/.cache/darkman/palette.css");
+
 window#osd {
     padding: 10px;
-    border: 1px solid #404040;
+    border: 1px solid @border;
     border-radius: 20px;
-    background: alpha(#060606, 0.94);
-    color: #e4e4e8;
+    background: alpha(@background, 0.94);
+    color: @foreground;
 }
 
 #container {
@@ -13,7 +14,7 @@ window#osd {
 
 image,
 label {
-    color: #e4e4e8;
+    color: @foreground;
 }
 
 progressbar:disabled,
@@ -35,7 +36,7 @@ segment {
     min-height: inherit;
     border: none;
     border-radius: inherit;
-    background: #333333;
+    background: @background_soft;
 }
 
 progress,
@@ -43,7 +44,7 @@ segment.active {
     min-height: inherit;
     border: none;
     border-radius: inherit;
-    background: #75a1c7;
+    background: @primary;
 }
 
 segment {

@@ -8,13 +8,13 @@
       "rev": "6cd7280adead7f586db6fccbd15d2cac7e2188b9",
       "src": "https://github.com/rafamadriz/friendly-snippets"
     },
-    "luna.nvim": {
-      "rev": "95e1c7beeb7bffa1f02a28f0fe921520d79ce317",
-      "src": "https://github.com/WTFox/luna.nvim"
-    },
     "mini.nvim": {
       "rev": "629bf6792187e11b4829411c1648f86f28df3963",
       "src": "https://github.com/echasnovski/mini.nvim"
+    },
+    "modus-themes.nvim": {
+      "rev": "56233f0986ef6c8d0eab97e924e87144e584d970",
+      "src": "https://github.com/miikanissi/modus-themes.nvim"
     },
     "nvim-dap": {
       "rev": "9e848e09a697ee95302a3ef2dd43fd6eb709e570",

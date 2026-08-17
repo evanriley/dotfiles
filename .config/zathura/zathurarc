@@ -1,0 +1,20 @@
+# Behavior shared by Modus Operandi and Modus Vivendi.
+set font "Berkeley Mono 12"
+set guioptions "s"
+set adjust-open "best-fit"
+set page-mode "equal_width"
+set pages-per-row 1
+set scroll-step 50
+set scroll-page-aware true
+set scroll-full-overlap 0.05
+set selection-clipboard "clipboard"
+set selection-notification false
+set continuous-hist-save true
+set database "sqlite"
+set statusbar-basename true
+set statusbar-home-tilde true
+set window-title-basename true
+set window-title-home-tilde true
+
+# Written by Darkman whenever the desktop theme changes.
+include /home/evan/.cache/darkman/zathurarc

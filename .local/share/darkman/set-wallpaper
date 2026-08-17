@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -eu
+
+mode=${1:-$(darkman get 2>/dev/null || printf dark)}
+
+case "$mode" in
+dark)
+    wallpaper=$HOME/Pictures/wallpapers/warm-skies.jpg
+    ;;
+light)
+    wallpaper=$HOME/Pictures/wallpapers/white-coast.jpg
+    ;;
+*)
+    printf 'unknown mode: %s\n' "$mode" >&2
+    exit 2
+    ;;
+esac
+
+pkill -x swaybg 2>/dev/null || true
+exec swaybg -i "$wallpaper" -m fill

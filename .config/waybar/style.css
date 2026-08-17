@@ -3,6 +3,7 @@
 * {
   border: none;
   border-radius: 0;
+  color: @on_background;
   font-family: Berkeley Mono;
   font-size: 12px;
   font-weight: bold;
@@ -11,6 +12,7 @@
 
 window#waybar {
   background: linear-gradient(180deg, alpha(@surface_container_lowest, 0.8), alpha(@surface_container_lowest, 1.0));
+  color: @on_background;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
@@ -31,7 +33,7 @@ tooltip label {
 #network,
 #disk,
 #memory {
-  color: @primary;
+  color: @on_background;
   margin-right: 9px;
   transition: 0.3s;
   padding-top: 2px;
@@ -41,16 +43,14 @@ tooltip label {
 #memory:hover,
 #network:hover {
   background: transparent;
-  color: @primary;
-  padding-left: 5px;
-  padding-right: 5px;
+  color: @on_background;
   box-shadow: inset 0 0 0px 1px @primary;
 }
 
 
 #network.disabled,
 #network.disconnected {
-  color: @outline;
+  color: @on_background;
   margin-right: 9px;
   transition: 0.3s;
   padding-top: 2px;
@@ -59,8 +59,6 @@ tooltip label {
 #network.disabled:hover,
 #network.disconnected:hover {
   color: @on_background;
-  padding-left: 5px;
-  padding-right: 5px;
   box-shadow: inset 0 0 0px 1px @primary;
 }
 
@@ -71,12 +69,12 @@ tooltip label {
 }
 
 #pulseaudio {
-  color: @primary;
+  color: @on_background;
   margin-top: 2px;
 }
 
 #cpu {
-  color: @primary;
+  color: @on_background;
   background: transparent;
   margin-right: 9px;
   transition: 0.3s;
@@ -86,19 +84,28 @@ tooltip label {
 
 #cpuntemp:hover {
   background: transparent;
-  color: @primary;
-  padding-left: 5px;
-  padding-right: 5px;
+  color: @on_background;
   box-shadow: inset 0 0 0px 1px @primary;
 }
 
+#cpu,
+#temperature,
+#memory,
+#disk {
+  min-width: 52px;
+}
+
+#network {
+  min-width: 190px;
+}
+
 #cpu {
-  color: @primary;
+  color: @on_background;
   margin-right: 9px;
 }
 
 #temperature.cpu {
-  color: @primary;
+  color: @on_background;
 }
 
 #temperature.cpu.critical {
@@ -120,13 +127,13 @@ tooltip label {
 }
 
 #custom-dnd:hover {
-  color: @tertiary_fixed_dim;
+  color: black;
 }
 
 #custom-sync,
 #tray {
   background: transparent;
-  color: @primary;
+  color: @on_background;
   transition: 0.2s;
   padding-left: 5px;
   padding-right: 5px;
@@ -140,7 +147,7 @@ tooltip label {
 }
 
 #tray menu {
-  color: @primary;
+  color: @on_background;
   background: @surface_container_low;
   transition: 0.2s;
   border-radius: 10px;

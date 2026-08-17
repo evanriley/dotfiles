@@ -1,0 +1,206 @@
+#!/bin/sh
+
+set -eu
+
+mode=${1:?expected light or dark}
+cache_root=${XDG_CACHE_HOME:-$HOME/.cache}/darkman
+config_root=${XDG_CONFIG_HOME:-$HOME/.config}
+script_dir=$(dirname "$(readlink -f "$0")")
+mkdir -p "$cache_root"
+
+case "$mode" in
+dark)
+    bg=000000; bg_alt=1e1e1e; bg_soft=2f3849; surface=646464
+    selection=2f3849; border=646464; muted=989898; fg=ffffff
+    blue=2fafff; cyan=00d3d0; green=44bc44; green_alt=70b900
+    magenta=feacd0; yellow=d0bc00; yellow_bright=fec43f; red=ff5f59
+    gtk_theme=Adwaita-dark; icon_theme=breeze-dark; color_scheme=prefer-dark
+    foot_signal=USR1
+    ;;
+light)
+    bg=ffffff; bg_alt=f2f2f2; bg_soft=dae5ec; surface=c4c4c4
+    selection=dae5ec; border=9f9f9f; muted=595959; fg=000000
+    blue=0031a9; cyan=005e8b; green=006800; green_alt=316500
+    magenta=721045; yellow=6f5500; yellow_bright=884900; red=a60000
+    gtk_theme=Adwaita; icon_theme=breeze; color_scheme=default
+    foot_signal=USR2
+    ;;
+*)
+    printf 'unknown mode: %s\n' "$mode" >&2
+    exit 2
+    ;;
+esac
+
+cat >"$cache_root/palette.css" <<EOF
+@define-color background #$bg;
+@define-color background_alt #$bg_alt;
+@define-color background_soft #$bg_soft;
+@define-color surface #$surface;
+@define-color selection #$selection;
+@define-color border #$border;
+@define-color muted #$muted;
+@define-color foreground #$fg;
+@define-color primary #$blue;
+@define-color cyan #$cyan;
+@define-color success #$green;
+@define-color success_alt #$green_alt;
+@define-color accent #$magenta;
+@define-color warning #$yellow;
+@define-color warning_bright #$yellow_bright;
+@define-color error #$red;
+EOF
+
+cat >"$cache_root/fuzzel.ini" <<EOF
+[colors]
+background=${bg}ff
+text=${fg}ff
+prompt=${yellow}ff
+placeholder=${muted}ff
+border=${border}ff
+selection=${selection}ff
+selection-text=${fg}ff
+match=${blue}ff
+selection-match=${magenta}ff
+EOF
+
+cat >"$cache_root/foot.ini" <<EOF
+[main]
+initial-color-theme=$mode
+EOF
+
+cat >"$cache_root/niri.kdl" <<EOF
+layout {
+    focus-ring {
+        active-color "#$blue"
+        inactive-color "#$border"
+    }
+    border {
+        inactive-color "#$bg_alt"
+    }
+}
+overview {
+    backdrop-color "#$bg"
+}
+window-rule {
+    match is-window-cast-target=true
+    focus-ring {
+        active-color "#$red"
+        inactive-color "#$red"
+    }
+    shadow {
+        color "#${red}70"
+        inactive-color "#${red}70"
+    }
+    tab-indicator {
+        active-color "#$red"
+        inactive-color "#$red"
+    }
+}
+EOF
+
+cat >"$cache_root/mpv.conf" <<EOF
+osd-color='#$fg'
+osd-border-color='#$bg'
+osd-shadow-color='#$bg'
+EOF
+
+cat >"$cache_root/gtk-settings.ini" <<EOF
+[Settings]
+gtk-application-prefer-dark-theme=$(test "$mode" = dark && printf true || printf false)
+gtk-theme-name=$gtk_theme
+gtk-icon-theme-name=$icon_theme
+EOF
+
+cat >"$cache_root/zathurarc" <<EOF
+set default-bg "#$bg"
+set default-fg "#$fg"
+set statusbar-bg "#$bg_alt"
+set statusbar-fg "#$fg"
+set inputbar-bg "#$bg_alt"
+set inputbar-fg "#$fg"
+set completion-bg "#$bg"
+set completion-fg "#$fg"
+set completion-group-bg "#$bg_alt"
+set completion-group-fg "#$muted"
+set completion-highlight-bg "#$selection"
+set completion-highlight-fg "#$fg"
+set notification-bg "#$bg_alt"
+set notification-fg "#$fg"
+set notification-error-bg "#$bg_alt"
+set notification-error-fg "#$red"
+set notification-warning-bg "#$bg_alt"
+set notification-warning-fg "#$yellow_bright"
+set index-bg "#$bg"
+set index-fg "#$fg"
+set index-active-bg "#$selection"
+set index-active-fg "#$fg"
+set highlight-color "#$selection"
+set highlight-active-color "#$yellow"
+set highlight-fg "#$fg"
+set render-loading-bg "#$bg"
+set render-loading-fg "#$fg"
+set signature-error-color "#$red"
+set signature-warning-color "#$yellow_bright"
+set signature-success-color "#$green"
+set recolor $(test "$mode" = dark && printf true || printf false)
+set recolor-darkcolor "#$fg"
+set recolor-lightcolor "#$bg"
+set recolor-keephue true
+set recolor-adjust-lightness true
+set recolor-reverse-video true
+EOF
+
+cp "$script_dir/swayimg-base.ini" "$cache_root/swayimg.ini"
+cat >>"$cache_root/swayimg.ini" <<EOF
+[viewer]
+window = #${bg}ff
+transparency = #${bg}ff
+[slideshow]
+window = #${bg}ff
+transparency = #${bg}ff
+[gallery]
+window = #${bg}ff
+background = #${bg_alt}ff
+select = #${selection}ff
+border = #${blue}ff
+shadow = #${bg}b0
+[font]
+color = #${fg}ff
+shadow = #${bg}d0
+background = #00000000
+EOF
+
+cp "$script_dir/themes/yazi-$mode.toml" "$cache_root/yazi.toml"
+
+# RMPC and btop have no Modus ports; recolor the existing layouts while
+# preserving their structure and behavior.
+sed \
+    -e "s/#090E13/#$bg/g" -e "s/#C5C9C7/#$fg/g" \
+    -e "s/#A4A7A4/#$muted/g" -e "s/#393B44/#$border/g" \
+    -e "s/#8ba4b0/#$blue/g" -e "s/#8a9a7b/#$green/g" \
+    -e "s/#c4b28a/#$yellow/g" -e "s/#c4746e/#$red/g" \
+    "$config_root/rmpc/themes/kanso-zen.ron" >"$cache_root/rmpc.ron"
+sed \
+    -e "s/#090E13/#$bg/g" -e "s/#C5C9C7/#$fg/g" \
+    -e "s/#A4A7A4/#$muted/g" -e "s/#393B44/#$border/g" \
+    -e "s/#8BA4B0/#$blue/g" -e "s/#8A9A7B/#$green/g" \
+    -e "s/#C4B28A/#$yellow/g" -e "s/#C4746E/#$red/g" \
+    "$config_root/btop/themes/kanso-zen.theme" >"$cache_root/btop.theme"
+
+gsettings set org.gnome.desktop.interface color-scheme "$color_scheme" 2>/dev/null || true
+gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null || true
+gsettings set org.gnome.desktop.interface icon-theme "$icon_theme" 2>/dev/null || true
+
+pkill -"$foot_signal" -x foot 2>/dev/null || true
+pkill -USR2 -x waybar 2>/dev/null || true
+pkill -USR1 -x swayimg 2>/dev/null || true
+swaync-client --reload-css 2>/dev/null || true
+swaync-client --reload-config 2>/dev/null || true
+qutebrowser ':config-source' >/dev/null 2>&1 || true
+
+# Keep the wallpaper in step with the rest of the desktop theme.
+setsid -f "$script_dir/set-wallpaper" "$mode" >/dev/null 2>&1
+
+# SwayOSD reads its stylesheet only at startup.
+pkill -x swayosd-server 2>/dev/null || true
+"$HOME/.local/bin/swayosd-server" >/dev/null 2>&1 &
