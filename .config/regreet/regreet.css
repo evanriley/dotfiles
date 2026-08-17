@@ -1,0 +1,45 @@
+* {
+  color: #ffffff;
+  font-family: "Berkeley Mono";
+}
+
+window {
+  background-color: #000000;
+}
+
+frame,
+popover,
+menu {
+  background-color: rgba(0, 0, 0, 0.92);
+  border: 1px solid #646464;
+  border-radius: 8px;
+}
+
+entry,
+button,
+dropdown > button {
+  background: #1e1e1e;
+  border: 1px solid #646464;
+  border-radius: 6px;
+  color: #ffffff;
+}
+
+entry:focus,
+button:focus,
+button:hover,
+dropdown > button:focus,
+dropdown > button:hover {
+  background: #2f3849;
+  border-color: #2fafff;
+  color: #ffffff;
+}
+
+button:active {
+  background: #2fafff;
+  color: #000000;
+}
+
+error,
+.error {
+  color: #ff5f59;
+}

@@ -16,6 +16,7 @@ dark)
     magenta=feacd0; yellow=d0bc00; yellow_bright=fec43f; red=ff5f59
     gtk_theme=Adwaita-dark; icon_theme=breeze-dark; color_scheme=prefer-dark
     foot_signal=USR1
+    lock_image=$HOME/Pictures/wallpapers/warm-skies.jpg
     ;;
 light)
     bg=ffffff; bg_alt=f2f2f2; bg_soft=dae5ec; surface=c4c4c4
@@ -24,6 +25,7 @@ light)
     magenta=721045; yellow=6f5500; yellow_bright=884900; red=a60000
     gtk_theme=Adwaita; icon_theme=breeze; color_scheme=default
     foot_signal=USR2
+    lock_image=$HOME/Pictures/wallpapers/white-coast.jpg
     ;;
 *)
     printf 'unknown mode: %s\n' "$mode" >&2
@@ -66,6 +68,41 @@ EOF
 cat >"$cache_root/foot.ini" <<EOF
 [main]
 initial-color-theme=$mode
+EOF
+
+cat >"$cache_root/swaylock.conf" <<EOF
+image=$lock_image
+scaling=fill
+color=$bg
+font=Berkeley Mono
+font-size=24
+indicator-radius=72
+indicator-thickness=8
+indicator-caps-lock
+show-failed-attempts
+ignore-empty-password
+inside-color=${bg}e6
+inside-clear-color=${bg_alt}e6
+inside-caps-lock-color=${bg_alt}e6
+inside-ver-color=${bg_alt}e6
+inside-wrong-color=${bg_alt}e6
+ring-color=$blue
+ring-clear-color=$green
+ring-caps-lock-color=$yellow_bright
+ring-ver-color=$cyan
+ring-wrong-color=$red
+key-hl-color=$magenta
+bs-hl-color=$red
+separator-color=00000000
+line-color=00000000
+text-color=$fg
+text-clear-color=$fg
+text-caps-lock-color=$yellow_bright
+text-ver-color=$cyan
+text-wrong-color=$red
+layout-bg-color=${bg_alt}e6
+layout-border-color=$border
+layout-text-color=$fg
 EOF
 
 cat >"$cache_root/niri.kdl" <<EOF
