@@ -60,8 +60,7 @@ c.tabs.padding = {'top': 10, 'bottom': 10, 'left': 5, 'right': 5}
 c.tabs.indicator.width = 0 
 c.tabs.favicons.scale = 1.0
 c.tabs.title.format = '{audio}{index}: {current_title}'
-c.tabs.show = 'switching'
-c.tabs.show_switching_delay = 1200
+c.tabs.show = 'never'
 
 # Tab Colors
 c.colors.tabs.bar.bg = p['bg']
@@ -220,6 +219,9 @@ config.bind('M', 'hint links spawn --detach /home/evan/.local/share/qutebrowser/
 config.bind('xm', 'spawn --detach /home/evan/.local/share/qutebrowser/userscripts/qute-mpv {url}')
 
 # Navigation helpers
+config.bind('J', 'tab-next')
+config.bind('K', 'tab-prev')
+config.bind('T', 'config-cycle tabs.show always never')
 config.bind(';r', 'hint --rapid links tab-bg')
 config.bind('m', 'quickmark-save')
 config.bind('b', 'cmd-set-text -s :quickmark-load')
