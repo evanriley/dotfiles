@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DeArrow for YouTube
 // @namespace    evan.qutebrowser
-// @version      1.4.0
+// @version      1.5.0
 // @description  Replace YouTube clickbait titles and thumbnails using DeArrow submissions and frame fallbacks.
 // @match        https://www.youtube.com/*
 // @match        https://youtube.com/*
@@ -12,7 +12,7 @@
 (() => {
     'use strict';
 
-    document.documentElement.dataset.dearrowUserscript = '1.4.0';
+    document.documentElement.dataset.dearrowUserscript = '1.5.0';
 
     const brandingCache = new Map();
     const imageObservers = new WeakMap();
@@ -72,9 +72,15 @@
         imageObservers.set(image, observer);
     };
 
-    const replaceThumbnail = (image, url, videoId, attempt = 0) => {
-        if (image.dataset.dearrowPending === videoId && attempt === 0) return;
+    const replaceThumbnail = (
+        image, urls, videoId, candidateIndex = 0, retry = 0,
+    ) => {
+        if (image.dataset.dearrowPending === videoId &&
+            candidateIndex === 0 && retry === 0) return;
         image.dataset.dearrowPending = videoId;
+
+        const candidates = Array.isArray(urls) ? urls : [urls];
+        const url = candidates[candidateIndex];
 
         const probe = new Image();
         probe.onload = () => {
@@ -87,11 +93,16 @@
             delete image.dataset.dearrowPending;
         };
         probe.onerror = () => {
-            if (attempt < 3 && image.isConnected) {
+            if (!image.isConnected) return;
+
+            if (candidateIndex + 1 < candidates.length) {
+                delete image.dataset.dearrowPending;
+                replaceThumbnail(image, candidates, videoId, candidateIndex + 1);
+            } else if (candidates.length === 1 && retry < 3) {
                 setTimeout(() => {
                     delete image.dataset.dearrowPending;
-                    replaceThumbnail(image, url, videoId, attempt + 1);
-                }, 1000 * (attempt + 1));
+                    replaceThumbnail(image, candidates, videoId, 0, retry + 1);
+                }, 1000 * (retry + 1));
             } else {
                 // Leave YouTube's original image intact when no replacement
                 // can be loaded; never turn a failed request into a blank tile.
@@ -99,7 +110,7 @@
             }
         };
         const separator = url.includes('?') ? '&' : '?';
-        probe.src = `${url}${separator}dearrowRetry=${attempt}`;
+        probe.src = `${url}${separator}dearrowRetry=${retry}`;
     };
 
     const updateCard = async (card, link, videoId) => {
@@ -132,9 +143,12 @@
                 thumbnailUrl = `https://dearrow-thumb.ajay.app/api/v1/getThumbnail?${params}`;
             } else {
                 // YouTube publishes three non-clickbait frames for every
-                // processed video. Pick one deterministically per video.
+                // processed video. Pick one deterministically per video, then
+                // try each resolution tier so older uploads still work.
                 const frame = 1 + Math.floor(fallbackFraction(videoId) * 3);
-                thumbnailUrl = `https://i.ytimg.com/vi/${videoId}/mq${frame}.jpg`;
+                thumbnailUrl = ['maxres', 'sd', 'hq', 'mq'].map(
+                    (tier) => `https://i.ytimg.com/vi/${videoId}/${tier}${frame}.jpg`,
+                );
             }
             replaceThumbnail(image, thumbnailUrl, videoId);
         }
