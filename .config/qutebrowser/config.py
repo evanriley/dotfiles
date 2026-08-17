@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 # QtWebEngine's GBM texture-import path produces black video frames on this
 # RDNA4/Wayland setup. This is the targeted workaround qutebrowser applies to
@@ -22,39 +23,45 @@ c.url.searchengines = {
 c.url.default_page = 'https://kagi.com'
 c.url.start_pages = ['https://kagi.com']
 
-# --- 2. LUNA THEME ---
-# Transparency disabled for solid look
+# --- 2. MODUS THEME ---
 c.window.transparent = False
 
-# https://github.com/WTFox/luna.nvim
-p = {
-    'bg': "#060606",
-    'bg_alt': "#1c1c1c",
-    'bg_soft': "#1f1f1f",
-    'surface': "#333333",
-    'sel': "#384048",
-    'border': "#404040",
-    'mute': "#7c7c7c",
-    'grey': "#a8a8a8",
-    'fg': "#e4e4e8",
-    'bright': "#f0f0f0",
-    'keyword': "#e19067",
-    'info': "#75a1c7",
-    'match': "#c4a8d6",
-    'string': "#9eb38e",
-    'signal': "#c2916a",
-    'error': "#e08585",
-    'warn': "#d9a35a",
-    'ok': "#6fbe80",
+try:
+    mode = subprocess.run(
+        ['darkman', 'get'], capture_output=True, text=True, timeout=1,
+    ).stdout.strip()
+except (OSError, subprocess.SubprocessError):
+    mode = 'dark'
+
+palettes = {
+    'light': {
+        'bg': '#ffffff', 'bg_alt': '#f2f2f2', 'bg_soft': '#dae5ec',
+        'surface': '#c4c4c4', 'sel': '#dae5ec', 'border': '#9f9f9f',
+        'mute': '#595959', 'grey': '#3b3b3b', 'fg': '#000000',
+        'bright': '#000000', 'keyword': '#8a290f', 'info': '#0031a9',
+        'match': '#721045', 'string': '#006800', 'signal': '#6f5500',
+        'error': '#a60000', 'warn': '#884900', 'ok': '#316500',
+    },
+    'dark': {
+        'bg': '#000000', 'bg_alt': '#1e1e1e', 'bg_soft': '#2f3849',
+        'surface': '#646464', 'sel': '#2f3849', 'border': '#646464',
+        'mute': '#989898', 'grey': '#c4c4c4', 'fg': '#ffffff',
+        'bright': '#ffffff', 'keyword': '#db7b5f', 'info': '#2fafff',
+        'match': '#feacd0', 'string': '#44bc44', 'signal': '#d0bc00',
+        'error': '#ff5f59', 'warn': '#fec43f', 'ok': '#70b900',
+    },
 }
+p = palettes.get(mode, palettes['dark'])
 
 # TABS (Solid & Minimal)
-c.tabs.position = 'top'
+c.tabs.position = 'left'
+c.tabs.width = 240
 c.tabs.padding = {'top': 10, 'bottom': 10, 'left': 5, 'right': 5}
 c.tabs.indicator.width = 0 
 c.tabs.favicons.scale = 1.0
 c.tabs.title.format = '{audio}{index}: {current_title}'
-c.tabs.show = 'multiple'
+c.tabs.show = 'switching'
+c.tabs.show_switching_delay = 1200
 
 # Tab Colors
 c.colors.tabs.bar.bg = p['bg']
@@ -199,8 +206,8 @@ config.bind('<Space>pp', 'spawn --userscript qute-bitwarden-fuzzel --password-on
 config.bind('<Space>po', 'spawn --userscript qute-bitwarden-fuzzel --totp-only')
 
 # MPV
-config.bind('M', 'hint links spawn --detach mpv {hint-url}')
-config.bind('xm', 'spawn --detach mpv {url}')
+config.bind('M', 'hint links spawn --detach /home/evan/.local/share/qutebrowser/userscripts/qute-mpv {hint-url}')
+config.bind('xm', 'spawn --detach /home/evan/.local/share/qutebrowser/userscripts/qute-mpv {url}')
 
 # Editor (Ctrl+E)
 c.editor.command = ["kitty", "--class", "dotfiles-floating", "-e", "nvim", "-f", "{file}", "-c", "normal {line}G{column0}l"]
