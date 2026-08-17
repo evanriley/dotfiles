@@ -16,7 +16,7 @@ c.url.searchengines = {
     'DEFAULT': 'https://kagi.com/search?q={}',
     'g':  'https://google.com/search?q={}',
     'aw': 'https://wiki.archlinux.org/?search={}',
-    'fw': 'https://docs.fedoraproject.org/en-US/search/?q={}',
+    'ch': 'https://kagi.com/search?q=site%3Achimera-linux.org%2Fdocs+{}',
     'yt': 'https://www.youtube.com/results?search_query={}',
     'gh': 'https://github.com/search?q={}'
 }
@@ -95,7 +95,7 @@ c.colors.tabs.indicator.error = p['error']
 c.statusbar.padding = {'top': 5, 'bottom': 5, 'left': 5, 'right': 5}
 c.statusbar.widgets = ['keypress', 'url', 'scroll', 'history', 'tabs', 'progress']
 
-c.colors.statusbar.normal.bg = p['bg']
+c.colors.statusbar.normal.bg = p['bg_alt']
 c.colors.statusbar.normal.fg = p['fg']
 c.colors.statusbar.insert.bg = p['info'] # Blue-ish for insert
 c.colors.statusbar.insert.fg = p['bg']
@@ -178,6 +178,7 @@ c.fonts.default_size = "12pt"
 c.fonts.web.size.default = 16 
 
 c.downloads.position = 'bottom'
+c.downloads.remove_finished = 5000
 
 # --- 4. PERFORMANCE & PRIVACY ---
 c.scrolling.smooth = False # Instant scrolling (snappy)
@@ -193,13 +194,22 @@ c.content.blocking.adblock.lists = [
 # Cloudflare Turnstile must load its cross-origin challenge script and iframe.
 c.content.blocking.whitelist = ['https://challenges.cloudflare.com/*']
 
-ua_chrome = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
-config.set('content.headers.user_agent', ua_chrome, 'accounts.google.com')
-config.set('content.headers.user_agent', ua_chrome, 'https://accounts.google.com/*')
+c.content.tls.certificate_errors = 'block'
 
-c.content.tls.certificate_errors = 'block' # This might be bad but I'm too annoyed to care
+# Deny sensitive capabilities by default. Grant exceptions later with
+# config.set(..., URL_PATTERN) when a specific site genuinely needs one.
+c.content.desktop_capture = False
+c.content.geolocation = False
+c.content.javascript.clipboard = 'none'
+c.content.media.audio_capture = False
+c.content.media.audio_video_capture = False
+c.content.media.video_capture = False
+c.content.mouse_lock = False
+c.content.notifications.enabled = False
+c.content.persistent_storage = False
+c.content.register_protocol_handler = False
 
-# Bitwarden
+# Password manager
 config.bind('<Space>pl', 'spawn --userscript qute-bitwarden-fuzzel')
 config.bind('<Space>pu', 'spawn --userscript qute-bitwarden-fuzzel --username-only')
 config.bind('<Space>pp', 'spawn --userscript qute-bitwarden-fuzzel --password-only')
@@ -209,14 +219,23 @@ config.bind('<Space>po', 'spawn --userscript qute-bitwarden-fuzzel --totp-only')
 config.bind('M', 'hint links spawn --detach /home/evan/.local/share/qutebrowser/userscripts/qute-mpv {hint-url}')
 config.bind('xm', 'spawn --detach /home/evan/.local/share/qutebrowser/userscripts/qute-mpv {url}')
 
-# Editor (Ctrl+E)
-c.editor.command = ["kitty", "--class", "dotfiles-floating", "-e", "nvim", "-f", "{file}", "-c", "normal {line}G{column0}l"]
+# Navigation helpers
+config.bind(';r', 'hint --rapid links tab-bg')
+config.bind('m', 'quickmark-save')
+config.bind('b', 'cmd-set-text -s :quickmark-load')
+config.bind('B', 'cmd-set-text -s :quickmark-load -t')
+
+# Edit form fields in Neovim with Ctrl+E while in insert mode.
+c.editor.command = [
+    'foot', '--app-id=qute-editor', 'nvim', '-f', '{file}',
+    '-c', 'normal {line}G{column0}l',
+]
 
 # Readability (ZR)
 config.bind('ZR', 'spawn --userscript readability-js')
 
-# Force Dark Mode on all sites
-# 'smart' tries to be intelligent about images, 'lightness-cielab' is usually the best looking algorithm
+# Keep forced dark mode available for site-specific overrides, but disabled
+# globally so sites can follow their own preferred color scheme.
 c.colors.webpage.darkmode.enabled = False
 c.colors.webpage.darkmode.algorithm = 'lightness-cielab' 
 c.colors.webpage.darkmode.policy.images = 'smart' # Don't invert photos
@@ -238,6 +257,3 @@ config.bind('yy', 'yank')
 # 'yt' -> Copy Title and URL (Great for sharing/markdown)
 # Copies: [Page Title](https://url...)
 config.bind('yt', 'yank inline [{title}]({url})')
-
-# Clone a git repo to Code folder
-config.bind('gc', 'spawn --userscript git-clone')
