@@ -70,6 +70,7 @@ vim.pack.add({
   'https://github.com/RRethy/nvim-treesitter-endwise',
   'https://github.com/nvim-mini/mini.nvim',
   'https://github.com/neovim/nvim-lspconfig',
+  'https://codeberg.org/mfussenegger/nvim-dap',
   'https://github.com/rafamadriz/friendly-snippets',
   'https://github.com/stevearc/oil.nvim',
   'https://github.com/Olical/conjure',
@@ -168,6 +169,13 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 vim.lsp.config('*', { root_markers = { '.git' } })
+vim.lsp.config('zls', {
+  settings = {
+    zls = {
+      enable_build_on_save = true,
+    },
+  },
+})
 vim.lsp.enable({ 'rust_analyzer', 'ruff', 'zls', 'clangd', 'clojure_lsp', 'lua_ls' })
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -258,6 +266,53 @@ local function toggle_terminal()
   end
 end
 vim.keymap.set({ 'n', 't' }, '<leader>t', toggle_terminal, { desc = 'Toggle terminal' })
+
+local function zig_root()
+  local root = vim.fs.root(0, { 'build.zig', 'build.zig.zon', '.git' })
+  return root or vim.fn.getcwd()
+end
+
+local function run_zig(args)
+  vim.cmd('botright 15split')
+  vim.fn.jobstart(vim.list_extend({ 'zig' }, args), {
+    cwd = zig_root(),
+    term = true,
+  })
+  vim.cmd('startinsert')
+end
+
+vim.keymap.set('n', '<leader>zb', function() run_zig({ 'build' }) end, { desc = 'Zig build' })
+vim.keymap.set('n', '<leader>zt', function() run_zig({ 'build', 'test' }) end, { desc = 'Zig build test' })
+vim.keymap.set('n', '<leader>zf', function()
+  run_zig({ 'test', vim.api.nvim_buf_get_name(0) })
+end, { desc = 'Zig test current file' })
+
+local dap = require('dap')
+dap.adapters.lldb = {
+  type = 'executable',
+  command = vim.fn.exepath('lldb-dap'),
+  name = 'lldb',
+}
+dap.configurations.zig = {
+  {
+    name = 'Launch Zig executable',
+    type = 'lldb',
+    request = 'launch',
+    cwd = '${workspaceFolder}',
+    stopOnEntry = false,
+    program = function()
+      return vim.fn.input('Executable: ', zig_root() .. '/zig-out/bin/', 'file')
+    end,
+  },
+}
+
+vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, { desc = 'Debug toggle breakpoint' })
+vim.keymap.set('n', '<leader>dc', dap.continue, { desc = 'Debug continue' })
+vim.keymap.set('n', '<leader>di', dap.step_into, { desc = 'Debug step into' })
+vim.keymap.set('n', '<leader>dn', dap.step_over, { desc = 'Debug step over' })
+vim.keymap.set('n', '<leader>do', dap.step_out, { desc = 'Debug step out' })
+vim.keymap.set('n', '<leader>dr', dap.repl.open, { desc = 'Debug REPL' })
+vim.keymap.set('n', '<leader>dt', dap.terminate, { desc = 'Debug terminate' })
 
 vim.keymap.set('n', '<leader><leader>', pick.builtin.files, { desc = 'Find files' })
 vim.keymap.set('n', '<leader>/', pick.builtin.grep_live, { desc = 'Live grep' })
