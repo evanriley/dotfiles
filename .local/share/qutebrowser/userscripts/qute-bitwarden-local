@@ -38,7 +38,7 @@ import shlex
 import subprocess
 import sys
 import json
-import tldextract
+from urllib.parse import urlparse
 
 argument_parser = argparse.ArgumentParser(
     description=__doc__,
@@ -86,93 +86,60 @@ def qute_command(command):
         fifo.flush()
 
 
-def ask_password(password_prompt_invocation):
-    process = subprocess.run(
-        shlex.split(password_prompt_invocation),
-        text=True,
-        stdout=subprocess.PIPE,
-    )
-    if process.returncode > 0:
-        raise Exception('Could not unlock vault')
-    master_pass = process.stdout.strip()
-    return subprocess.check_output(
-        ['bw', 'unlock', '--raw', '--passwordenv', 'BW_MASTERPASS'],
-        env={**os.environ, 'BW_MASTERPASS': master_pass},
-        text=True,
-    ).strip()
-
-
-def get_session_key(auto_lock, password_prompt_invocation):
-    if auto_lock == 0:
-        subprocess.call(['keyctl', 'purge', 'user', 'bw_session'])
-        return ask_password(password_prompt_invocation)
-    else:
-        process = subprocess.run(
-            ['keyctl', 'request', 'user', 'bw_session'],
-            text=True,
-            stdout=subprocess.PIPE,
-        )
-        key_id = process.stdout.strip()
-        if process.returncode > 0:
-            session = ask_password(password_prompt_invocation)
-            if not session:
-                raise Exception('Could not unlock vault')
-            key_id = subprocess.check_output(
-                ['keyctl', 'add', 'user', 'bw_session', session, '@u'],
-                text=True,
-            ).strip()
-
-        if auto_lock > 0:
-            subprocess.call(['keyctl', 'timeout', str(key_id), str(auto_lock)])
-        return subprocess.check_output(
-            ['keyctl', 'pipe', str(key_id)],
-            text=True,
-        ).strip()
-
-
-def pass_(domain, encoding, auto_lock, password_prompt_invocation):
-    session_key = get_session_key(auto_lock, password_prompt_invocation)
-    process = subprocess.run(
-        ['bw', 'list', 'items', '--nointeraction', '--session', session_key, '--url', domain],
-        capture_output=True,
-    )
-
-    err = process.stderr.decode(encoding).strip()
-    if err:
-        msg = 'Bitwarden CLI returned for {:s} - {:s}'.format(domain, err)
-        stderr(msg)
-
-        if "Vault is locked" in err:
-            stderr("Bitwarden Vault got locked, trying again with clean session")
-            return pass_(domain, encoding, 0, password_prompt_invocation)
-
+def list_candidates(url, encoding):
+    """Return matching metadata without fetching any decrypted passwords."""
+    process = subprocess.run(['rbw', 'list', '--raw'], capture_output=True)
     if process.returncode:
-        return '[]'
+        stderr(process.stderr.decode(encoding).strip())
+        return []
 
-    out = process.stdout.decode(encoding).strip()
+    hostname = (urlparse(url).hostname or '').lower().rstrip('.')
+    entries = json.loads(process.stdout.decode(encoding))
+    candidates = []
+    for entry in entries:
+        for uri in entry.get('uris') or []:
+            parsed = urlparse(uri if '://' in uri else '//' + uri)
+            saved_hostname = (parsed.hostname or '').lower().rstrip('.')
+            if saved_hostname and (
+                hostname == saved_hostname or hostname.endswith('.' + saved_hostname)
+            ):
+                candidates.append({
+                    'id': entry['id'],
+                    'name': entry['name'],
+                    'login': {'username': entry.get('user') or ''},
+                })
+                break
+    if candidates:
+        return candidates
 
-    return out
+    # Some services keep authentication on a different parent domain from the
+    # URI stored in Bitwarden. Fall back to a searchable picker of every login
+    # rather than failing without giving the user a choice.
+    return [
+        {
+            'id': entry['id'],
+            'name': entry['name'],
+            'login': {'username': entry.get('user') or ''},
+        }
+        for entry in entries
+        if (entry.get('type') or '').lower() == 'login'
+    ]
 
 
 def get_totp_code(selection_id, domain_name, encoding, auto_lock, password_prompt_invocation):
-    session_key = get_session_key(auto_lock, password_prompt_invocation)
     process = subprocess.run(
-        ['bw', 'get', 'totp', '--nointeraction', '--session', session_key, selection_id],
+        ['rbw', 'code', selection_id],
         capture_output=True,
     )
 
     err = process.stderr.decode(encoding).strip()
     if err:
         # domain_name instead of selection_id to make it more user-friendly
-        msg = 'Bitwarden CLI returned for {:s} - {:s}'.format(domain_name, err)
+        msg = 'rbw returned for {:s} - {:s}'.format(domain_name, err)
         stderr(msg)
 
-        if "Vault is locked" in err:
-            stderr("Bitwarden Vault got locked, trying again with clean session")
-            return get_totp_code(selection_id, domain_name, encoding, 0, password_prompt_invocation)
-
     if process.returncode:
-        return '[]'
+        return ''
 
     out = process.stdout.decode(encoding).strip()
 
@@ -198,45 +165,10 @@ def main(arguments):
         argument_parser.print_help()
         return ExitCodes.FAILURE
 
-    extract_result = tldextract.extract(arguments.url)
-
-    # Try to find candidates using targets in the following order: fully-qualified domain name (includes subdomains),
-    # the registered domain name and finally: the IPv4 address if that's what
-    # the URL represents
-    candidates = []
-    for target in filter(
-        None,
-        [
-            extract_result.fqdn,
-            (
-                extract_result.top_domain_under_public_suffix
-                if hasattr(extract_result, "top_domain_under_public_suffix")
-                else extract_result.registered_domain
-            ),
-            extract_result.subdomain + "." + extract_result.domain,
-            extract_result.domain,
-            extract_result.ipv4,
-        ],
-    ):
-        target_candidates = json.loads(
-            pass_(
-                target,
-                arguments.io_encoding,
-                arguments.auto_lock,
-                arguments.password_prompt_invocation,
-            )
-        )
-        if not target_candidates:
-            continue
-
-        candidates = candidates + target_candidates
-        if not arguments.merge_candidates:
-            break
-    else:
-        if not candidates:
-            stderr('No pass candidates for URL {!r} found!'.format(
-                arguments.url))
-            return ExitCodes.NO_PASS_CANDIDATES
+    candidates = list_candidates(arguments.url, arguments.io_encoding)
+    if not candidates:
+        stderr('No pass candidates for URL {!r} found!'.format(arguments.url))
+        return ExitCodes.NO_PASS_CANDIDATES
 
     if len(candidates) == 1:
         selection = candidates.pop()
@@ -255,11 +187,17 @@ def main(arguments):
     if not selection:
         return ExitCodes.SUCCESS
 
-    username = selection['login']['username']
-    password = selection['login']['password']
-    # Recent Bitwarden CLI versions omit optional null fields instead of
-    # returning them as JSON null. Most login items have no TOTP key.
-    totp = selection['login'].get('totp')
+    process = subprocess.run(
+        ['rbw', 'get', '--raw', selection['id']],
+        capture_output=True,
+    )
+    if process.returncode:
+        stderr(process.stderr.decode(arguments.io_encoding).strip())
+        return ExitCodes.FAILURE
+    login = json.loads(process.stdout.decode(arguments.io_encoding))['data']
+    username = login.get('username') or ''
+    password = login.get('password') or ''
+    totp = login.get('totp')
 
     if arguments.username_only:
         fake_key_raw(username)

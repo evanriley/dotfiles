@@ -161,7 +161,7 @@ c.colors.downloads.error.fg = p['bg']
 
 # WEBPAGE (Dark Mode Preference)
 c.colors.webpage.bg = p['bg']
-c.colors.webpage.preferred_color_scheme = "dark"
+c.colors.webpage.preferred_color_scheme = "auto"
 c.content.user_stylesheets = ["/home/evan/.config/qutebrowser/youtube.css"]
 
 # --- 3. UI & FONTS ---
@@ -183,6 +183,8 @@ c.content.blocking.adblock.lists = [
     "https://secure.fanboy.co.nz/fanboy-annoyance.txt",
     "https://easylist.to/easylist/fanboy-social.txt"
 ]
+# Cloudflare Turnstile must load its cross-origin challenge script and iframe.
+c.content.blocking.whitelist = ['https://challenges.cloudflare.com/*']
 
 ua_chrome = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 config.set('content.headers.user_agent', ua_chrome, 'accounts.google.com')
@@ -208,7 +210,7 @@ config.bind('ZR', 'spawn --userscript readability-js')
 
 # Force Dark Mode on all sites
 # 'smart' tries to be intelligent about images, 'lightness-cielab' is usually the best looking algorithm
-c.colors.webpage.darkmode.enabled = True
+c.colors.webpage.darkmode.enabled = False
 c.colors.webpage.darkmode.algorithm = 'lightness-cielab' 
 c.colors.webpage.darkmode.policy.images = 'smart' # Don't invert photos
 # YouTube supplies its own dark theme. Chromium's forced dark-mode compositor can
@@ -218,7 +220,8 @@ config.set('colors.webpage.darkmode.enabled', False, 'https://youtube.com/*')
 
 c.content.cookies.accept = 'no-3rdparty'
 c.content.headers.referer = 'same-domain'
-c.content.canvas_reading = False
+# Cloudflare's human verification rejects modified Canvas/WebGL APIs.
+c.content.canvas_reading = True
 
 # Use home row keys for hints (Vim style)
 c.hints.chars = 'asdfghjkl'
