@@ -17,9 +17,9 @@ case "$choice" in
         niri msg action quit
         ;;
     'Reboot')
-        reboot
+        doas /usr/bin/reboot
         ;;
     'Power Off')
-        poweroff
+        doas /usr/bin/poweroff
         ;;
 esac
