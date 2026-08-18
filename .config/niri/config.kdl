@@ -413,13 +413,13 @@ window-rule {
     }
 }
 window-rule {
-    match app-id="^steam_app_\\d+$"
+    // Steam games do not consistently use steam_app_<id>; native and Proton
+    // games often expose their executable name instead.
+    match app-id="(?i)(^steam_app_\\d+$|\\.x86(?:_64)?$|\\.exe$|^gamescope$)"
     opacity 1.0
 }
 window-rule {
     match app-id="^steam_app_\\d+$"
-    opacity 1.0
-
     default-column-width {
         fixed 2560
     }
