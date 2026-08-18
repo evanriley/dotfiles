@@ -238,6 +238,6 @@ qutebrowser ':config-source' >/dev/null 2>&1 || true
 # Keep the wallpaper in step with the rest of the desktop theme.
 setsid -f "$script_dir/set-wallpaper" "$mode" >/dev/null 2>&1
 
-# SwayOSD reads its stylesheet only at startup.
-pkill -x swayosd-server 2>/dev/null || true
-"$HOME/.local/bin/swayosd-server" >/dev/null 2>&1 &
+# SwayOSD reads its stylesheet only at startup; its dinit service owns the
+# process and ensures that theme reloads cannot create duplicate servers.
+dinitctl restart swayosd >/dev/null 2>&1 || true

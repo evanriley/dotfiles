@@ -106,18 +106,8 @@ spawn-at-startup "/usr/lib/polkit-kde-authentication-agent-1"
 
 spawn-at-startup "/home/evan/.local/share/darkman/set-wallpaper"
 
-spawn-at-startup "swayidle" "-w" \
-    "timeout" "600" "swaylock -f" \
-    "timeout" "900" "niri msg action power-off-monitors"
-
-spawn-at-startup "waybar"
-spawn-at-startup "/home/evan/.config/scripts/waybar-overview"
-spawn-at-startup "swaync"
-spawn-at-startup "/home/evan/.local/bin/swayosd-server"
-spawn-at-startup "/home/evan/.local/bin/scapectl"
-
-spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
-spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
+// Supervise the long-running desktop daemons and retain their logs with dinit.
+spawn-at-startup "dinitctl" "start" "desktop-services"
 
 spawn-at-startup "foot" "--app-id=scratch_rmpc" "rmpc"
 spawn-at-startup "foot" "--app-id=scratch_btop" "btop"

@@ -1,0 +1,10 @@
+type = process
+command = /home/evan/.local/bin/swayosd-server
+restart = yes
+smooth-recovery = yes
+restart-delay = 2
+restart-limit-count = 0
+logfile = /home/evan/.local/state/swayosd.log
+logfile-permissions = 600
+depends-on = dbus
+depends-on = graphical.target

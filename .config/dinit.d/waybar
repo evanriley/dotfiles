@@ -1,0 +1,9 @@
+type = process
+command = /usr/bin/waybar
+restart = yes
+restart-delay = 2
+restart-limit-count = 0
+logfile = /home/evan/.local/state/waybar.log
+logfile-permissions = 600
+depends-on = dbus
+depends-on = graphical.target

@@ -1,0 +1,9 @@
+type = internal
+depends-on = graphical.target
+waits-for = waybar-overview
+waits-for = swayidle
+waits-for = swaync
+waits-for = swayosd
+waits-for = scapectl
+waits-for = clipboard-history-text
+waits-for = clipboard-history-image
