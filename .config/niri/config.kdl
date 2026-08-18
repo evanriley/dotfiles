@@ -122,7 +122,7 @@ spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
 spawn-at-startup "foot" "--app-id=scratch_rmpc" "rmpc"
 spawn-at-startup "foot" "--app-id=scratch_btop" "btop"
 
-spawn-at-startup "firefox"
+// spawn-at-startup "firefox"
 
 spawn-at-startup "flatpak" "run" "com.valvesoftware.Steam" "-silent"
 
@@ -131,9 +131,9 @@ spawn-at-startup "flatpak" "run" "com.discordapp.Discord"
 
 spawn-at-startup "flatpak" "run" "dev.deedles.Trayscale"
 
-spawn-at-startup "flatpak" "run" "io.gitlab.librewolf-community"
+// spawn-at-startup "flatpak" "run" "io.gitlab.librewolf-community"
 
-spawn-at-startup "flatpak" "run" "org.gnome.World.PikaBackup"
+spawn-at-startup "flatpak" "run" "--command=pika-backup-monitor" "org.gnome.World.PikaBackup"
 
 hotkey-overlay {
     skip-at-startup
@@ -239,6 +239,11 @@ window-rule {
 }
 window-rule {
     match app-id="librewolf"
+    open-on-workspace "web"
+    open-maximized-to-edges false
+}
+window-rule {
+    match app-id="org.qutebrowser.qutebrowser"
     open-on-workspace "web"
     open-maximized-to-edges false
 }
