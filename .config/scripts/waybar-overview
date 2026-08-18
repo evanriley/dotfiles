@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Keep Waybar's visibility synchronized with niri's overview.
+# Waybar starts hidden; SIGUSR1 toggles its visibility.
+while :; do
+    first_event=true
+
+    niri msg --json event-stream 2>/dev/null |
+    while IFS= read -r event; do
+        case "$event" in
+            *'"OverviewOpenedOrClosed":{"is_open":true}'*)
+                # The first overview event is niri's current state. Since Waybar
+                # starts hidden, only toggle it when that state is open.
+                pkill -USR1 -x waybar 2>/dev/null || :
+                first_event=false
+                ;;
+            *'"OverviewOpenedOrClosed":{"is_open":false}'*)
+                if [ "$first_event" = false ]; then
+                    pkill -USR1 -x waybar 2>/dev/null || :
+                fi
+                first_event=false
+                ;;
+        esac
+    done
+
+    # Reconnect if niri reloads or its event stream is interrupted.
+    sleep 1
+done

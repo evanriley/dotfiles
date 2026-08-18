@@ -111,6 +111,7 @@ spawn-at-startup "swayidle" "-w" \
     "timeout" "900" "niri msg action power-off-monitors"
 
 spawn-at-startup "waybar"
+spawn-at-startup "/home/evan/.config/scripts/waybar-overview"
 spawn-at-startup "swaync"
 spawn-at-startup "/home/evan/.local/bin/swayosd-server"
 spawn-at-startup "/home/evan/.local/bin/scapectl"
@@ -150,6 +151,13 @@ overview {
         off
     }
 }
+
+// Keep darkman's current swaybg wallpaper visible behind the overview.
+layer-rule {
+    match namespace="^wallpaper$"
+    place-within-backdrop true
+}
+
 animations {
     // NOTE: Uncomment to turn off all animations
     // NOTE: We can also put "off" into each individual animation to disable it.
@@ -474,9 +482,6 @@ binds {
     }
     MOD+ALT+M hotkey-overlay-title="Watch Media: rofi" {
         spawn-sh "~/.config/scripts/watch-media"
-    }
-    MOD+B {
-        spawn-sh "killall -SIGUSR1 waybar"
     }
     XF86AudioRaiseVolume allow-when-locked=true {
         spawn "/home/evan/.local/bin/swayosd-client" "--output-volume" "raise"
