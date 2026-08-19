@@ -33,8 +33,10 @@ image/x-portable-graymap=swayimg.desktop
 image/x-portable-pixmap=swayimg.desktop
 image/x-targa=swayimg.desktop
 image/x-tga=swayimg.desktop
+application/pdf=org.pwmt.zathura-pdf-poppler.desktop
 
 [Added Associations]
+application/pdf=org.pwmt.zathura-pdf-poppler.desktop;
 x-scheme-handler/http=firefox.desktop;
 x-scheme-handler/https=firefox.desktop;
 x-scheme-handler/chrome=firefox.desktop;
