@@ -16,7 +16,8 @@ dark)
     magenta=feacd0; yellow=d0bc00; yellow_bright=fec43f; red=ff5f59
     gtk_theme=Adwaita-dark; icon_theme=breeze-dark; color_scheme=prefer-dark
     foot_signal=USR1
-    lock_image=$HOME/Pictures/wallpapers/warm-skies.jpg
+    lock_source=$HOME/Pictures/wallpapers/warm-skies.jpg
+    lock_dim=0.25
     ;;
 light)
     bg=ffffff; bg_alt=f2f2f2; bg_soft=dae5ec; surface=c4c4c4
@@ -25,13 +26,17 @@ light)
     magenta=721045; yellow=6f5500; yellow_bright=884900; red=a60000
     gtk_theme=Adwaita; icon_theme=breeze; color_scheme=default
     foot_signal=USR2
-    lock_image=$HOME/Pictures/wallpapers/white-coast.jpg
+    lock_source=$HOME/Pictures/wallpapers/white-coast.jpg
+    lock_dim=0.42
     ;;
 *)
     printf 'unknown mode: %s\n' "$mode" >&2
     exit 2
     ;;
 esac
+
+lock_image=$cache_root/lockscreen-$mode.jpg
+"$script_dir/make-lockscreen" "$lock_source" "$lock_image" "$lock_dim"
 
 cat >"$cache_root/palette.css" <<EOF
 @define-color background #$bg;
