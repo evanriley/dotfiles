@@ -208,6 +208,13 @@ c.content.notifications.enabled = False
 c.content.persistent_storage = False
 c.content.register_protocol_handler = False
 
+# QtWebEngine reports GitHub's Trusted Types policy when qutebrowser injects
+# caret-mode JavaScript. The operation still works, so hide only that expected
+# internal error while preserving all other JavaScript error messages.
+c.content.javascript.log_message.excludes['userscript:_qute_js'] = [
+    '*TrustedHTML*',
+]
+
 # Password manager
 config.bind('<Space>pl', 'spawn --userscript qute-bitwarden-fuzzel')
 config.bind('<Space>pu', 'spawn --userscript qute-bitwarden-fuzzel --username-only')
