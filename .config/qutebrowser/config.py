@@ -233,6 +233,8 @@ config.bind(';r', 'hint --rapid links tab-bg')
 config.bind('m', 'quickmark-save')
 config.bind('b', 'cmd-set-text -s :quickmark-load')
 config.bind('B', 'cmd-set-text -s :quickmark-load -t')
+# Search mouse-highlighted or primary-selected text in a new tab.
+config.bind('ss', 'open -t {primary}')
 
 # Edit form fields in Neovim with Ctrl+E while in insert mode.
 c.editor.command = [
