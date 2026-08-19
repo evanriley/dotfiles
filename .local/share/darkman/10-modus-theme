@@ -233,7 +233,11 @@ pkill -USR2 -x waybar 2>/dev/null || true
 pkill -USR1 -x swayimg 2>/dev/null || true
 swaync-client --reload-css 2>/dev/null || true
 swaync-client --reload-config 2>/dev/null || true
-qutebrowser ':config-source' >/dev/null 2>&1 || true
+# Reload an existing qutebrowser instance, but never launch one from this
+# synchronous hook: darkman waits for every hook command to exit.
+if pgrep -u "$(id -u)" -f '[/]usr/bin/qutebrowser( |$)' >/dev/null; then
+    qutebrowser ':config-source' >/dev/null 2>&1 || true
+fi
 
 # Keep the wallpaper in step with the rest of the desktop theme.
 setsid -f "$script_dir/set-wallpaper" "$mode" >/dev/null 2>&1
