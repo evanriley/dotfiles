@@ -112,6 +112,12 @@ local darkman_watch = vim.system({ 'darkman', 'watch' }, {
   end,
 })
 
+-- Without this the watcher outlives Neovim and accumulates one stray
+-- 'darkman watch' process per session.
+vim.api.nvim_create_autocmd('VimLeavePre', {
+  callback = function() darkman_watch:kill('sigterm') end,
+})
+
 setup('oil', { default_file_explorer = true })
 setup('render-markdown')
 
