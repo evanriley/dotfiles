@@ -1,5 +1,5 @@
 type = process
-command = /usr/bin/swayidle -w timeout 600 "swaylock -f" timeout 900 "niri msg action power-off-monitors"
+command = /usr/bin/swayidle -w before-sleep "swaylock -f" timeout 600 "swaylock -f" timeout 900 "niri msg action power-off-monitors"
 restart = yes
 smooth-recovery = yes
 restart-delay = 2
