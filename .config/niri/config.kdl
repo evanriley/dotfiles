@@ -123,7 +123,9 @@ spawn-at-startup "flatpak" "run" "dev.deedles.Trayscale"
 
 // spawn-at-startup "flatpak" "run" "io.gitlab.librewolf-community"
 
-spawn-at-startup "flatpak" "run" "--command=pika-backup-monitor" "org.gnome.World.PikaBackup"
+// Pika Backup requests autostart through the background portal, which keeps
+// ~/.config/autostart in step with the setting inside the app. Spawning the
+// monitor here as well started it twice.
 
 hotkey-overlay {
     skip-at-startup
