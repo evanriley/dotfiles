@@ -3,7 +3,7 @@
 export XDG_CONFIG_HOME="$HOME/.config"
 
 export ZVM_INSTALL="$HOME/.zvm/self"
-export PATH="$HOME/bin:$HOME/.local/bin:$HOME/go/bin:$HOME/.cargo/bin:$HOME/.zvm/bin:$ZVM_INSTALL:$PATH"
+export PATH="$HOME/bin:$HOME/.local/bin:$HOME/go/bin:$HOME/.cargo/bin:$HOME/.zvm/bin:$ZVM_INSTALL:$HOME/.npm-global/bin:$PATH"
 
 export FZF_DEFAULT_OPTS="
   --color=fg:#C5C9C7,bg:#090E13,hl:#c4746e
