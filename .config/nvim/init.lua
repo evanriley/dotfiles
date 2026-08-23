@@ -58,8 +58,6 @@ vim.api.nvim_create_autocmd('PackChanged', {
     if name == 'nvim-treesitter' then
       if not ev.data.active then vim.cmd.packadd('nvim-treesitter') end
       vim.cmd('TSUpdate')
-    elseif name == 'smart-splits.nvim' then
-      vim.system({ './kitty/install-kittens.bash' }, { cwd = ev.data.path }):wait()
     end
   end,
 })
@@ -77,7 +75,6 @@ vim.pack.add({
   'https://github.com/gpanders/nvim-parinfer',
   'https://github.com/MeanderingProgrammer/render-markdown.nvim',
   'https://github.com/mbbill/undotree',
-  'https://github.com/mrjones2014/smart-splits.nvim',
 }, {
   confirm = false,
 })
@@ -115,7 +112,6 @@ local darkman_watch = vim.system({ 'darkman', 'watch' }, {
   end,
 })
 
-setup('smart-splits')
 setup('oil', { default_file_explorer = true })
 setup('render-markdown')
 
@@ -156,23 +152,37 @@ setup('mini.completion', {
 
 vim.g.parinfer_filetypes = { 'clojure' }
 
-local smart_splits = require('smart-splits')
 local pick = require('mini.pick')
 local extra = require('mini.extra')
 
-vim.keymap.set('n', '<A-h>', smart_splits.resize_left)
-vim.keymap.set('n', '<A-j>', smart_splits.resize_down)
-vim.keymap.set('n', '<A-k>', smart_splits.resize_up)
-vim.keymap.set('n', '<A-l>', smart_splits.resize_right)
-vim.keymap.set('n', '<C-h>', smart_splits.move_cursor_left)
-vim.keymap.set('n', '<C-j>', smart_splits.move_cursor_down)
-vim.keymap.set('n', '<C-k>', smart_splits.move_cursor_up)
-vim.keymap.set('n', '<C-l>', smart_splits.move_cursor_right)
-vim.keymap.set('n', '<C-\\>', smart_splits.move_cursor_previous)
-vim.keymap.set('n', '<leader><leader>h', smart_splits.swap_buf_left)
-vim.keymap.set('n', '<leader><leader>j', smart_splits.swap_buf_down)
-vim.keymap.set('n', '<leader><leader>k', smart_splits.swap_buf_up)
-vim.keymap.set('n', '<leader><leader>l', smart_splits.swap_buf_right)
+-- Swap the current buffer with the one in the given direction, leaving the
+-- cursor in the window it started in.
+local function swap_buf(dir)
+  return function()
+    local cur_win = vim.api.nvim_get_current_win()
+    vim.cmd.wincmd(dir)
+    local target_win = vim.api.nvim_get_current_win()
+    if target_win == cur_win then return end
+    local cur_buf = vim.api.nvim_win_get_buf(cur_win)
+    vim.api.nvim_win_set_buf(cur_win, vim.api.nvim_win_get_buf(target_win))
+    vim.api.nvim_win_set_buf(target_win, cur_buf)
+    vim.api.nvim_set_current_win(cur_win)
+  end
+end
+
+vim.keymap.set('n', '<A-h>', '<Cmd>vertical resize -2<CR>')
+vim.keymap.set('n', '<A-j>', '<Cmd>resize +2<CR>')
+vim.keymap.set('n', '<A-k>', '<Cmd>resize -2<CR>')
+vim.keymap.set('n', '<A-l>', '<Cmd>vertical resize +2<CR>')
+vim.keymap.set('n', '<C-h>', '<C-w>h')
+vim.keymap.set('n', '<C-j>', '<C-w>j')
+vim.keymap.set('n', '<C-k>', '<C-w>k')
+vim.keymap.set('n', '<C-l>', '<C-w>l')
+vim.keymap.set('n', '<C-\\>', '<C-w>p')
+vim.keymap.set('n', '<leader><leader>h', swap_buf('h'))
+vim.keymap.set('n', '<leader><leader>j', swap_buf('j'))
+vim.keymap.set('n', '<leader><leader>k', swap_buf('k'))
+vim.keymap.set('n', '<leader><leader>l', swap_buf('l'))
 
 vim.keymap.set('n', '<leader>m', '<Cmd>RenderMarkdown toggle<CR>', { desc = 'Toggle markdown render' })
 
