@@ -46,16 +46,11 @@
     keepBackup = false
 
 [diff]
-    tool = kitty
-    guitool = kitty
+    tool = nvimdiff
 
 [difftool]
     prompt = false
     trustExitCode = true
-
-[difftool "kitty"]
-    # 'kitten diff' is the correct modern command
-    cmd = kitten diff $LOCAL $REMOTE
 
 [delta]
     navigate = true
