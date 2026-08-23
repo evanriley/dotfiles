@@ -6,7 +6,7 @@ workspace "system"
 workspace "scratch"
 environment {
     QT_QPA_PLATFORMTHEME "gtk3"
-    PATH "/home/evan/bin:/home/evan/.local/bin:/home/evan/go/bin:/home/evan/.cargo/bin:/home/evan/.zvm/bin:/home/evan/.zvm/self:/usr/local/bin:/usr/bin:/bin"
+    PATH "/home/evan/bin:/home/evan/.local/bin:/home/evan/go/bin:/home/evan/.cargo/bin:/home/evan/.zvm/bin:/home/evan/.zvm/self:/home/evan/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
 }
 
 input {
