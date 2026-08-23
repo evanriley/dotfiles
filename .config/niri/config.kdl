@@ -193,6 +193,10 @@ window-rule {
     // Apply to all windows
     opacity 0.95
 }
+window-rule {
+    match app-id="io.github.manta"
+    opacity 1.0
+}
 // Niri can detect individual-window screencasts. Keep the shared target fully
 // opaque so screen shares and recordings do not inherit cosmetic transparency.
 window-rule {
