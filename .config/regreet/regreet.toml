@@ -4,7 +4,7 @@ fit = "Cover"
 
 [GTK]
 application_prefer_dark_theme = true
-cursor_theme_name = "Bibata-Modern-Classic"
+cursor_theme_name = "Bibata-Original-Classic"
 font_name = "Berkeley Mono 13"
 icon_theme_name = "breeze-dark"
 theme_name = "Adwaita"
