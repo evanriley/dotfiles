@@ -17,4 +17,4 @@ set window-title-basename true
 set window-title-home-tilde true
 
 # Written by Darkman whenever the desktop theme changes.
-include /home/evan/.cache/darkman/zathurarc
+include /home/evan/.local/state/darkman/zathurarc

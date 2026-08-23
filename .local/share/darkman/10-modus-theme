@@ -3,10 +3,10 @@
 set -eu
 
 mode=${1:?expected light or dark}
-cache_root=${XDG_CACHE_HOME:-$HOME/.cache}/darkman
+state_root=${XDG_STATE_HOME:-$HOME/.local/state}/darkman
 config_root=${XDG_CONFIG_HOME:-$HOME/.config}
 script_dir=$(dirname "$(readlink -f "$0")")
-mkdir -p "$cache_root"
+mkdir -p "$state_root"
 
 case "$mode" in
 dark)
@@ -35,10 +35,10 @@ light)
     ;;
 esac
 
-lock_image=$cache_root/lockscreen-$mode.jpg
+lock_image=$state_root/lockscreen-$mode.jpg
 "$script_dir/make-lockscreen" "$lock_source" "$lock_image" "$lock_dim"
 
-cat >"$cache_root/palette.css" <<EOF
+cat >"$state_root/palette.css" <<EOF
 @define-color background #$bg;
 @define-color background_alt #$bg_alt;
 @define-color background_soft #$bg_soft;
@@ -57,7 +57,7 @@ cat >"$cache_root/palette.css" <<EOF
 @define-color error #$red;
 EOF
 
-cat >"$cache_root/fuzzel.ini" <<EOF
+cat >"$state_root/fuzzel.ini" <<EOF
 [colors]
 background=${bg}ff
 text=${fg}ff
@@ -70,12 +70,12 @@ match=${blue}ff
 selection-match=${magenta}ff
 EOF
 
-cat >"$cache_root/foot.ini" <<EOF
+cat >"$state_root/foot.ini" <<EOF
 [main]
 initial-color-theme=$mode
 EOF
 
-cat >"$cache_root/swaylock.conf" <<EOF
+cat >"$state_root/swaylock.conf" <<EOF
 image=$lock_image
 scaling=fill
 color=$bg
@@ -110,7 +110,7 @@ layout-border-color=$border
 layout-text-color=$fg
 EOF
 
-cat >"$cache_root/niri.kdl" <<EOF
+cat >"$state_root/niri.kdl" <<EOF
 layout {
     focus-ring {
         active-color "#$blue"
@@ -140,20 +140,20 @@ window-rule {
 }
 EOF
 
-cat >"$cache_root/mpv.conf" <<EOF
+cat >"$state_root/mpv.conf" <<EOF
 osd-color='#$fg'
 osd-border-color='#$bg'
 osd-shadow-color='#$bg'
 EOF
 
-cat >"$cache_root/gtk-settings.ini" <<EOF
+cat >"$state_root/gtk-settings.ini" <<EOF
 [Settings]
 gtk-application-prefer-dark-theme=$(test "$mode" = dark && printf true || printf false)
 gtk-theme-name=$gtk_theme
 gtk-icon-theme-name=$icon_theme
 EOF
 
-cat >"$cache_root/zathurarc" <<EOF
+cat >"$state_root/zathurarc" <<EOF
 set default-bg "#$bg"
 set default-fg "#$fg"
 set statusbar-bg "#$bg_alt"
@@ -192,8 +192,8 @@ set recolor-adjust-lightness true
 set recolor-reverse-video true
 EOF
 
-cp "$script_dir/swayimg-base.ini" "$cache_root/swayimg.ini"
-cat >>"$cache_root/swayimg.ini" <<EOF
+cp "$script_dir/swayimg-base.ini" "$state_root/swayimg.ini"
+cat >>"$state_root/swayimg.ini" <<EOF
 [viewer]
 window = #${bg}ff
 transparency = #${bg}ff
@@ -212,7 +212,7 @@ shadow = #${bg}d0
 background = #00000000
 EOF
 
-cp "$script_dir/themes/yazi-$mode.toml" "$cache_root/yazi.toml"
+cp "$script_dir/themes/yazi-$mode.toml" "$state_root/yazi.toml"
 
 # RMPC and btop have no Modus ports; recolor the existing layouts while
 # preserving their structure and behavior.
@@ -221,13 +221,13 @@ sed \
     -e "s/#A4A7A4/#$muted/g" -e "s/#393B44/#$border/g" \
     -e "s/#8ba4b0/#$blue/g" -e "s/#8a9a7b/#$green/g" \
     -e "s/#c4b28a/#$yellow/g" -e "s/#c4746e/#$red/g" \
-    "$config_root/rmpc/themes/kanso-zen.ron" >"$cache_root/rmpc.ron"
+    "$config_root/rmpc/themes/kanso-zen.ron" >"$state_root/rmpc.ron"
 sed \
     -e "s/#090E13/#$bg/g" -e "s/#C5C9C7/#$fg/g" \
     -e "s/#A4A7A4/#$muted/g" -e "s/#393B44/#$border/g" \
     -e "s/#8BA4B0/#$blue/g" -e "s/#8A9A7B/#$green/g" \
     -e "s/#C4B28A/#$yellow/g" -e "s/#C4746E/#$red/g" \
-    "$config_root/btop/themes/kanso-zen.theme" >"$cache_root/btop.theme"
+    "$config_root/btop/themes/kanso-zen.theme" >"$state_root/btop.theme"
 
 gsettings set org.gnome.desktop.interface color-scheme "$color_scheme" 2>/dev/null || true
 gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null || true

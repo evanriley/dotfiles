@@ -1,4 +1,4 @@
-@import url("/home/evan/.cache/darkman/palette.css");
+@import url("/home/evan/.local/state/darkman/palette.css");
 
 @define-color on_background @foreground;
 @define-color on_surface @foreground;
