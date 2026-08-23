@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-runtime_config="${XDG_RUNTIME_DIR}/waybar-hyprland.jsonc"
-sed 's#niri/workspaces#hyprland/workspaces#g' \
-  "${XDG_CONFIG_HOME:-$HOME/.config}/waybar/config.jsonc" > "$runtime_config"
-
-exec waybar --config "$runtime_config" \
-  --style "${XDG_CONFIG_HOME:-$HOME/.config}/waybar/style.css"
