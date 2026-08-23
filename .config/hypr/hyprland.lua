@@ -113,12 +113,12 @@ end
 
 hl.workspace_rule({
     workspace = "special:rmpc",
-    on_created_empty = "foot --app-id scratch_rmpc -e rmpc",
+    on_created_empty = "kitty --class scratch_rmpc -e rmpc",
 })
 
 hl.workspace_rule({
     workspace = "special:btop",
-    on_created_empty = "foot --app-id scratch_btop -e btop",
+    on_created_empty = "kitty --class scratch_btop -e btop",
 })
 
 hl.gesture({
@@ -131,9 +131,9 @@ hl.on("hyprland.start", function()
     hl.exec_cmd(app_shell("~/.config/scripts/hypr-autostart"))
 end)
 
-hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd(app("foot")))
+hl.bind(mod .. " + RETURN", hl.dsp.exec_cmd(app("kitty --single-instance")))
 hl.bind(mod .. " + SPACE", hl.dsp.exec_cmd(app("hyprlauncher")))
-hl.bind(mod .. " + P", hl.dsp.exec_cmd(app("wlogout")))
+hl.bind(mod .. " + P", hl.dsp.exec_cmd(app_shell("wlogout -l ~/.config/wlogout/hyprland-layout -C ~/.config/wlogout/hyprland-style.css")))
 hl.bind(mod .. " + ALT + L", hl.dsp.exec_cmd(app("hyprlock")), { locked = true })
 hl.bind(mod .. " + E", hl.dsp.exec_cmd(app("nautilus")))
 hl.bind(mod .. " + CTRL + S", hl.dsp.workspace.toggle_special("rmpc"))
@@ -176,6 +176,7 @@ hl.bind(mod .. " + I", hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
 hl.bind(mod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
+hl.bind(mod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 hl.bind("Print", shell("hyprshot -m region -o ~/Pictures/Screenshots"))
 hl.bind("CTRL + Print", shell("hyprshot -m output -m active -o ~/Pictures/Screenshots"))
@@ -236,11 +237,30 @@ hl.window_rule({
 })
 
 hl.window_rule({
+    name = "steam-streaming-capture",
+    match = { class = "streaming_client" },
+    float = true,
+    size = "2560 1440",
+    center = true,
+})
+
+hl.window_rule({
     name = "steam-friends-workspace",
     match = { title = "Friends List" },
     workspace = "3 silent",
     float = true,
     size = "600 700",
+    center = true,
+})
+
+hl.window_rule({
+    name = "obs-preview-projector",
+    match = {
+        class = "com\\.obsproject\\.Studio",
+        title = "^Projector - Preview$",
+    },
+    float = true,
+    size = "1920 1080",
     center = true,
 })
 
