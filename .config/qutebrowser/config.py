@@ -202,12 +202,23 @@ c.content.autoplay = False
 c.content.pdfjs = True
 c.session.lazy_restore = True
 c.content.blocking.method = 'both'
+# qutebrowser's adblocker is network-only -- it never applies element-hiding
+# rules -- so a list's cosmetic half is parsed and discarded. The fanboy
+# annoyance/social/cookiemonster lists were 92-95% cosmetic and contributed
+# almost nothing here. uBlock Origin's lists are network-dense, and unbreak
+# and quick-fixes are exception rules that undo breakage the other lists
+# cause: the /akam/ whitelist below is exactly that class of problem.
 c.content.blocking.adblock.lists = [
     "https://easylist.to/easylist/easylist.txt",
-    "https://easylist.to/easylist/easyprivacy.txt", 
-    "https://secure.fanboy.co.nz/fanboy-cookiemonster.txt",
-    "https://secure.fanboy.co.nz/fanboy-annoyance.txt",
-    "https://easylist.to/easylist/fanboy-social.txt"
+    "https://easylist.to/easylist/easyprivacy.txt",
+    "https://ublockorigin.github.io/uAssets/filters/filters.txt",
+    "https://ublockorigin.github.io/uAssets/filters/badware.txt",
+    "https://ublockorigin.github.io/uAssets/filters/privacy.txt",
+    "https://ublockorigin.github.io/uAssets/filters/quick-fixes.txt",
+    "https://ublockorigin.github.io/uAssets/filters/unbreak.txt",
+    # Peter Lowe's list: every rule is a network rule, none are cosmetic.
+    "https://pgl.yoyo.org/adservers/serverlist.php"
+    "?hostformat=adblockplus&showintro=0&mimetype=plaintext",
 ]
 # Cloudflare Turnstile must load its cross-origin challenge script and iframe.
 # EasyPrivacy's /akam/1{0,1,3}/* rules block Akamai Bot Manager's sensor
