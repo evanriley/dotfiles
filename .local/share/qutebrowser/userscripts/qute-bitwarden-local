@@ -10,22 +10,18 @@ Insert login information using Bitwarden CLI and a dmenu-compatible application
 """
 
 USAGE = """The domain of the site has to be in the name of the Bitwarden entry, for example: "github.com/cryzed" or
-"websites/github.com".  The login information is inserted by emulating key events using qutebrowser's fake-key command in this manner:
-[USERNAME]<Tab>[PASSWORD], which is compatible with almost all login forms.
+"websites/github.com".  The login information is inserted using qutebrowser's insert-text command in this manner:
+[USERNAME]<Tab>[PASSWORD], which is compatible with almost all login forms. Use
+--fake-key to fall back to emulating individual key events instead.
 
-If enabled, with the `--totp` flag, it will also move the TOTP code to the
-clipboard, much like the Firefox add-on.
-
-You must log into Bitwarden CLI using `bw login` prior to use of this script.
-The session key will be stored using keyctl for the number of seconds passed to
-the --auto-lock option.
+You must have an unlocked rbw vault prior to use of this script; rbw-agent
+handles unlocking itself.
 
 To use in qutebrowser, run: `spawn --userscript qute-bitwarden`
 """
 
-EPILOG = """Dependencies: tldextract (Python 3 module), pyperclip (optional
-Python module, used for TOTP codes), Bitwarden CLI (1.7.4 is known to work
-but older versions may well also work)
+EPILOG = """Dependencies: tldextract (Python 3 module), Bitwarden CLI (1.7.4 is
+known to work but older versions may well also work)
 
 WARNING: The login details are viewable as plaintext in qutebrowser's debug log
 (qute://log) and might be shared if you decide to submit a crash report!"""
@@ -33,12 +29,17 @@ WARNING: The login details are viewable as plaintext in qutebrowser's debug log
 import argparse
 import enum
 import functools
+import json
 import os
 import shlex
 import subprocess
 import sys
-import json
+import tempfile
+import time
 from urllib.parse import urlparse
+
+CACHE_FILENAME = 'qute-bitwarden-last.json'
+CACHE_TTL_SECONDS = 60
 
 argument_parser = argparse.ArgumentParser(
     description=__doc__,
@@ -48,25 +49,19 @@ argument_parser = argparse.ArgumentParser(
 argument_parser.add_argument('url', nargs='?', default=os.getenv('QUTE_URL'))
 argument_parser.add_argument('--dmenu-invocation', '-d', default='rofi -dmenu -i -p Bitwarden',
                              help='Invocation used to execute a dmenu-provider')
-argument_parser.add_argument('--password-prompt-invocation', '-p', default='rofi -dmenu -p "Master Password" -password -lines 0',
-                             help='Invocation used to prompt the user for their Bitwarden password')
 argument_parser.add_argument('--no-insert-mode', '-n', dest='insert_mode', action='store_false',
                              help="Don't automatically enter insert mode")
-argument_parser.add_argument('--totp', '-t', action='store_true',
-                             help="Copy TOTP key to clipboard")
 argument_parser.add_argument('--io-encoding', '-i', default='UTF-8',
                              help='Encoding used to communicate with subprocesses')
 argument_parser.add_argument('--merge-candidates', '-m', action='store_true',
                              help='Merge pass candidates for fully-qualified and registered domain name')
-argument_parser.add_argument('--auto-lock', type=int, default=900,
-                             help='Automatically lock the vault after this many seconds')
+argument_parser.add_argument('--fake-key', '-k', action='store_true',
+                             help='Insert text by emulating individual key events instead of using insert-text')
 group = argument_parser.add_mutually_exclusive_group()
 group.add_argument('--username-only', '-e',
                    action='store_true', help='Only insert username')
 group.add_argument('--password-only', '-w',
                    action='store_true', help='Only insert password')
-group.add_argument('--totp-only', '-T',
-                   action='store_true', help='Only insert totp code')
 
 stderr = functools.partial(print, file=sys.stderr)
 
@@ -86,6 +81,64 @@ def qute_command(command):
         fifo.flush()
 
 
+def normalize_hostname(hostname):
+    return (hostname or '').lower().rstrip('.')
+
+
+def cache_path():
+    directory = os.environ.get('XDG_RUNTIME_DIR') or tempfile.gettempdir()
+    return os.path.join(directory, CACHE_FILENAME)
+
+
+def read_cache(hostname):
+    """Return the cached entry id for hostname, or None."""
+    try:
+        with open(cache_path(), 'r') as cache_file:
+            cache = json.load(cache_file)
+        if normalize_hostname(cache.get('hostname')) != hostname:
+            return None
+        if time.time() - float(cache.get('timestamp', 0)) > CACHE_TTL_SECONDS:
+            return None
+        return cache.get('id') or None
+    except (OSError, ValueError, TypeError, AttributeError):
+        return None
+
+
+def write_cache(hostname, selection):
+    """Store only non-secret metadata: hostname, entry id and entry name."""
+    path = cache_path()
+    directory = os.path.dirname(path) or '.'
+    payload = {
+        'hostname': hostname,
+        'id': selection['id'],
+        'name': selection['name'],
+        'timestamp': time.time(),
+    }
+    temp_fd = None
+    temp_path = None
+    try:
+        temp_fd, temp_path = tempfile.mkstemp(dir=directory, prefix='.qute-bitwarden-')
+        os.fchmod(temp_fd, 0o600)
+        with os.fdopen(temp_fd, 'w') as temp_file:
+            temp_fd = None
+            json.dump(payload, temp_file)
+        os.replace(temp_path, path)
+        temp_path = None
+    except OSError:
+        pass
+    finally:
+        if temp_fd is not None:
+            try:
+                os.close(temp_fd)
+            except OSError:
+                pass
+        if temp_path is not None:
+            try:
+                os.unlink(temp_path)
+            except OSError:
+                pass
+
+
 def list_candidates(url, encoding):
     """Return matching metadata without fetching any decrypted passwords."""
     process = subprocess.run(['rbw', 'list', '--raw'], capture_output=True)
@@ -93,13 +146,13 @@ def list_candidates(url, encoding):
         stderr(process.stderr.decode(encoding).strip())
         return []
 
-    hostname = (urlparse(url).hostname or '').lower().rstrip('.')
+    hostname = normalize_hostname(urlparse(url).hostname)
     entries = json.loads(process.stdout.decode(encoding))
     candidates = []
     for entry in entries:
         for uri in entry.get('uris') or []:
             parsed = urlparse(uri if '://' in uri else '//' + uri)
-            saved_hostname = (parsed.hostname or '').lower().rstrip('.')
+            saved_hostname = normalize_hostname(parsed.hostname)
             if saved_hostname and (
                 hostname == saved_hostname or hostname.endswith('.' + saved_hostname)
             ):
@@ -126,26 +179,6 @@ def list_candidates(url, encoding):
     ]
 
 
-def get_totp_code(selection_id, domain_name, encoding, auto_lock, password_prompt_invocation):
-    process = subprocess.run(
-        ['rbw', 'code', selection_id],
-        capture_output=True,
-    )
-
-    err = process.stderr.decode(encoding).strip()
-    if err:
-        # domain_name instead of selection_id to make it more user-friendly
-        msg = 'rbw returned for {:s} - {:s}'.format(domain_name, err)
-        stderr(msg)
-
-    if process.returncode:
-        return ''
-
-    out = process.stdout.decode(encoding).strip()
-
-    return out
-
-
 def dmenu(items, invocation, encoding):
     command = shlex.split(invocation)
     process = subprocess.run(command, input='\n'.join(
@@ -160,28 +193,73 @@ def fake_key_raw(text):
         qute_command('fake-key {}'.format(sequence))
 
 
+def mangled_by_command_parser(text):
+    """Return True if qutebrowser's command parser would alter this text.
+
+    :insert-text is registered with maxsplit=0, so the text is not quoted or
+    escaped -- but it is still run through the command parser first, which
+    strips surrounding whitespace, splits the line on ';;', and expands
+    variables such as {url}, {title}, {clipboard} and {primary}. A newline
+    would additionally terminate the FIFO command early.
+
+    Leading '-' matters too: the parser treats whitespace-separated leading
+    tokens that start with '-' as flags, so '-pw with spaces' arrives as
+    'spaces'.
+    """
+    return (
+        text != text.strip()
+        or text.startswith('-')
+        or ';;' in text
+        or '{' in text
+        or '\n' in text
+        or '\r' in text
+    )
+
+
+def insert_text(text):
+    if not text:
+        # :insert-text rejects an empty argument, while fake_key_raw is a
+        # no-op for one; keep the empty case harmless either way.
+        return
+    if mangled_by_command_parser(text):
+        fake_key_raw(text)
+        return
+    qute_command('insert-text {}'.format(text))
+
+
 def main(arguments):
     if not arguments.url:
         argument_parser.print_help()
         return ExitCodes.FAILURE
+
+    insert = fake_key_raw if arguments.fake_key else insert_text
 
     candidates = list_candidates(arguments.url, arguments.io_encoding)
     if not candidates:
         stderr('No pass candidates for URL {!r} found!'.format(arguments.url))
         return ExitCodes.NO_PASS_CANDIDATES
 
-    if len(candidates) == 1:
-        selection = candidates.pop()
-    else:
-        choices = ['{:s} | {:s}'.format(c['name'], c['login']['username']) for c in candidates]
-        choice = dmenu(choices, arguments.dmenu_invocation, arguments.io_encoding)
-        choice_tokens = choice.split('|')
-        choice_name = choice_tokens[0].strip()
-        choice_username = choice_tokens[1].strip()
-        selection = next((c for (i, c) in enumerate(candidates)
-                          if c['name'] == choice_name
-                          and c['login']['username'] == choice_username),
-                         None)
+    hostname = normalize_hostname(urlparse(arguments.url).hostname)
+
+    selection = None
+    cached_id = read_cache(hostname)
+    if cached_id:
+        selection = next(
+            (c for c in candidates if c['id'] == cached_id), None)
+
+    if selection is None:
+        if len(candidates) == 1:
+            selection = candidates.pop()
+        else:
+            choices = ['{:s} | {:s}'.format(c['name'], c['login']['username']) for c in candidates]
+            choice = dmenu(choices, arguments.dmenu_invocation, arguments.io_encoding)
+            choice_tokens = choice.split('|')
+            choice_name = choice_tokens[0].strip()
+            choice_username = choice_tokens[1].strip()
+            selection = next((c for (i, c) in enumerate(candidates)
+                              if c['name'] == choice_name
+                              and c['login']['username'] == choice_username),
+                             None)
 
     # Nothing was selected, simply return
     if not selection:
@@ -197,48 +275,25 @@ def main(arguments):
     login = json.loads(process.stdout.decode(arguments.io_encoding))['data']
     username = login.get('username') or ''
     password = login.get('password') or ''
-    totp = login.get('totp')
+
+    # Refresh the cache timestamp so a follow-up invocation skips the picker.
+    write_cache(hostname, selection)
 
     if arguments.username_only:
-        fake_key_raw(username)
+        insert(username)
     elif arguments.password_only:
-        fake_key_raw(password)
-    elif arguments.totp_only:
-        # No point in moving it to the clipboard in this case
-        fake_key_raw(
-            get_totp_code(
-                selection['id'],
-                selection['name'],
-                arguments.io_encoding,
-                arguments.auto_lock,
-                arguments.password_prompt_invocation,
-            )
-        )
+        insert(password)
     else:
-        # Enter username and password using fake-key and <Tab> (which seems to work almost universally), then switch
-        # back into insert-mode, so the form can be directly submitted by
-        # hitting enter afterwards
-        fake_key_raw(username)
+        # Enter username and password, separated by <Tab> (which seems to work
+        # almost universally), then switch back into insert-mode, so the form
+        # can be directly submitted by hitting enter afterwards. :insert-text
+        # cannot move focus, so the <Tab> stays a fake-key.
+        insert(username)
         qute_command('fake-key <Tab>')
-        fake_key_raw(password)
+        insert(password)
 
     if arguments.insert_mode:
         qute_command('mode-enter insert')
-
-    # If it finds a TOTP code, it copies it to the clipboard,
-    # which is the same behavior as the Firefox add-on.
-    if not arguments.totp_only and totp and arguments.totp:
-        # The import is done here, to make pyperclip an optional dependency
-        import pyperclip
-        pyperclip.copy(
-            get_totp_code(
-                selection['id'],
-                selection['name'],
-                arguments.io_encoding,
-                arguments.auto_lock,
-                arguments.password_prompt_invocation,
-            )
-        )
 
     return ExitCodes.SUCCESS
 
