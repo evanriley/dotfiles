@@ -334,8 +334,14 @@ c.content.canvas_reading = True
 # Use home row keys for hints (Vim style)
 c.hints.chars = 'asdfghjkl'
 
-# 'yy' -> Copy URL
-config.bind('yy', 'yank')
-# 'yt' -> Copy Title and URL (Great for sharing/markdown)
+# 'yy' -> Copy URL, with tracking parameters stripped (ClearURLs ruleset).
+# The userscript writes to the clipboard itself with wl-copy rather than going
+# through ':yank inline', which would run the URL through the command parser.
+# If cleaning fails for any reason it copies the URL unchanged and says so.
+config.bind('yy', 'spawn --userscript qute-cleanurl')
+# 'yr' -> Copy the raw URL, exactly as the address bar has it. 'yY' is taken by
+# the builtin (yank --sel), so the raw copy lives on a free key instead.
+config.bind('yr', 'yank')
+# 'yt' -> Copy Title and cleaned URL (Great for sharing/markdown)
 # Copies: [Page Title](https://url...)
-config.bind('yt', 'yank inline [{title}]({url})')
+config.bind('yt', 'spawn --userscript qute-cleanurl --markdown')
