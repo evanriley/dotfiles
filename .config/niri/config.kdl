@@ -112,20 +112,15 @@ spawn-at-startup "dinitctl" "start" "desktop-services"
 spawn-at-startup "foot" "--app-id=scratch_rmpc" "rmpc"
 spawn-at-startup "foot" "--app-id=scratch_btop" "btop"
 
-// spawn-at-startup "firefox"
-
 spawn-at-startup "flatpak" "run" "com.valvesoftware.Steam" "-silent"
-
 
 spawn-at-startup "flatpak" "run" "com.discordapp.Discord"
 
 spawn-at-startup "flatpak" "run" "dev.deedles.Trayscale"
 
-// spawn-at-startup "flatpak" "run" "io.gitlab.librewolf-community"
+spawn-at-startup "udiskie" "--automount" "--notify"
 
-// Pika Backup requests autostart through the background portal, which keeps
-// ~/.config/autostart in step with the setting inside the app. Spawning the
-// monitor here as well started it twice.
+spawn-at-startup "flatpak" "run" "io.gitlab.librewolf-community"
 
 hotkey-overlay {
     skip-at-startup
