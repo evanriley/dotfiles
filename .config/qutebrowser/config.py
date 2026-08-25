@@ -283,12 +283,11 @@ c.colors.webpage.darkmode.policy.images = 'smart' # Don't invert photos
 # invisible while audio and controls keep working.
 #
 # Check a site with <Space>td (toggles for the current host and reloads); if
-# the page looks better untouched, add it here. old.reddit.com is deliberately
-# absent -- it has no dark theme of its own and does want forcing.
+# the page looks better untouched, add it here. Reddit is deliberately absent:
+# the old layout has no dark theme of its own and does want forcing, and the
+# account preference serves it from www.reddit.com rather than old.reddit.com.
 darkmode_native_sites = [
     '*://*.youtube.com/*',
-    '*://www.reddit.com/*',
-    '*://sh.reddit.com/*',
     '*://*.discord.com/*',
     '*://*.fastmail.com/*',
     '*://*.codeberg.org/*',
