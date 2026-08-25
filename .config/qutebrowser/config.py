@@ -22,6 +22,8 @@ c.url.searchengines = {
 }
 c.url.default_page = 'https://kagi.com'
 c.url.start_pages = ['https://kagi.com']
+# ':open gh' visits github.com instead of searching for the string "gh".
+c.url.open_base_url = True
 
 # --- 2. MODUS THEME ---
 c.window.transparent = False
@@ -178,10 +180,22 @@ c.fonts.web.size.default = 16
 
 c.downloads.position = 'bottom'
 c.downloads.remove_finished = 5000
+c.downloads.location.prompt = False
+c.downloads.location.directory = '~/Downloads'
+
+c.completion.open_categories = ['quickmarks', 'bookmarks', 'history',
+                                'searchengines', 'filesystem']
+c.tabs.last_close = 'startpage'
+c.tabs.mode_on_change = 'restore'
+c.confirm_quit = ['downloads']
+c.spellcheck.languages = ['en-US']
 
 # --- 4. PERFORMANCE & PRIVACY ---
 c.scrolling.smooth = False # Instant scrolling (snappy)
 c.content.autoplay = False
+# The system pdf.js in /usr/share/pdf.js is installed.
+c.content.pdfjs = True
+c.session.lazy_restore = True
 c.content.blocking.method = 'both'
 c.content.blocking.adblock.lists = [
     "https://easylist.to/easylist/easylist.txt",
@@ -191,7 +205,12 @@ c.content.blocking.adblock.lists = [
     "https://easylist.to/easylist/fanboy-social.txt"
 ]
 # Cloudflare Turnstile must load its cross-origin challenge script and iframe.
-c.content.blocking.whitelist = ['https://challenges.cloudflare.com/*']
+# EasyPrivacy's /akam/1{0,1,3}/* rules block Akamai Bot Manager's sensor
+# endpoint, which makes sites like bestbuy.com return "Access Denied".
+c.content.blocking.whitelist = [
+    'https://challenges.cloudflare.com/*',
+    '*://*/akam/*',
+]
 
 c.content.tls.certificate_errors = 'block'
 
@@ -199,7 +218,6 @@ c.content.tls.certificate_errors = 'block'
 # config.set(..., URL_PATTERN) when a specific site genuinely needs one.
 c.content.desktop_capture = False
 c.content.geolocation = False
-c.content.javascript.clipboard = 'none'
 c.content.media.audio_capture = False
 c.content.media.audio_video_capture = False
 c.content.media.video_capture = False
@@ -207,6 +225,11 @@ c.content.mouse_lock = False
 c.content.notifications.enabled = False
 c.content.persistent_storage = False
 c.content.register_protocol_handler = False
+
+# 'none' also makes qutebrowser auto-deny Qt 6.8's ClipboardReadWrite
+# permission, which breaks every site's "Copy" button. 'access' allows
+# JavaScript clipboard writes and reads but still blocks execCommand('paste').
+c.content.javascript.clipboard = 'access'
 
 # QtWebEngine reports GitHub's Trusted Types policy when qutebrowser injects
 # caret-mode JavaScript. The operation still works, so hide only that expected
@@ -219,7 +242,6 @@ c.content.javascript.log_message.excludes['userscript:_qute_js'] = [
 config.bind('<Space>pl', 'spawn --userscript qute-bitwarden-fuzzel')
 config.bind('<Space>pu', 'spawn --userscript qute-bitwarden-fuzzel --username-only')
 config.bind('<Space>pp', 'spawn --userscript qute-bitwarden-fuzzel --password-only')
-config.bind('<Space>po', 'spawn --userscript qute-bitwarden-fuzzel --totp-only')
 
 # MPV
 config.bind('M', 'hint links spawn --detach /home/evan/.local/share/qutebrowser/userscripts/qute-mpv {hint-url}')
