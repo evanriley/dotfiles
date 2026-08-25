@@ -1,15 +1,19 @@
-import os
 import subprocess
-
-# QtWebEngine's GBM texture-import path produces black video frames on this
-# RDNA4/Wayland setup. This is the targeted workaround qutebrowser applies to
-# affected AMD systems; keep Chromium's GPU compositing enabled.
-os.environ['QTWEBENGINE_FORCE_USE_GBM'] = '0'
 
 config.load_autoconfig(False)
 c.auto_save.session = True
 
 c.qt.force_software_rendering = 'none'
+
+# Black video frames on this RDNA4/Wayland setup come from the zero-copy leg
+# of the GBM texture-import path, not from hardware decode itself. Turning off
+# QTWEBENGINE_FORCE_USE_GBM disables both, which costs hardware video decode
+# (Chromium then drops AcceleratedVideoDecoder). Disabling only the zero-copy
+# feature keeps the decoder and renders correctly.
+#
+# If black frames ever come back, set QTWEBENGINE_FORCE_USE_GBM=0 in the
+# environment instead -- that is the blunt version of this workaround.
+c.qt.args = ['disable-features=AcceleratedVideoDecodeLinuxZeroCopyGL']
 
 # --- 1. SEARCH ENGINES & START PAGE ---
 c.url.searchengines = {
