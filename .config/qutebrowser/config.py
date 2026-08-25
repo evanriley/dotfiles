@@ -93,6 +93,7 @@ c.colors.tabs.indicator.stop = p['ok']
 c.colors.tabs.indicator.error = p['error']
 
 # STATUS BAR
+c.statusbar.show = 'in-mode'
 c.statusbar.padding = {'top': 5, 'bottom': 5, 'left': 5, 'right': 5}
 c.statusbar.widgets = ['keypress', 'url', 'scroll', 'history', 'tabs', 'progress']
 
@@ -180,6 +181,7 @@ c.fonts.web.size.default = 16
 
 c.downloads.position = 'bottom'
 c.downloads.remove_finished = 5000
+c.downloads.location.suggestion = 'both'
 c.downloads.location.prompt = False
 c.downloads.location.directory = '~/Downloads'
 
@@ -192,6 +194,9 @@ c.spellcheck.languages = ['en-US']
 
 # --- 4. PERFORMANCE & PRIVACY ---
 c.scrolling.smooth = False # Instant scrolling (snappy)
+# One renderer per site rather than per site-instance: less memory across a
+# large restored session, at the cost of less isolation between tabs.
+c.qt.chromium.process_model = 'process-per-site'
 c.content.autoplay = False
 # The system pdf.js in /usr/share/pdf.js is installed.
 c.content.pdfjs = True
@@ -242,6 +247,10 @@ c.content.javascript.log_message.excludes['userscript:_qute_js'] = [
 config.bind('<Space>pl', 'spawn --userscript qute-bitwarden-fuzzel')
 config.bind('<Space>pu', 'spawn --userscript qute-bitwarden-fuzzel --username-only')
 config.bind('<Space>pp', 'spawn --userscript qute-bitwarden-fuzzel --password-only')
+# Same, but typed as individual key events, for a form that only reacts to
+# keydown and ignores the input events insert-text fires.
+config.bind('<Space>pk',
+            'spawn --userscript qute-bitwarden-fuzzel --password-only --fake-key')
 
 # MPV
 config.bind('M', 'hint links spawn --detach /home/evan/.local/share/qutebrowser/userscripts/qute-mpv {hint-url}')
