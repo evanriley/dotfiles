@@ -262,10 +262,9 @@ c.content.javascript.log_message.excludes['userscript:_qute_js'] = [
 config.bind('<Space>pl', 'spawn --userscript qute-bitwarden-fuzzel')
 config.bind('<Space>pu', 'spawn --userscript qute-bitwarden-fuzzel --username-only')
 config.bind('<Space>pp', 'spawn --userscript qute-bitwarden-fuzzel --password-only')
-# Same, but typed as individual key events, for a form that only reacts to
-# keydown and ignores the input events insert-text fires.
-config.bind('<Space>pk',
-            'spawn --userscript qute-bitwarden-fuzzel --password-only --fake-key')
+# Generate a fresh addy.io alias, type it into the focused field and put it on
+# the clipboard so it can be pasted into the Bitwarden entry being saved.
+config.bind('<Space>pa', 'spawn --userscript qute-addy')
 
 # MPV
 config.bind('M', 'hint links spawn --detach /home/evan/.local/share/qutebrowser/userscripts/qute-mpv {hint-url}')

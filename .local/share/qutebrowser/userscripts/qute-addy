@@ -284,8 +284,17 @@ def extract_email(body):
 
 def copy_to_clipboard(text):
     try:
-        process = subprocess.run([WL_COPY, '--'], input=text.encode('UTF-8'))
-    except OSError as exception:
+        # wl-copy daemonises to serve the selection and the daemon inherits our
+        # stdout/stderr. qutebrowser reads a userscript's output through pipes,
+        # so those would only reach EOF once the clipboard is next replaced --
+        # i.e. this would hang, and the alias would never get typed. Hand the
+        # daemon /dev/null and go by the exit status of the process that forked
+        # it.
+        process = subprocess.run(
+            [WL_COPY, '--'], input=text.encode('UTF-8'),
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            timeout=10)
+    except (OSError, subprocess.SubprocessError) as exception:
         stderr('Could not run wl-copy: {}'.format(exception))
         return False
     return process.returncode == 0
