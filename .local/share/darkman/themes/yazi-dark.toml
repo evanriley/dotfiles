@@ -1,15 +1,11 @@
 # Modus Themes for Yazi
 # Auto generated with https://github.com/miikanissi/modus-themes.nvim/blob/master/lua/modus-themes/extras/yazi.lua
 
-[manager]
+[mgr]
 # NOTE: can combined with tmTheme (sublime colorshceme file) for preview code highlight
 # syntect_theme = "path/to/tmTheme"
 
 cwd = { fg = "#00d3d0", italic = true }
-
-# Hovered
-hovered         = { bg = "#2f3849" }
-preview_hovered = { bg = "#2f3849" }
 
 # Find
 find_keyword  = { fg = "#ffffff", bg = "#7030af", bold = true }
@@ -21,11 +17,6 @@ marker_cut      = { fg = "#ff5f59", bg = "#ff5f59" }
 marker_marked   = { fg = "#feacd0", bg = "#feacd0" }
 marker_selected = { fg = "#2fafff", bg = "#2fafff" }
 
-# Tab
-tab_active   = { fg = "#000000", bg = "#2fafff" }
-tab_inactive = { fg = "#989898", bg = "#000000" }
-tab_width    = 1
-
 # Count
 count_copied   = { fg = "#000000", bg = "#70b900" }
 count_cut      = { fg = "#000000", bg = "#ff6b55" }
@@ -35,15 +26,25 @@ count_selected = { fg = "#000000", bg = "#79a8ff" }
 border_symbol = "│"
 border_style  = { fg = "#C4C4C4" }
 
-[status]
-separator_open  = ""
-separator_close = ""
-separator_style = { fg = "#0f0f0f", bg = "#0f0f0f" }
+[tabs]
+active   = { fg = "#000000", bg = "#2fafff" }
+inactive = { fg = "#989898", bg = "#000000" }
+
+# Indicator of the hovered file
+[indicator]
+parent  = { bg = "#2f3849" }
+current = { bg = "#2f3849" }
+preview = { bg = "#2f3849" }
 
 # Mode
-mode_normal = { fg = "#000000", bg = "#2fafff", bold = true }
-mode_select = { fg = "#000000", bg = "#f78fe7", bold = true }
-mode_unset  = { fg = "#000000", bg = "#db7b5f", bold = true }
+[mode]
+normal_main = { fg = "#000000", bg = "#2fafff", bold = true }
+select_main = { fg = "#000000", bg = "#f78fe7", bold = true }
+unset_main  = { fg = "#000000", bg = "#db7b5f", bold = true }
+
+[status]
+sep_left  = { open = "", close = "" }
+sep_right = { open = "", close = "" }
 
 # Progress
 progress_label  = { fg = "#989898", bold = true }
@@ -51,13 +52,13 @@ progress_normal = { fg = "#000000" }
 progress_error  = { fg = "#ff5f59" }
 
 # Permissions
-permissions_t = { fg = "#2fafff" }
-permissions_r = { fg = "#d0bc00" }
-permissions_w = { fg = "#ff5f59" }
-permissions_x = { fg = "#44bc44" }
-permissions_s = { fg = "#989898" }
+perm_type  = { fg = "#2fafff" }
+perm_read  = { fg = "#d0bc00" }
+perm_write = { fg = "#ff5f59" }
+perm_exec  = { fg = "#44bc44" }
+perm_sep   = { fg = "#989898" }
 
-[select]
+[pick]
 border   = { fg = "#C4C4C4" }
 active   = { fg = "#ffffff",  bg = "#646464" }
 inactive = { fg = "#ffffff" }
@@ -70,7 +71,7 @@ value    = { fg = "#f78fe7" }
 selected = { bg = "#646464" }
 
 # Completion
-[completion]
+[cmp]
 border   = { fg = "#00bcff" }
 active   = { fg = "#ffffff", bg = "#646464" }
 inactive = { fg = "#ffffff" }
@@ -124,11 +125,11 @@ rules = [
 	# { mime = "inode/x-empty", fg = "#ff5f59" },
 
 	# Special files
-	{ name = "*", is = "orphan", bg = "#ff5f59" },
-	{ name = "*", is = "exec"  , fg = "#44bc44" },
+	{ url = "*", is = "orphan", bg = "#ff5f59" },
+	{ url = "*", is = "exec"  , fg = "#44bc44" },
 
-	{ name = "*.rs", fg = "#db7b5f" },
+	{ url = "*.rs", fg = "#db7b5f" },
 
 	# Fallback
-	{ name = "*/", fg = "#2fafff" }
+	{ url = "*/", fg = "#2fafff" }
 ]
