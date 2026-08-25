@@ -1,0 +1,353 @@
+#!/usr/bin/python3
+
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+"""
+Generate a new addy.io email alias and type it into the focused field.
+"""
+
+USAGE = """The API token is read from the Bitwarden vault via rbw: an entry
+named "addy.io", with the token stored as that entry's password. The vault must
+be unlocked beforehand; rbw-agent handles unlocking itself.
+
+The generated alias is inserted into the currently focused input using
+qutebrowser's fake-key command, and is also copied to the Wayland clipboard
+with wl-copy so it can be pasted into Bitwarden when saving the login.
+
+To use in qutebrowser, run: `spawn --userscript qute-addy`
+"""
+
+EPILOG = """Dependencies: rbw (unlocked), wl-copy.
+
+WARNING: The generated alias is viewable as plaintext in qutebrowser's debug log
+(qute://log) and might be shared if you decide to submit a crash report!"""
+
+import argparse
+import enum
+import functools
+import json
+import os
+import re
+import subprocess
+import sys
+import urllib.error
+import urllib.request
+from urllib.parse import urlparse
+
+API_URL = 'https://app.addy.io/api/v1/aliases'
+ACCOUNT_URL = 'https://app.addy.io/api/v1/account-details'
+RBW_ENTRY = 'addy.io'
+WL_COPY = '/usr/bin/wl-copy'
+TIMEOUT_SECONDS = 20
+
+EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
+
+argument_parser = argparse.ArgumentParser(
+    description=__doc__,
+    usage=USAGE,
+    epilog=EPILOG,
+)
+argument_parser.add_argument('url', nargs='?', default=os.getenv('QUTE_URL'))
+argument_parser.add_argument('--domain', '-D', default=None,
+                             help="addy.io domain to create the alias under "
+                                  "(default: the account's default_alias_domain)")
+argument_parser.add_argument('--format', '-f', dest='alias_format', default=None,
+                             help="addy.io alias format "
+                                  "(default: the account's default_alias_format)")
+argument_parser.add_argument('--local-part', '-l', default=None,
+                             help='Local part, only meaningful with --format custom')
+argument_parser.add_argument('--clipboard-only', '-c', action='store_true',
+                             help='Only copy the alias to the clipboard, do not insert it')
+argument_parser.add_argument('--no-insert-mode', '-n', dest='insert_mode', action='store_false',
+                             help="Don't automatically enter insert mode")
+argument_parser.add_argument('--io-encoding', '-i', default='UTF-8',
+                             help='Encoding used to communicate with subprocesses')
+argument_parser.add_argument('--insert-text', '-I', dest='use_insert_text',
+                             action='store_true',
+                             help='Insert with one insert-text command instead of per-character key events')
+# Accepted for compatibility; per-character key events are the default now.
+argument_parser.add_argument('--fake-key', '-k', action='store_true',
+                             help=argparse.SUPPRESS)
+
+stderr = functools.partial(print, file=sys.stderr)
+
+
+class ExitCodes(enum.IntEnum):
+    SUCCESS = 0
+    FAILURE = 1
+    # 1 is automatically used if Python throws an exception
+    NO_TOKEN = 2
+    RBW_FAILURE = 3
+    UNAUTHENTICATED = 4
+    API_ERROR = 5
+    UNPARSEABLE_RESPONSE = 6
+    NETWORK_ERROR = 7
+    CLIPBOARD_FAILURE = 8
+
+
+def qute_command(command):
+    with open(os.environ['QUTE_FIFO'], 'w') as fifo:
+        fifo.write(command + '\n')
+        fifo.flush()
+
+
+def fake_key_raw(text):
+    for character in text:
+        # Escape all characters by default, space requires special handling
+        sequence = '" "' if character == ' ' else r'\{}'.format(character)
+        qute_command('fake-key {}'.format(sequence))
+
+
+def mangled_by_command_parser(text):
+    """Return True if qutebrowser's command parser would alter this text.
+
+    :insert-text is registered with maxsplit=0, so the text is not quoted or
+    escaped -- but it is still run through the command parser first, which
+    strips surrounding whitespace, splits the line on ';;', and expands
+    variables such as {url}, {title}, {clipboard} and {primary}. A newline
+    would additionally terminate the FIFO command early.
+
+    Leading '-' matters too: the parser treats whitespace-separated leading
+    tokens that start with '-' as flags, so '-pw with spaces' arrives as
+    'spaces'.
+    """
+    return (
+        text != text.strip()
+        or text.startswith('-')
+        or ';;' in text
+        or '{' in text
+        or '\n' in text
+        or '\r' in text
+    )
+
+
+def insert_text(text):
+    """Insert with a single :insert-text command.
+
+    Not the default: it resolves its target with an async find_focused() that
+    reads document.activeElement without descending into shadow roots, so on a
+    site whose form is a web component it types nothing.
+    """
+    if not text:
+        # :insert-text rejects an empty argument, while fake_key_raw is a
+        # no-op for one; keep the empty case harmless either way.
+        return
+    if mangled_by_command_parser(text):
+        fake_key_raw(text)
+        return
+    qute_command('insert-text {}'.format(text))
+
+
+def error(text):
+    """Report a fixed, already-sanitised message through the FIFO."""
+    stderr(text)
+    if mangled_by_command_parser(text):
+        # Never feed anything the parser would mangle into a command line.
+        text = 'qute-addy failed'
+    try:
+        qute_command('message-error {}'.format(text))
+    except (OSError, KeyError):
+        pass
+
+
+def normalize_hostname(hostname):
+    return (hostname or '').lower().rstrip('.')
+
+
+def description_for(url):
+    hostname = normalize_hostname(urlparse(url or '').hostname)
+    if not hostname:
+        return 'Created by qute-addy'
+    return 'qutebrowser: {}'.format(hostname)
+
+
+def get_token(encoding):
+    """Return the addy.io API token from the rbw vault, or None."""
+    try:
+        process = subprocess.run(
+            ['rbw', 'get', '--raw', RBW_ENTRY],
+            capture_output=True,
+        )
+    except OSError as exception:
+        stderr('Could not run rbw: {}'.format(exception))
+        return None
+    if process.returncode:
+        stderr(process.stderr.decode(encoding, 'replace').strip())
+        return None
+    try:
+        entry = json.loads(process.stdout.decode(encoding, 'replace'))
+    except ValueError:
+        stderr('rbw returned output that is not JSON')
+        return None
+    data = entry.get('data') if isinstance(entry, dict) else None
+    token = (data or {}).get('password') if isinstance(data, dict) else None
+    if not token or not token.strip():
+        return None
+    return token.strip()
+
+
+def api_get(token, url):
+    """GET a JSON endpoint. Returns the decoded body, or None on any failure."""
+    request = urllib.request.Request(
+        url,
+        method='GET',
+        headers={
+            'Authorization': 'Bearer {}'.format(token),
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:
+            return json.loads(response.read().decode('UTF-8', 'replace'))
+    except (urllib.error.URLError, OSError, ValueError):
+        return None
+
+
+def account_defaults(token):
+    """Return (domain, alias_format) from the account, or (None, None).
+
+    Hardcoding a domain is wrong: it differs per account, and an account using
+    a custom domain would otherwise get aliases on the wrong one.
+    """
+    body = api_get(token, ACCOUNT_URL) or {}
+    data = body.get('data')
+    if not isinstance(data, dict):
+        return None, None
+    domain = data.get('default_alias_domain')
+    alias_format = data.get('default_alias_format')
+    return (domain if isinstance(domain, str) and domain else None,
+            alias_format if isinstance(alias_format, str) and alias_format else None)
+
+
+def create_alias(token, domain, alias_format, local_part, description):
+    """POST a new alias. Returns (status, body_text) or raises URLError/OSError."""
+    payload = {
+        'domain': domain,
+        'description': description,
+        'format': alias_format,
+        'local_part': local_part or '',
+        'recipient_ids': [],
+        'label_ids': [],
+    }
+    request = urllib.request.Request(
+        API_URL,
+        data=json.dumps(payload).encode('UTF-8'),
+        method='POST',
+        headers={
+            'Authorization': 'Bearer {}'.format(token),
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json',
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:
+            return response.status, response.read().decode('UTF-8', 'replace')
+    except urllib.error.HTTPError as exception:
+        body = ''
+        try:
+            body = exception.read().decode('UTF-8', 'replace')
+        except OSError:
+            pass
+        return exception.code, body
+
+
+def extract_email(body):
+    """Pull the alias address out of an API response body, or return None.
+
+    Verified against the live API: a successful create returns HTTP 201 with
+    {"data": {..., "email": "<alias>@<domain>", ...}}. The fallback keys are
+    kept only as cheap insurance against addy.io reshaping the envelope.
+    Anything that does not look like an email address is rejected rather than
+    guessed, so a shape change fails loudly instead of typing garbage.
+    """
+    try:
+        parsed = json.loads(body)
+    except ValueError:
+        return None
+    if not isinstance(parsed, dict):
+        return None
+
+    data = parsed.get('data')
+    candidates = []
+    if isinstance(data, dict):
+        candidates.extend([data.get('email'), data.get('alias'), data.get('address')])
+    candidates.extend([parsed.get('email'), parsed.get('alias'), parsed.get('address')])
+
+    for candidate in candidates:
+        if isinstance(candidate, str) and EMAIL_RE.match(candidate.strip()):
+            return candidate.strip()
+    return None
+
+
+def copy_to_clipboard(text):
+    try:
+        process = subprocess.run([WL_COPY, '--'], input=text.encode('UTF-8'))
+    except OSError as exception:
+        stderr('Could not run wl-copy: {}'.format(exception))
+        return False
+    return process.returncode == 0
+
+
+def main(arguments):
+    token = get_token(arguments.io_encoding)
+    if token is None:
+        error('qute-addy: no addy.io token from rbw (locked vault or missing entry)')
+        return ExitCodes.NO_TOKEN
+
+    domain, alias_format = arguments.domain, arguments.alias_format
+    if domain is None or alias_format is None:
+        account_domain, account_format = account_defaults(token)
+        domain = domain or account_domain
+        alias_format = alias_format or account_format
+    if not domain or not alias_format:
+        error('qute-addy: could not determine the alias domain/format')
+        return ExitCodes.API_ERROR
+
+    try:
+        status, body = create_alias(
+            token,
+            domain,
+            alias_format,
+            arguments.local_part,
+            description_for(arguments.url),
+        )
+    except (urllib.error.URLError, OSError) as exception:
+        stderr('addy.io request failed: {}'.format(exception))
+        error('qute-addy: could not reach app.addy.io')
+        return ExitCodes.NETWORK_ERROR
+
+    if status == 401:
+        error('qute-addy: addy.io rejected the token (401 Unauthenticated)')
+        return ExitCodes.UNAUTHENTICATED
+    if not 200 <= status < 300:
+        stderr('addy.io returned HTTP {}: {}'.format(status, body[:500]))
+        error('qute-addy: addy.io returned HTTP {:d}'.format(int(status)))
+        return ExitCodes.API_ERROR
+
+    alias = extract_email(body)
+    if not alias:
+        stderr('Could not find an alias address in the response: {}'.format(body[:500]))
+        error('qute-addy: could not find an alias address in the API response')
+        return ExitCodes.UNPARSEABLE_RESPONSE
+
+    copied = copy_to_clipboard(alias)
+
+    if not arguments.clipboard_only:
+        insert = insert_text if arguments.use_insert_text else fake_key_raw
+        insert(alias)
+        if arguments.insert_mode:
+            qute_command('mode-enter insert')
+
+    if not copied:
+        error('qute-addy: alias created but wl-copy failed')
+        return ExitCodes.CLIPBOARD_FAILURE
+
+    return ExitCodes.SUCCESS
+
+
+if __name__ == '__main__':
+    arguments = argument_parser.parse_args()
+    sys.exit(main(arguments))

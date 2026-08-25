@@ -10,9 +10,10 @@ Insert login information using Bitwarden CLI and a dmenu-compatible application
 """
 
 USAGE = """The domain of the site has to be in the name of the Bitwarden entry, for example: "github.com/cryzed" or
-"websites/github.com".  The login information is inserted using qutebrowser's insert-text command in this manner:
+"websites/github.com".  The login information is inserted by emulating key events using qutebrowser's fake-key command in this manner:
 [USERNAME]<Tab>[PASSWORD], which is compatible with almost all login forms. Use
---fake-key to fall back to emulating individual key events instead.
+--insert-text for the faster single-command path, which only suits simple forms
+(see the note on insert_text below).
 
 You must have an unlocked rbw vault prior to use of this script; rbw-agent
 handles unlocking itself.
@@ -55,8 +56,13 @@ argument_parser.add_argument('--io-encoding', '-i', default='UTF-8',
                              help='Encoding used to communicate with subprocesses')
 argument_parser.add_argument('--merge-candidates', '-m', action='store_true',
                              help='Merge pass candidates for fully-qualified and registered domain name')
+argument_parser.add_argument('--insert-text', '-I', dest='use_insert_text',
+                             action='store_true',
+                             help='Insert with one insert-text command instead of per-character key events')
+# Accepted for compatibility with existing bindings; per-character key events
+# are the default now, so this is a no-op.
 argument_parser.add_argument('--fake-key', '-k', action='store_true',
-                             help='Insert text by emulating individual key events instead of using insert-text')
+                             help=argparse.SUPPRESS)
 group = argument_parser.add_mutually_exclusive_group()
 group.add_argument('--username-only', '-e',
                    action='store_true', help='Only insert username')
@@ -217,6 +223,16 @@ def mangled_by_command_parser(text):
 
 
 def insert_text(text):
+    """Insert with a single :insert-text command.
+
+    Not the default, and not safe for the username<Tab>password sequence.
+    :insert-text resolves its target through find_focused(), which is an
+    async JS round-trip (run_js_async), while fake-key is synchronous. The
+    <Tab> therefore lands before either insertion resolves and both strings
+    end up in whichever field is focused by then. Its JS also reads
+    document.activeElement without descending into shadow roots, so on a site
+    whose login is a web component it targets the host and types nothing.
+    """
     if not text:
         # :insert-text rejects an empty argument, while fake_key_raw is a
         # no-op for one; keep the empty case harmless either way.
@@ -232,7 +248,7 @@ def main(arguments):
         argument_parser.print_help()
         return ExitCodes.FAILURE
 
-    insert = fake_key_raw if arguments.fake_key else insert_text
+    insert = insert_text if arguments.use_insert_text else fake_key_raw
 
     candidates = list_candidates(arguments.url, arguments.io_encoding)
     if not candidates:
@@ -286,8 +302,7 @@ def main(arguments):
     else:
         # Enter username and password, separated by <Tab> (which seems to work
         # almost universally), then switch back into insert-mode, so the form
-        # can be directly submitted by hitting enter afterwards. :insert-text
-        # cannot move focus, so the <Tab> stays a fake-key.
+        # can be directly submitted by hitting enter afterwards.
         insert(username)
         qute_command('fake-key <Tab>')
         insert(password)
