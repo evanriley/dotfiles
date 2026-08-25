@@ -267,15 +267,42 @@ c.editor.command = [
 # Readability (ZR)
 config.bind('ZR', 'spawn --userscript readability-js')
 
-# Keep forced dark mode available for site-specific overrides, but disabled
-# globally so sites can follow their own preferred color scheme.
-c.colors.webpage.darkmode.enabled = False
-c.colors.webpage.darkmode.algorithm = 'lightness-cielab' 
+# Forced dark mode follows darkman. Only 'enabled' can change at runtime; its
+# siblings below are startup-only, so darkman switches toggle just this one.
+# Blink already leaves alone any page that declares `color-scheme: dark`, so
+# this never touches github, gitlab, duckduckgo, x, wikipedia, mdn,
+# docs.python.org, kagi or lobste.rs -- they render their own dark theme.
+c.colors.webpage.darkmode.enabled = mode == 'dark'
+c.colors.webpage.darkmode.algorithm = 'lightness-cielab'
 c.colors.webpage.darkmode.policy.images = 'smart' # Don't invert photos
-# YouTube supplies its own dark theme. Chromium's forced dark-mode compositor can
-# make the video layer invisible while audio and controls continue to work.
-config.set('colors.webpage.darkmode.enabled', False, 'https://www.youtube.com/*')
-config.set('colors.webpage.darkmode.enabled', False, 'https://youtube.com/*')
+
+# Sites that ship a good dark theme but drive it from an account setting or a
+# JS toggle rather than a declared color-scheme. Chromium cannot detect those,
+# so forcing dark on top of them inverts an already-dark page. YouTube is the
+# worst case: its forced dark-mode compositor can make the video layer
+# invisible while audio and controls keep working.
+#
+# Check a site with <Space>td (toggles for the current host and reloads); if
+# the page looks better untouched, add it here. old.reddit.com is deliberately
+# absent -- it has no dark theme of its own and does want forcing.
+darkmode_native_sites = [
+    '*://*.youtube.com/*',
+    '*://www.reddit.com/*',
+    '*://sh.reddit.com/*',
+    '*://*.discord.com/*',
+    '*://*.fastmail.com/*',
+    '*://*.codeberg.org/*',
+    '*://*.crates.io/*',
+]
+for _pattern in darkmode_native_sites:
+    config.set('colors.webpage.darkmode.enabled', False, _pattern)
+
+# Try a site's own dark theme instead of Chromium's, for the current host.
+config.bind(
+    '<Space>td',
+    'config-cycle -t -p -u *://{url:host}/* colors.webpage.darkmode.enabled'
+    ' false true ;; reload',
+)
 
 c.content.cookies.accept = 'no-3rdparty'
 c.content.headers.referer = 'same-domain'
