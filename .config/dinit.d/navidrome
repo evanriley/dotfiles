@@ -1,0 +1,15 @@
+type = process
+command = /usr/bin/podman run --rm --replace --pull never --name navidrome
+command += --userns keep-id --user 1000:1000 --security-opt no-new-privileges
+command += --cap-drop all --read-only --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m
+command += --publish 127.0.0.1:4533:4533
+command += --volume /home/evan/.local/share/navidrome:/data:rw
+command += --volume /mnt/Media/Music:/music:ro
+command += docker.io/deluan/navidrome:0.63.2
+restart = yes
+smooth-recovery = yes
+restart-delay = 10
+restart-limit-count = 0
+stop-timeout = 20
+logfile = /home/evan/.local/state/navidrome.log
+logfile-permissions = 600
