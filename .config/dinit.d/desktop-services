@@ -5,5 +5,6 @@ waits-for = swayidle
 waits-for = swaync
 waits-for = swayosd
 waits-for = scapectl
+waits-for = kdeconnect-indicator
 waits-for = clipboard-history-text
 waits-for = clipboard-history-image

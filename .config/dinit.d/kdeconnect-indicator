@@ -1,0 +1,10 @@
+type = process
+command = /usr/bin/kdeconnect-indicator
+restart = yes
+smooth-recovery = yes
+restart-delay = 2
+restart-limit-count = 0
+logfile = /home/evan/.local/state/kdeconnect-indicator.log
+logfile-permissions = 600
+depends-on = kdeconnect
+depends-on = graphical.target
