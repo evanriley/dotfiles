@@ -263,6 +263,7 @@ window-rule {
 window-rule {
     match app-id="org.gnome.World.PikaBackup"
     open-on-workspace "system"
+    open-focused true
 }
 window-rule {
     match app-id="(org\\.gnome\\.Nautilus|nautilus)"
