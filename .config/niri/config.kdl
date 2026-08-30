@@ -9,7 +9,7 @@ environment {
     // Lets qutebrowser userscripts spawned from here resolve globally
     // installed node modules, which readability-js needs.
     NODE_PATH "/home/evan/.npm-global/lib/node_modules"
-    PATH "/home/evan/bin:/home/evan/.local/bin:/home/evan/go/bin:/home/evan/.cargo/bin:/home/evan/.zvm/bin:/home/evan/.zvm/self:/home/evan/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
+    PATH "/home/evan/.local/bin:/home/evan/go/bin:/home/evan/.cargo/bin:/home/evan/.zvm/bin:/home/evan/.zvm/self:/home/evan/.npm-global/bin:/usr/local/bin:/usr/bin:/bin"
 }
 
 input {
@@ -255,10 +255,6 @@ window-rule {
     opacity 1.0
 }
 window-rule {
-    match app-id="org.mozilla.Thunderbird"
-    open-on-workspace "social"
-}
-window-rule {
     match app-id="org.gnome.World.PikaBackup"
     open-on-workspace "system"
     open-focused true
@@ -287,11 +283,6 @@ window-rule {
 window-rule {
     match app-id="steam"
     open-on-workspace "game"
-}
-window-rule {
-    match app-id="org.nicotine_plus.Nicotine"
-    open-on-workspace "misc"
-    open-maximized-to-edges false
 }
 window-rule {
     match app-id="steam" title="^notificationtoasts_\\d+_desktop$"
@@ -375,11 +366,11 @@ window-rule {
     opacity 1.0
 }
 window-rule {
-    match app-id="((google-)?[cC]hrom(e|ium)|com\\.brave\\.Browser|[bB]rave-browser|[mM]icrosoft-edge|Vivaldi-stable|helium)"
+    match app-id="(com\\.brave\\.Browser|[bB]rave-browser|helium)"
     opacity 1.0
 }
 window-rule {
-    match app-id="([fF]irefox|firefox-bin|org\\.mozilla\\.firefox|zen|app\\.zen_browser\\.zen|librewolf|io\\.gitlab\\.librewolf-community)"
+    match app-id="([fF]irefox|firefox-bin|org\\.mozilla\\.firefox|librewolf|io\\.gitlab\\.librewolf-community)"
     opacity 1.0
 }
 window-rule {
@@ -478,7 +469,7 @@ binds {
     MOD+ALT+V hotkey-overlay-title="Clipboard History: fuzzel" {
         spawn-sh "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
     }
-    MOD+ALT+M hotkey-overlay-title="Watch Media: rofi" {
+    MOD+ALT+M hotkey-overlay-title="Watch Media: fuzzel" {
         spawn-sh "~/.config/scripts/watch-media"
     }
     XF86AudioRaiseVolume allow-when-locked=true {
