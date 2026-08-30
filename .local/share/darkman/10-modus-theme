@@ -14,6 +14,7 @@ dark)
     selection=2f3849; border=646464; muted=989898; fg=ffffff
     blue=2fafff; cyan=00d3d0; green=44bc44; green_alt=70b900
     magenta=feacd0; yellow=d0bc00; yellow_bright=fec43f; red=ff5f59
+    fg_alt=c4c4c4; rust=db7b5f
     gtk_theme=Adwaita-dark; icon_theme=breeze-dark; color_scheme=prefer-dark
     foot_signal=USR1
     lock_source=$HOME/Pictures/wallpapers/warm-skies.jpg
@@ -24,6 +25,7 @@ light)
     selection=dae5ec; border=9f9f9f; muted=595959; fg=000000
     blue=0031a9; cyan=005e8b; green=006800; green_alt=316500
     magenta=721045; yellow=6f5500; yellow_bright=884900; red=a60000
+    fg_alt=3b3b3b; rust=8a290f
     gtk_theme=Adwaita; icon_theme=breeze; color_scheme=default
     foot_signal=USR2
     lock_source=$HOME/Pictures/wallpapers/white-coast.jpg
@@ -210,6 +212,28 @@ shadow = #${bg}b0
 color = #${fg}ff
 shadow = #${bg}d0
 background = #00000000
+EOF
+
+cat >"$state_root/qutebrowser.conf" <<EOF
+mode=$mode
+bg=#$bg
+bg_alt=#$bg_alt
+bg_soft=#$bg_soft
+surface=#$surface
+selection=#$selection
+border=#$border
+muted=#$muted
+fg=#$fg
+fg_alt=#$fg_alt
+blue=#$blue
+cyan=#$cyan
+green=#$green
+green_alt=#$green_alt
+magenta=#$magenta
+yellow=#$yellow
+yellow_bright=#$yellow_bright
+red=#$red
+rust=#$rust
 EOF
 
 # RMPC and btop have no Modus ports; recolor the existing layouts while

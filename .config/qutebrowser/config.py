@@ -1,4 +1,6 @@
-import subprocess
+import os
+import pathlib
+import re
 
 config.load_autoconfig(False)
 c.auto_save.session = True
@@ -32,150 +34,177 @@ c.url.open_base_url = True
 # --- 2. MODUS THEME ---
 c.window.transparent = False
 
-try:
-    mode = subprocess.run(
-        ['darkman', 'get'], capture_output=True, text=True, timeout=1,
-    ).stdout.strip()
-except (OSError, subprocess.SubprocessError):
-    mode = 'dark'
-
-palettes = {
-    'light': {
-        'bg': '#ffffff', 'bg_alt': '#f2f2f2', 'bg_soft': '#dae5ec',
-        'surface': '#c4c4c4', 'sel': '#dae5ec', 'border': '#9f9f9f',
-        'mute': '#595959', 'grey': '#3b3b3b', 'fg': '#000000',
-        'bright': '#000000', 'keyword': '#8a290f', 'info': '#0031a9',
-        'match': '#721045', 'string': '#006800', 'signal': '#6f5500',
-        'error': '#a60000', 'warn': '#884900', 'ok': '#316500',
-    },
-    'dark': {
-        'bg': '#000000', 'bg_alt': '#1e1e1e', 'bg_soft': '#2f3849',
-        'surface': '#646464', 'sel': '#2f3849', 'border': '#646464',
-        'mute': '#989898', 'grey': '#c4c4c4', 'fg': '#ffffff',
-        'bright': '#ffffff', 'keyword': '#db7b5f', 'info': '#2fafff',
-        'match': '#feacd0', 'string': '#44bc44', 'signal': '#d0bc00',
-        'error': '#ff5f59', 'warn': '#fec43f', 'ok': '#70b900',
-    },
-}
-p = palettes.get(mode, palettes['dark'])
-
 # TABS (Solid & Minimal)
 c.tabs.position = 'left'
 c.tabs.width = 240
 c.tabs.padding = {'top': 10, 'bottom': 10, 'left': 5, 'right': 5}
-c.tabs.indicator.width = 0 
+c.tabs.indicator.width = 0
 c.tabs.favicons.scale = 1.0
 c.tabs.title.format = '{audio}{index}: {current_title}'
 c.tabs.show = 'never'
-
-# Tab Colors
-c.colors.tabs.bar.bg = p['bg']
-
-# Inactive Tabs (Background color + Muted Text)
-c.colors.tabs.odd.bg = p['bg']
-c.colors.tabs.even.bg = p['bg']
-c.colors.tabs.odd.fg = p['mute']
-c.colors.tabs.even.fg = p['mute']
-
-# Active Tab (Selection Background + Bright Text)
-c.colors.tabs.selected.odd.bg = p['sel']
-c.colors.tabs.selected.even.bg = p['sel']
-c.colors.tabs.selected.odd.fg = p['fg']
-c.colors.tabs.selected.even.fg = p['fg']
-
-# Pinned Tabs
-c.colors.tabs.pinned.even.bg = p['sel']
-c.colors.tabs.pinned.odd.bg = p['sel']
-c.colors.tabs.pinned.even.fg = p['grey']
-c.colors.tabs.pinned.odd.fg = p['grey']
-c.colors.tabs.pinned.selected.even.bg = p['sel']
-c.colors.tabs.pinned.selected.odd.bg = p['sel']
-c.colors.tabs.pinned.selected.even.fg = p['bright']
-c.colors.tabs.pinned.selected.odd.fg = p['bright']
-c.colors.tabs.indicator.start = p['info']
-c.colors.tabs.indicator.stop = p['ok']
-c.colors.tabs.indicator.error = p['error']
 
 # STATUS BAR
 c.statusbar.show = 'in-mode'
 c.statusbar.padding = {'top': 5, 'bottom': 5, 'left': 5, 'right': 5}
 c.statusbar.widgets = ['keypress', 'url', 'scroll', 'history', 'tabs', 'progress']
 
-c.colors.statusbar.normal.bg = p['bg_alt']
-c.colors.statusbar.normal.fg = p['fg']
-c.colors.statusbar.insert.bg = p['info'] # Blue-ish for insert
-c.colors.statusbar.insert.fg = p['bg']
-c.colors.statusbar.command.bg = p['sel']
-c.colors.statusbar.command.fg = p['fg']
-c.colors.statusbar.command.private.bg = p['sel']
-c.colors.statusbar.command.private.fg = p['match']
-c.colors.statusbar.caret.bg = p['match']
-c.colors.statusbar.caret.fg = p['bg']
-c.colors.statusbar.caret.selection.bg = p['keyword']
-c.colors.statusbar.caret.selection.fg = p['bg']
-c.colors.statusbar.passthrough.bg = p['signal']
-c.colors.statusbar.passthrough.fg = p['bg']
-c.colors.statusbar.private.bg = p['bg_soft']
-c.colors.statusbar.private.fg = p['match']
-c.colors.statusbar.progress.bg = p['info']
-c.colors.statusbar.url.error.fg = p['error']
-c.colors.statusbar.url.hover.fg = p['match']
-c.colors.statusbar.url.warn.fg = p['warn']
-c.colors.statusbar.url.success.http.fg = p['mute']
-c.colors.statusbar.url.success.https.fg = p['string']
-
-# HINTS
-c.colors.hints.bg = p['warn']
-c.colors.hints.fg = p['bg']
-c.colors.hints.match.fg = p['error']
-
-# COMPLETION MENU
-c.colors.completion.category.bg = p['bg']
-c.colors.completion.category.fg = p['grey']
-c.colors.completion.category.border.top = p['border']
-c.colors.completion.category.border.bottom = p['border']
-c.colors.completion.odd.bg = p['bg']
-c.colors.completion.even.bg = p['bg_alt']
-c.colors.completion.fg = p['fg']
-c.colors.completion.item.selected.bg = p['sel']
-c.colors.completion.item.selected.fg = p['bright']
-c.colors.completion.item.selected.border.top = p['sel']
-c.colors.completion.item.selected.border.bottom = p['sel']
-c.colors.completion.match.fg = p['match']
-c.colors.completion.item.selected.match.fg = p['keyword']
-c.colors.completion.scrollbar.bg = p['bg_alt']
-c.colors.completion.scrollbar.fg = p['grey']
-
-# Prompts, messages, downloads, and key hints
-c.colors.prompts.bg = p['bg_alt']
-c.colors.prompts.fg = p['fg']
-c.colors.prompts.border = '1px solid ' + p['border']
-c.colors.prompts.selected.bg = p['sel']
-c.colors.prompts.selected.fg = p['bright']
-c.colors.messages.info.bg = p['bg_alt']
-c.colors.messages.info.border = p['info']
-c.colors.messages.info.fg = p['fg']
-c.colors.messages.warning.bg = p['bg_alt']
-c.colors.messages.warning.border = p['warn']
-c.colors.messages.warning.fg = p['warn']
-c.colors.messages.error.bg = p['bg_alt']
-c.colors.messages.error.border = p['error']
-c.colors.messages.error.fg = p['error']
-c.colors.keyhint.bg = p['bg_alt']
-c.colors.keyhint.fg = p['fg']
-c.colors.keyhint.suffix.fg = p['keyword']
-c.colors.downloads.bar.bg = p['bg']
-c.colors.downloads.start.bg = p['info']
-c.colors.downloads.start.fg = p['bg']
-c.colors.downloads.stop.bg = p['string']
-c.colors.downloads.stop.fg = p['bg']
-c.colors.downloads.error.bg = p['error']
-c.colors.downloads.error.fg = p['bg']
-
-# WEBPAGE (Dark Mode Preference)
-c.colors.webpage.bg = p['bg']
 c.colors.webpage.preferred_color_scheme = "auto"
 c.content.user_stylesheets = ["/home/evan/.config/qutebrowser/youtube.css"]
+
+# The Modus palette lives in ~/.local/share/darkman/10-modus-theme, which
+# regenerates this file on every mode switch. qutebrowser keeps no copy.
+PALETTE_FILE = (
+    pathlib.Path(os.environ.get('XDG_STATE_HOME') or pathlib.Path.home()
+                 / '.local' / 'state') / 'darkman' / 'qutebrowser.conf'
+)
+PALETTE_KEYS = frozenset({
+    'bg', 'bg_alt', 'bg_soft', 'selection', 'border', 'muted', 'fg', 'fg_alt',
+    'blue', 'green', 'green_alt', 'magenta', 'yellow', 'yellow_bright', 'red',
+    'rust',
+})
+HEX_COLOR = re.compile(r'#[0-9a-f]{6}')
+FALLBACK_MODE = 'dark'
+
+
+def load_palette(path):
+    """Read the generated palette, or None when it is unusable.
+
+    Absent, unreadable, half-written and malformed files all yield None so
+    that qutebrowser still starts -- notably on a checkout where darkman has
+    never run. Validation is strict because a partial palette would paint an
+    unreadable mix of the two modes.
+    """
+    try:
+        text = path.read_text(encoding='utf-8')
+    except (OSError, UnicodeDecodeError):
+        return None
+    palette = {}
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        key, separator, value = line.partition('=')
+        if not separator:
+            return None
+        palette[key.strip()] = value.strip()
+    if palette.get('mode') not in ('light', 'dark'):
+        return None
+    if not PALETTE_KEYS <= palette.keys():
+        return None
+    if not all(HEX_COLOR.fullmatch(palette[key]) for key in PALETTE_KEYS):
+        return None
+    return palette
+
+
+def apply_palette(p):
+    # Tab Colors
+    c.colors.tabs.bar.bg = p['bg']
+
+    # Inactive Tabs (Background color + Muted Text)
+    c.colors.tabs.odd.bg = p['bg']
+    c.colors.tabs.even.bg = p['bg']
+    c.colors.tabs.odd.fg = p['muted']
+    c.colors.tabs.even.fg = p['muted']
+
+    # Active Tab (Selection Background + Bright Text)
+    c.colors.tabs.selected.odd.bg = p['selection']
+    c.colors.tabs.selected.even.bg = p['selection']
+    c.colors.tabs.selected.odd.fg = p['fg']
+    c.colors.tabs.selected.even.fg = p['fg']
+
+    # Pinned Tabs
+    c.colors.tabs.pinned.even.bg = p['selection']
+    c.colors.tabs.pinned.odd.bg = p['selection']
+    c.colors.tabs.pinned.even.fg = p['fg_alt']
+    c.colors.tabs.pinned.odd.fg = p['fg_alt']
+    c.colors.tabs.pinned.selected.even.bg = p['selection']
+    c.colors.tabs.pinned.selected.odd.bg = p['selection']
+    c.colors.tabs.pinned.selected.even.fg = p['fg']
+    c.colors.tabs.pinned.selected.odd.fg = p['fg']
+    c.colors.tabs.indicator.start = p['blue']
+    c.colors.tabs.indicator.stop = p['green_alt']
+    c.colors.tabs.indicator.error = p['red']
+
+    # Status bar
+    c.colors.statusbar.normal.bg = p['bg_alt']
+    c.colors.statusbar.normal.fg = p['fg']
+    c.colors.statusbar.insert.bg = p['blue']
+    c.colors.statusbar.insert.fg = p['bg']
+    c.colors.statusbar.command.bg = p['selection']
+    c.colors.statusbar.command.fg = p['fg']
+    c.colors.statusbar.command.private.bg = p['selection']
+    c.colors.statusbar.command.private.fg = p['magenta']
+    c.colors.statusbar.caret.bg = p['magenta']
+    c.colors.statusbar.caret.fg = p['bg']
+    c.colors.statusbar.caret.selection.bg = p['rust']
+    c.colors.statusbar.caret.selection.fg = p['bg']
+    c.colors.statusbar.passthrough.bg = p['yellow']
+    c.colors.statusbar.passthrough.fg = p['bg']
+    c.colors.statusbar.private.bg = p['bg_soft']
+    c.colors.statusbar.private.fg = p['magenta']
+    c.colors.statusbar.progress.bg = p['blue']
+    c.colors.statusbar.url.error.fg = p['red']
+    c.colors.statusbar.url.hover.fg = p['magenta']
+    c.colors.statusbar.url.warn.fg = p['yellow_bright']
+    c.colors.statusbar.url.success.http.fg = p['muted']
+    c.colors.statusbar.url.success.https.fg = p['green']
+
+    # HINTS
+    c.colors.hints.bg = p['yellow_bright']
+    c.colors.hints.fg = p['bg']
+    c.colors.hints.match.fg = p['red']
+
+    # COMPLETION MENU
+    c.colors.completion.category.bg = p['bg']
+    c.colors.completion.category.fg = p['fg_alt']
+    c.colors.completion.category.border.top = p['border']
+    c.colors.completion.category.border.bottom = p['border']
+    c.colors.completion.odd.bg = p['bg']
+    c.colors.completion.even.bg = p['bg_alt']
+    c.colors.completion.fg = p['fg']
+    c.colors.completion.item.selected.bg = p['selection']
+    c.colors.completion.item.selected.fg = p['fg']
+    c.colors.completion.item.selected.border.top = p['selection']
+    c.colors.completion.item.selected.border.bottom = p['selection']
+    c.colors.completion.match.fg = p['magenta']
+    c.colors.completion.item.selected.match.fg = p['rust']
+    c.colors.completion.scrollbar.bg = p['bg_alt']
+    c.colors.completion.scrollbar.fg = p['fg_alt']
+
+    # Prompts, messages, downloads, and key hints
+    c.colors.prompts.bg = p['bg_alt']
+    c.colors.prompts.fg = p['fg']
+    c.colors.prompts.border = '1px solid ' + p['border']
+    c.colors.prompts.selected.bg = p['selection']
+    c.colors.prompts.selected.fg = p['fg']
+    c.colors.messages.info.bg = p['bg_alt']
+    c.colors.messages.info.border = p['blue']
+    c.colors.messages.info.fg = p['fg']
+    c.colors.messages.warning.bg = p['bg_alt']
+    c.colors.messages.warning.border = p['yellow_bright']
+    c.colors.messages.warning.fg = p['yellow_bright']
+    c.colors.messages.error.bg = p['bg_alt']
+    c.colors.messages.error.border = p['red']
+    c.colors.messages.error.fg = p['red']
+    c.colors.keyhint.bg = p['bg_alt']
+    c.colors.keyhint.fg = p['fg']
+    c.colors.keyhint.suffix.fg = p['rust']
+    c.colors.downloads.bar.bg = p['bg']
+    c.colors.downloads.start.bg = p['blue']
+    c.colors.downloads.start.fg = p['bg']
+    c.colors.downloads.stop.bg = p['green']
+    c.colors.downloads.stop.fg = p['bg']
+    c.colors.downloads.error.bg = p['red']
+    c.colors.downloads.error.fg = p['bg']
+
+    c.colors.webpage.bg = p['bg']
+
+
+_palette = load_palette(PALETTE_FILE)
+# Without a palette the stock qutebrowser colors stand; forced page darkening
+# still needs a mode, and dark is the safer guess for an unthemed session.
+mode = _palette['mode'] if _palette is not None else FALLBACK_MODE
+if _palette is not None:
+    apply_palette(_palette)
 
 # --- 3. UI & FONTS ---
 c.scrolling.bar = 'never'
