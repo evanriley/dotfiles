@@ -123,8 +123,6 @@ spawn-at-startup "flatpak" "run" "dev.deedles.Trayscale"
 
 spawn-at-startup "udiskie" "--automount" "--notify"
 
-spawn-at-startup "flatpak" "run" "io.gitlab.librewolf-community"
-
 hotkey-overlay {
     skip-at-startup
 }
