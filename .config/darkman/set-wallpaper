@@ -2,14 +2,18 @@
 
 set -eu
 
+# Solid colour rather than an image: bg_alt sits one step off the window
+# background in each mode -- darker in light, lighter in dark -- so the gaps
+# niri leaves between windows stay visible instead of bleeding together.
+
 mode=${1:-$(darkman get 2>/dev/null || printf dark)}
 
 case "$mode" in
 dark)
-    wallpaper=$HOME/Pictures/wallpapers/warm-skies.jpg
+    color=1C1E25
     ;;
 light)
-    wallpaper=$HOME/Pictures/wallpapers/white-coast.jpg
+    color=e2e1df
     ;;
 *)
     printf 'unknown mode: %s\n' "$mode" >&2
@@ -18,4 +22,4 @@ light)
 esac
 
 pkill -x swaybg 2>/dev/null || true
-exec swaybg -i "$wallpaper" -m fill
+exec swaybg -c "$color" -m solid_color
