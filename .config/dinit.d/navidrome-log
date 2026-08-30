@@ -1,0 +1,12 @@
+# Truncates the navidrome log once per session, before the container starts.
+# Growth is otherwise unbounded (~160 KB/day) because dinit does not rotate a
+# logfile and Chimera ships no logrotate.
+#
+# Deliberately a dependency rather than a `: > log` prefixed to navidrome's own
+# command: `restart = yes` would re-run that on every restart and erase the
+# crash output of a looping container. A dependency starts once and is not
+# re-run when the dependent process restarts.
+type = scripted
+# Double quotes, not single: dinit treats only " as grouping, so a
+# single-quoted argument reaches sh unterminated and exits status 2.
+command = /bin/sh -c ": > /home/evan/.local/state/navidrome.log"

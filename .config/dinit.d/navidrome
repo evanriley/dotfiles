@@ -11,5 +11,9 @@ smooth-recovery = yes
 restart-delay = 10
 restart-limit-count = 0
 stop-timeout = 20
+# Persistent file, not log-type = buffer: a buffer is lost at session end and
+# discards output once full, so a container failure could leave no record.
+# navidrome-log truncates this file once per session to bound its growth.
 logfile = /home/evan/.local/state/navidrome.log
 logfile-permissions = 600
+waits-for = navidrome-log
