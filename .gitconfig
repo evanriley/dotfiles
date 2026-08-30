@@ -1,10 +1,10 @@
 [user]
     name = Evan Riley
-    email = evan@evanriley.net
+    email = evan@evanriley.com
     signingkey = ~/.ssh/id_ed25519.pub # Used ~ for cross-platform safety
 
 [core]
-    excludesfile = ~/.gitignore
+    excludesfile = ~/.config/git/ignore
     pager = delta
     # Performance & whitespace
     autocrlf = false
@@ -14,10 +14,6 @@
 
 [init]
     defaultBranch = main
-
-[display]
-    # Moves the sort to a more global display logic if supported
-    ui = auto
 
 [column]
     ui = auto
@@ -30,7 +26,7 @@
     prune = true
 
 [push]
-    default = tracking
+    default = upstream
     autoSetupRemote = true # Automatically sets up tracking for new branches
 
 [pull]
@@ -63,8 +59,10 @@
     gpgsign = true
 
 [gpg]
-    program = gpg2
     format = ssh
+
+[gpg "ssh"]
+    allowedSignersFile = ~/.ssh/allowed_signers
 
 [help]
     autocorrect = 1
