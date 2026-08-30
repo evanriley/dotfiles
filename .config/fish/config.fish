@@ -5,8 +5,6 @@ end
 set -gx SHELL /usr/bin/fish
 set -gx XDG_CONFIG_HOME $HOME/.config
 set -gx ZVM_INSTALL $HOME/.zvm/self
-fish_add_path -g $HOME/bin $HOME/.local/bin $HOME/go/bin $HOME/.cargo/bin \
-    $HOME/.zvm/bin $ZVM_INSTALL $HOME/.npm-global/bin
 
 set -gx FZF_DEFAULT_OPTS \
     '--color=fg:#C5C9C7,bg:#090E13,hl:#c4746e' \
