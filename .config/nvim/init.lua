@@ -32,17 +32,6 @@ vim.o.mouse = 'a'
 vim.o.list = true
 vim.opt.listchars = { tab = '  ', trail = '.', nbsp = '+' }
 vim.opt.jumpoptions:append('view')
-vim.g.clipboard = {
-  name = 'OSC 52',
-  copy = {
-    ['+'] = require('vim.ui.clipboard.osc52').copy('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
-  },
-  paste = {
-    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
-  },
-}
 vim.o.clipboard = 'unnamedplus'
 vim.o.showmode = false
 vim.o.showtabline = 2
@@ -186,10 +175,10 @@ vim.keymap.set('n', '<C-j>', '<C-w>j')
 vim.keymap.set('n', '<C-k>', '<C-w>k')
 vim.keymap.set('n', '<C-l>', '<C-w>l')
 vim.keymap.set('n', '<C-\\>', '<C-w>p')
-vim.keymap.set('n', '<leader><leader>h', swap_buf('h'))
-vim.keymap.set('n', '<leader><leader>j', swap_buf('j'))
-vim.keymap.set('n', '<leader><leader>k', swap_buf('k'))
-vim.keymap.set('n', '<leader><leader>l', swap_buf('l'))
+vim.keymap.set('n', '<leader>sh', swap_buf('h'), { desc = 'Swap buffer h' })
+vim.keymap.set('n', '<leader>sj', swap_buf('j'), { desc = 'Swap buffer j' })
+vim.keymap.set('n', '<leader>sk', swap_buf('k'), { desc = 'Swap buffer k' })
+vim.keymap.set('n', '<leader>sl', swap_buf('l'), { desc = 'Swap buffer l' })
 
 vim.keymap.set('n', '<leader>m', '<Cmd>RenderMarkdown toggle<CR>', { desc = 'Toggle markdown render' })
 
@@ -369,11 +358,11 @@ vim.keymap.set('n', '<leader>q', extra.pickers.list, { desc = 'Lists' })
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 vim.keymap.set('n', '<Esc>', '<Cmd>nohlsearch<CR>', { desc = 'Clear search highlight' })
 vim.keymap.set('n', '<leader>w', '<Cmd>w<CR>', { desc = 'Save file' })
-vim.keymap.set('n', '<leader>bd', function() MiniBufremove.delete(0, false) end, { desc = 'Delete buffer' })
+vim.keymap.set('n', '<leader>k', function() MiniBufremove.delete(0, false) end, { desc = 'Kill buffer' })
 vim.keymap.set('n', '<leader>xd', vim.diagnostic.setqflist, { desc = 'Diagnostics to quickfix' })
 vim.keymap.set('n', '<leader>u', '<Cmd>UndotreeToggle<CR>', { desc = 'Toggle undotree' })
 vim.keymap.set('n', '<leader>cw', '<Cmd>lua MiniTrailspace.trim()<CR>', { desc = 'Trim trailing whitespace' })
-vim.keymap.set('n', '<leader>gg', '<Cmd>botright 15split | terminal lazygit<CR>', { desc = 'Lazygit' })
+vim.keymap.set('n', '<leader>G', '<Cmd>botright 15split | terminal lazygit<CR>', { desc = 'Lazygit' })
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('yank-highlight', {}),
