@@ -1,5 +1,5 @@
 type = process
-command = /home/evan/.local/bin/scapectl
+command = /usr/bin/scapectl
 restart = yes
 smooth-recovery = yes
 restart-delay = 2

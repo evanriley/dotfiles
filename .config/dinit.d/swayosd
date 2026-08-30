@@ -1,5 +1,5 @@
 type = process
-command = /home/evan/.local/bin/swayosd-server
+command = /usr/bin/swayosd-server
 restart = yes
 smooth-recovery = yes
 restart-delay = 2
