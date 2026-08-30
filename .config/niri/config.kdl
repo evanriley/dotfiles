@@ -60,14 +60,13 @@ layout {
     focus-ring {
         off
         width 1
-        active-color 255 200 127 255
-        inactive-color 80 80 80 255
+        active-color "#FFC87F"
+        inactive-color "#505050"
     }
     border {
         off
         width 1
         active-gradient from="#1C1E25" to="#c4746e" angle=45 relative-to="workspace-view"
-        // active-color 34 38 45 255
         inactive-color "#1C1E25"
     }
     tab-indicator {
@@ -179,20 +178,20 @@ animations {
         spring damping-ratio=1.0 stiffness=800 epsilon=0.0001
     }
 }
-// Transparency and blur
+// Cosmetic transparency is opt-in. Everything unlisted stays fully opaque:
+// browsers, media players and games render their own content, and blending it
+// with the wallpaper degrades it.
 window-rule {
-    match is-active=true
-    // Apply to all windows
+    match app-id="^foot$"
+    match app-id="^scratch_rmpc$"
+    match app-id="^scratch_btop$"
+    match app-id="(org\\.gnome\\.Nautilus|nautilus)"
+    match app-id="org.pulseaudio.pavucontrol"
+    match app-id="dev.deedles.Trayscale"
+    match app-id="org.gnome.World.PikaBackup"
+    match app-id="Bitwarden"
+    match app-id="^steam$"
     opacity 0.95
-}
-window-rule {
-    match is-active=false
-    // Apply to all windows
-    opacity 0.95
-}
-window-rule {
-    match app-id="io.github.manta"
-    opacity 1.0
 }
 // Niri can detect individual-window screencasts. Keep the shared target fully
 // opaque so screen shares and recordings do not inherit cosmetic transparency.
@@ -219,32 +218,20 @@ window-rule {
         inactive-color "#C34043"
     }
 }
-// Open the Firefox picture-in-picture player as floating by default.
+// Picture-in-picture players float and stay on the workspace they were opened
+// from. The workspace rule below excludes them: app-id patterns match anywhere
+// in the app id, so a bare "firefox" pattern also matches the PiP window.
 window-rule {
     match app-id="firefox$" title="^Picture-in-Picture$"
-    open-floating true
-}
-window-rule {
-    match app-id="firefox"
-    open-on-workspace "web"
-    open-maximized-to-edges false
-}
-window-rule {
-    match app-id="librewolf"
-    open-on-workspace "web"
-    open-maximized-to-edges false
-}
-window-rule {
-    match app-id="org.qutebrowser.qutebrowser"
-    open-on-workspace "web"
-    open-maximized-to-edges false
-}
-window-rule {
     match app-id="librewolf$" title="^Picture-in-Picture$"
     open-floating true
 }
 window-rule {
-    match app-id="(com\\.brave\\.Browser|brave-browser|Brave-browser)"
+    match app-id="firefox"
+    match app-id="librewolf"
+    match app-id="org.qutebrowser.qutebrowser"
+    match app-id="(com\\.brave\\.Browser|[bB]rave-browser)"
+    exclude title="^Picture-in-Picture$"
     open-on-workspace "web"
     open-maximized-to-edges false
 }
@@ -252,7 +239,6 @@ window-rule {
     match app-id="(discord|com\\.discordapp\\.Discord)"
     open-on-workspace "social"
     open-maximized-to-edges false
-    opacity 1.0
 }
 window-rule {
     match app-id="org.gnome.World.PikaBackup"
@@ -280,12 +266,19 @@ window-rule {
         fixed 620
     }
 }
+// Steam client window only. Games carry their own app id and are matched
+// separately below.
 window-rule {
-    match app-id="steam"
+    match app-id="^steam$"
+    exclude title="^notificationtoasts_\\d+_desktop$"
     open-on-workspace "game"
 }
+// Notification toasts belong wherever the user currently is. Floating is
+// declared here rather than assumed of the client: a tiled toast ignores
+// default-floating-position.
 window-rule {
-    match app-id="steam" title="^notificationtoasts_\\d+_desktop$"
+    match app-id="^steam$" title="^notificationtoasts_\\d+_desktop$"
+    open-floating true
     default-floating-position x=10 y=10 relative-to="bottom-right"
 }
 window-rule {
@@ -309,10 +302,9 @@ window-rule {
     default-window-height {
         fixed 900
     }
-    opacity 1.0
 }
 window-rule {
-    match title="Friends List"
+    match app-id="^steam$" title="^Friends List$"
     open-on-workspace "game"
     default-column-width {
         fixed 600
@@ -352,7 +344,6 @@ window-rule {
     default-window-height {
         fixed 1080
     }
-    opacity 1.0
 }
 window-rule {
     match app-id="swayimg"
@@ -363,28 +354,6 @@ window-rule {
     default-window-height {
         fixed 800
     }
-    opacity 1.0
-}
-window-rule {
-    match app-id="(com\\.brave\\.Browser|[bB]rave-browser|helium)"
-    opacity 1.0
-}
-window-rule {
-    match app-id="([fF]irefox|firefox-bin|org\\.mozilla\\.firefox|librewolf|io\\.gitlab\\.librewolf-community)"
-    opacity 1.0
-}
-window-rule {
-    match app-id="(org\\.qutebrowser\\.qutebrowser|qutebrowser)"
-    opacity 1.0
-}
-// Qutebrowser specifically on YouTube
-window-rule {
-    match app-id="(org\\.qutebrowser\\.qutebrowser|qutebrowser)" title=".*YouTube.*"
-    opacity 1.0
-}
-window-rule {
-    match title="((?i)(?:[a-z0-9-]+\\.)*youtube\\.com_/|app\\.zoom\\.us_/wc/home)"
-    opacity 1.0
 }
 window-rule {
     match app-id="org.pulseaudio.pavucontrol"
@@ -396,14 +365,11 @@ window-rule {
         fixed 600
     }
 }
-window-rule {
-    // Steam games do not consistently use steam_app_<id>; native and Proton
-    // games often expose their executable name instead.
-    match app-id="(?i)(^steam_app_\\d+$|\\.x86(?:_64)?$|\\.exe$|^gamescope$)"
-    opacity 1.0
-}
+// Steam games do not consistently use steam_app_<id>; native and Proton games
+// often expose their executable name instead and match no rule here.
 window-rule {
     match app-id="^steam_app_\\d+$"
+    open-on-workspace "game"
     default-column-width {
         fixed 2560
     }
@@ -425,10 +391,6 @@ window-rule {
     }
 }
 
-window-rule {
-    match app-id="bg3"
-    opacity 1.0
-}
 binds {
     Mod+Shift+C hotkey-overlay-title="Screencast: Pick Window" repeat=false {
         spawn-sh "niri msg action set-dynamic-cast-window --id $(niri msg --json pick-window | jq -r .id)"
@@ -439,37 +401,37 @@ binds {
     Mod+Shift+Alt+C hotkey-overlay-title="Screencast: Clear Target" repeat=false {
         clear-dynamic-cast-target
     }
-    MOD+SHIFT+SLASH {
+    Mod+Shift+Slash {
         show-hotkey-overlay
     }
-    MOD+RETURN hotkey-overlay-title="Open Terminal: foot" {
+    Mod+Return hotkey-overlay-title="Open Terminal: foot" {
         spawn "foot"
     }
-    Mod+SPACE hotkey-overlay-title="Run an Application: fuzzel" {
+    Mod+Space hotkey-overlay-title="Run an Application: fuzzel" {
         spawn "fuzzel"
     }
-    Mod+P hotkey-overlay-title="Open Power Menu: Power Menu" {
+    Mod+P hotkey-overlay-title="Open Power Menu: fuzzel" {
         spawn-sh "~/.config/scripts/powermenu"
     }
-    MOD+ALT+L hotkey-overlay-title="Lock Screen: swaylock" allow-when-locked=true {
+    Mod+Alt+L hotkey-overlay-title="Lock Screen: swaylock" allow-when-locked=true {
         spawn "swaylock" "-f"
     }
-    MOD+E hotkey-overlay-title="File Manager: Nautilus" {
+    Mod+E hotkey-overlay-title="File Manager: Nautilus" {
         spawn-sh "nautilus"
     }
-    MOD+CTRL+S {
+    Mod+Ctrl+S {
         spawn-sh "~/.config/scripts/ns.py -id scratch_rmpc"
     }
-    MOD+CTRL+T {
+    Mod+Ctrl+T {
         spawn-sh "~/.config/scripts/ns.py -id scratch_btop"
     }
-    MOD+CTRL+N {
+    Mod+Ctrl+N {
         spawn-sh "swaync-client -t"
     }
-    MOD+ALT+V hotkey-overlay-title="Clipboard History: fuzzel" {
+    Mod+Alt+V hotkey-overlay-title="Clipboard History: fuzzel" {
         spawn-sh "cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"
     }
-    MOD+ALT+M hotkey-overlay-title="Watch Media: fuzzel" {
+    Mod+Alt+M hotkey-overlay-title="Watch Media: fuzzel" {
         spawn-sh "~/.config/scripts/watch-media"
     }
     XF86AudioRaiseVolume allow-when-locked=true {
@@ -499,7 +461,7 @@ binds {
     Mod+O repeat=false {
         toggle-overview
     }
-    MOD+Q {
+    Mod+Q {
         close-window
     }
     Mod+H {
