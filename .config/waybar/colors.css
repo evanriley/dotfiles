@@ -2,13 +2,9 @@
 
 @define-color on_background @foreground;
 @define-color on_surface @foreground;
-@define-color on_surface_variant @muted;
-@define-color outline @muted;
-@define-color outline_variant @border;
 @define-color secondary @success;
 @define-color tertiary @accent;
 @define-color tertiary_fixed @accent;
-@define-color tertiary_fixed_dim @muted;
 @define-color surface_container_lowest @background;
 @define-color surface_container_low @background_alt;
 @define-color surface_container @background_alt;

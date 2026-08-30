@@ -29,7 +29,6 @@ tooltip label {
   font-family: "Noto Sans";
 }
 
-#custom-updates,
 #network,
 #disk,
 #memory {
@@ -73,15 +72,6 @@ tooltip label {
   margin-top: 2px;
 }
 
-#cpu {
-  color: @on_background;
-  background: transparent;
-  margin-right: 9px;
-  transition: 0.3s;
-  border: 0px solid transparent;
-  padding-top: 2px;
-}
-
 #cpuntemp:hover {
   background: transparent;
   color: @on_background;
@@ -101,7 +91,11 @@ tooltip label {
 
 #cpu {
   color: @on_background;
+  background: transparent;
   margin-right: 9px;
+  transition: 0.3s;
+  border: 0px solid transparent;
+  padding-top: 2px;
 }
 
 #temperature.cpu {
@@ -116,21 +110,6 @@ tooltip label {
   padding: 0px 5px 0px 5px;
 }
 
-#custom-dnd {
-  background: @tertiary_fixed;
-  color: black;
-  margin-right: 0px;
-  padding-left: 7px;
-  padding-top: 2px;
-  padding-right: 7px;
-  border-radius: 5px;
-}
-
-#custom-dnd:hover {
-  color: black;
-}
-
-#custom-sync,
 #tray {
   background: transparent;
   color: @on_background;
@@ -140,7 +119,6 @@ tooltip label {
   padding-top: 2px;
 }
 
-#custom-sync:hover,
 #tray:hover {
   background: transparent;
   box-shadow: inset 0 0 0 1px @primary;

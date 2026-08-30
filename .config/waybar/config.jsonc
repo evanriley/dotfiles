@@ -6,8 +6,9 @@
   "exclusive": false,
   "height": 0,
   "spacing": 0, // Gaps between modules (4px)
-  "margin-left": 1287,
-  "margin-right": 1287,
+  // A horizontal bar with an explicit width drops its left and right layer-shell
+  // anchors, so the bar is this wide and centered on any output.
+  "width": 2546,
   "reload_style_on_change": true,
    "group/cpuntemp": {
     "orientation": "horizontal",
@@ -72,6 +73,9 @@
         "days": "<b>{}</b>",
         "weeks": "<b>W{}</b>",
         "weekdays": "<b>{}</b>",
+        // Pango markup cannot reference GTK @colors, so this literal does not
+        // follow darkman. It reads only against the light-mode tooltip
+        // foreground; a darkman-generated palette fragment is the fix.
         "today": "<span bgcolor='#c2916a'><b>{}</b></span>"
       }
     },
@@ -115,6 +119,8 @@
     "interface": "enp*",
     "interval": 2,
     "format": "{ifname}",
+    // Literal for the same reason as the clock calendar's today cell: Pango
+    // markup cannot reference GTK @colors.
     "format-ethernet": "󰈁 <span foreground=\"#c2916a\"></span> {bandwidthDownBytes}  <span foreground=\"#c2916a\"></span> {bandwidthUpBytes}",
     "format-disconnected": "", //An empty format will hide the module.
     "tooltip-format": "{ifname} via {gwaddr} 󰊗",
