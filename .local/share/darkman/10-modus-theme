@@ -212,8 +212,6 @@ shadow = #${bg}d0
 background = #00000000
 EOF
 
-cp "$script_dir/themes/yazi-$mode.toml" "$state_root/yazi.toml"
-
 # RMPC and btop have no Modus ports; recolor the existing layouts while
 # preserving their structure and behavior.
 sed \
