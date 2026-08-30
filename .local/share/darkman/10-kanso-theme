@@ -184,12 +184,26 @@ cat >"$state_root/delta.gitconfig" <<EOF
     blame-palette = "#$bg #$bg_alt #$bg_soft #$surface"
 EOF
 
+# fish sources this only if it exists, so a shell started before darkman has ever
+# run simply keeps fzf's own default colors.
+cat >"$state_root/fzf.fish" <<EOF
+set -gx FZF_DEFAULT_OPTS \\
+    '--color=fg:#$fg,bg:#$bg,hl:#$red' \\
+    '--color=fg+:#$fg,bg+:#$selection,hl+:#$red_bright' \\
+    '--color=info:#$yellow,prompt:#$green,pointer:#$green' \\
+    '--color=marker:#$green,spinner:#$yellow,header:#$blue'
+EOF
+
 cat >"$state_root/mpv.conf" <<EOF
 osd-color='#$fg'
 osd-border-color='#$bg'
 osd-shadow-color='#$bg'
 EOF
 
+# ~/.config/gtk-3.0/settings.ini and ~/.config/gtk-4.0/settings.ini are tracked
+# symlinks to this file, so grepping the repo for its name finds nothing but
+# this block. GTK reads settings.ini once at application startup; the settings
+# portal carries color-scheme to already-running applications.
 cat >"$state_root/gtk-settings.ini" <<EOF
 [Settings]
 gtk-application-prefer-dark-theme=$(test "$mode" = dark && printf true || printf false)
@@ -312,6 +326,9 @@ gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null || 
 gsettings set org.gnome.desktop.interface icon-theme "$icon_theme" 2>/dev/null || true
 
 pkill -"$foot_signal" -x foot 2>/dev/null || true
+# An optional include that did not exist when niri started is not watched, so
+# the first run after a wiped state directory needs an explicit reload.
+niri msg action load-config-file >/dev/null 2>&1 || true
 pkill -USR2 -x waybar 2>/dev/null || true
 pkill -USR1 -x swayimg 2>/dev/null || true
 swaync-client --reload-css 2>/dev/null || true
@@ -327,4 +344,15 @@ setsid -f "$helper_dir/set-wallpaper" "$mode" >/dev/null 2>&1
 
 # SwayOSD reads its stylesheet only at startup; its dinit service owns the
 # process and ensures that theme reloads cannot create duplicate servers.
-dinitctl restart swayosd >/dev/null 2>&1 || true
+# A failure here leaves SwayOSD stopped for the rest of the session, so it is
+# reported rather than swallowed: darkman records hook output, and the desktop
+# notification reaches the user while the cause is still on screen.
+if ! dinitctl restart swayosd >/dev/null 2>&1; then
+    printf 'darkman: failed to restart the swayosd dinit service.\n' >&2
+    printf 'expected SwayOSD to reload its stylesheet; it is now stopped.\n' >&2
+    printf 'check: dinitctl status swayosd\n' >&2
+    notify-send --urgency=critical \
+        'SwayOSD did not restart' \
+        'The theme hook could not restart swayosd. Check: dinitctl status swayosd' \
+        2>/dev/null || true
+fi

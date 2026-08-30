@@ -720,4 +720,8 @@ binds {
 
 // Keep this last: included values override the static fallback colors above.
 // Niri watches the generated file and live-reloads it after a mode transition.
-include "/home/evan/.local/state/darkman/niri.kdl"
+// optional=true keeps the whole config loadable before darkman has ever run,
+// such as on a fresh clone or after ~/.local/state is cleared; without it a
+// missing include is a fatal parse error and niri falls back to its built-in
+// default config, losing every keybind and startup command.
+include "/home/evan/.local/state/darkman/niri.kdl" optional=true

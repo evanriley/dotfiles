@@ -6,11 +6,15 @@ set -gx SHELL /usr/bin/fish
 set -gx XDG_CONFIG_HOME $HOME/.config
 set -gx ZVM_INSTALL $HOME/.zvm/self
 
-set -gx FZF_DEFAULT_OPTS \
-    '--color=fg:#C5C9C7,bg:#090E13,hl:#c4746e' \
-    '--color=fg+:#C5C9C7,bg+:#393B44,hl+:#E46876' \
-    '--color=info:#c4b28a,prompt:#8a9a7b,pointer:#8a9a7b' \
-    '--color=marker:#8a9a7b,spinner:#c4b28a,header:#8ba4b0'
+# Colors for the current darkman mode. Absent until darkman has run at least
+# once, in which case fzf keeps its own defaults. Read at shell startup only, so
+# shells opened before a mode change keep the previous palette.
+set -l state_root $XDG_STATE_HOME
+test -n "$state_root"; or set state_root $HOME/.local/state
+set -l fzf_colors $state_root/darkman/fzf.fish
+if test -r $fzf_colors
+    source $fzf_colors
+end
 
 set -g fish_greeting
 

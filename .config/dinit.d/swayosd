@@ -3,8 +3,11 @@ command = /usr/bin/swayosd-server
 restart = yes
 smooth-recovery = yes
 restart-delay = 2
-restart-limit-count = 5
-restart-limit-interval = 60
+# The darkman theme hook restarts this service on every mode change to reload
+# the stylesheet. A rate limit cannot tell those restarts from a crash loop,
+# and once tripped it leaves SwayOSD stopped for the session, so it is off --
+# as it is for the other externally restarted services.
+restart-limit-count = 0
 log-type = buffer
 log-buffer-size = 131072
 depends-on = dbus
