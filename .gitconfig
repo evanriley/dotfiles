@@ -50,7 +50,11 @@
 
 [delta]
     navigate = true
-    dark = true
+
+# Light/dark and every diff color come from the darkman theme hook. git
+# ignores the include when the file is absent, leaving delta's defaults.
+[include]
+    path = ~/.local/state/darkman/delta.gitconfig
 
 [interactive]
     diffFilter = delta --color-only

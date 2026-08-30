@@ -66,10 +66,9 @@ layout {
     border {
         off
         width 1
-        active-gradient from="#090E13" to="#C14043" angle=45 relative-to="workspace-view"
-        // inactive-gradient from="#0d0c0c" to="#808080" angle=45 relative-to="workspace-view"
+        active-gradient from="#1C1E25" to="#c4746e" angle=45 relative-to="workspace-view"
         // active-color 34 38 45 255
-        inactive-color "#090D12"
+        inactive-color "#1C1E25"
     }
     tab-indicator {
         // off
@@ -85,7 +84,7 @@ layout {
         // inactive-color "gray"
         // urgent-color "blue"
         active-gradient from="#c4b28a" to="#c4746e" angle=45
-        inactive-gradient from="#0d0c0c" to="#808080" angle=45 relative-to="workspace-view"
+        inactive-gradient from="#393B44" to="#909398" angle=45 relative-to="workspace-view"
         urgent-gradient from="#E46876" to="#c4746e" angle=45
     }
     shadow {
@@ -94,8 +93,8 @@ layout {
         spread 5
         offset x=0 y=5
         draw-behind-window false
-        color "#090D1270"
-        inactive-color "#00000054"
+        color "#090E1370"
+        inactive-color "#090E1354"
     }
     struts {
         left 0
@@ -107,7 +106,7 @@ layout {
 
 spawn-at-startup "/usr/lib/polkit-kde-authentication-agent-1"
 
-spawn-at-startup "/home/evan/.local/share/darkman/set-wallpaper"
+spawn-at-startup "/home/evan/.config/darkman/set-wallpaper"
 
 // Supervise the long-running desktop daemons and retain their logs with dinit.
 spawn-at-startup "dinitctl" "start" "desktop-services"
@@ -201,22 +200,23 @@ window-rule {
     match is-window-cast-target=true
     opacity 1.0
 
-    // Luna error red: conspicuous without introducing a color outside the theme.
+    // Kanso red, kept static in both modes: a screencast warning must stay
+    // recognizable at a glance rather than shifting with the theme.
     focus-ring {
         on
         width 3
-        active-color "#e08585"
-        inactive-color "#e08585"
+        active-color "#C34043"
+        inactive-color "#C34043"
     }
 
     shadow {
-        color "#e0858570"
-        inactive-color "#e0858570"
+        color "#C3404370"
+        inactive-color "#C3404370"
     }
 
     tab-indicator {
-        active-color "#e08585"
-        inactive-color "#e08585"
+        active-color "#C34043"
+        inactive-color "#C34043"
     }
 }
 // Open the Firefox picture-in-picture player as floating by default.

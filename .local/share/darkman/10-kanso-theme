@@ -5,27 +5,49 @@ set -eu
 mode=${1:?expected light or dark}
 state_root=${XDG_STATE_HOME:-$HOME/.local/state}/darkman
 config_root=${XDG_CONFIG_HOME:-$HOME/.config}
-script_dir=$(dirname "$(readlink -f "$0")")
+helper_dir=$config_root/darkman
 mkdir -p "$state_root"
 
 case "$mode" in
 dark)
-    bg=000000; bg_alt=1e1e1e; bg_soft=2f3849; surface=646464
-    selection=2f3849; border=646464; muted=989898; fg=ffffff
-    blue=2fafff; cyan=00d3d0; green=44bc44; green_alt=70b900
-    magenta=feacd0; yellow=d0bc00; yellow_bright=fec43f; red=ff5f59
-    fg_alt=c4c4c4; rust=db7b5f
+    # Kanso Zen.
+    bg=090E13; bg_alt=1C1E25; bg_soft=22262D; surface=393B44
+    selection=22262D; border=393B44; muted=909398; fg=C5C9C7
+    blue=8ba4b0; cyan=8ea4a2; green=8a9a7b; green_alt=87a987
+    magenta=a292a3; yellow=c4b28a; yellow_bright=E6C384; red=c4746e
+    fg_alt=A4A7A4; rust=b6927b
+    # ANSI bright blue, magenta and red, from the upstream Kanso terminal port.
+    blue_bright=7FB4CA; magenta_bright=938AA9; red_bright=E46876
+    shadow=090E13
+    # Kanso diffGreen/diffRed; the emphasis tones blend 35% toward
+    # gitGreen #76946A and gitRed #C34043.
+    diff_add=2B3328; diff_add_emph=45553F
+    diff_del=43242B; diff_del_emph=702E33
+    delta_syntax_theme=zenburn
     gtk_theme=Adwaita-dark; icon_theme=breeze-dark; color_scheme=prefer-dark
     foot_signal=USR1
     lock_source=$HOME/Pictures/wallpapers/warm-skies.jpg
     lock_dim=0.25
     ;;
 light)
-    bg=ffffff; bg_alt=f2f2f2; bg_soft=dae5ec; surface=c4c4c4
-    selection=dae5ec; border=9f9f9f; muted=595959; fg=000000
-    blue=0031a9; cyan=005e8b; green=006800; green_alt=316500
-    magenta=721045; yellow=6f5500; yellow_bright=884900; red=a60000
-    fg_alt=3b3b3b; rust=8a290f
+    # Kanso Pearl.
+    bg=f2f1ef; bg_alt=e2e1df; bg_soft=dddddb; surface=cacac7
+    # muted is pearlBlack1 rather than the lighter pearlGray3 so that secondary
+    # text clears 4.5:1 on bg_alt and on selection, not only on bg.
+    selection=dddddb; border=cacac7; muted=545464; fg=22262D
+    blue=4d699b; cyan=597b75; green=6f894e; green_alt=6e915f
+    magenta=b35b79; yellow=836f4a; yellow_bright=de9800; red=c84053
+    # fg_alt is pearlBlack2, which keeps fg > fg_alt > muted ordered by
+    # prominence in both modes.
+    fg_alt=43436c; rust=cc6d00
+    # ANSI bright blue, magenta and red, from the upstream Kanso terminal port.
+    blue_bright=6693bf; magenta_bright=624c83; red_bright=d7474b
+    shadow=22262D
+    # pearlGreen3 #b7d0ae and pearlRed4 #d9a594 carry the emphasis, with the
+    # base tones the same colors at 50% over pearlWhite0.
+    diff_add=d4e0ce; diff_add_emph=b7d0ae
+    diff_del=e5cbc1; diff_del_emph=d9a594
+    delta_syntax_theme=gruvbox-light
     gtk_theme=Adwaita; icon_theme=breeze; color_scheme=default
     foot_signal=USR2
     lock_source=$HOME/Pictures/wallpapers/white-coast.jpg
@@ -38,7 +60,7 @@ light)
 esac
 
 lock_image=$state_root/lockscreen-$mode.jpg
-"$script_dir/make-lockscreen" "$lock_source" "$lock_image" "$lock_dim"
+"$helper_dir/make-lockscreen" "$lock_source" "$lock_image" "$lock_dim"
 
 cat >"$state_root/palette.css" <<EOF
 @define-color background #$bg;
@@ -119,27 +141,54 @@ layout {
         inactive-color "#$border"
     }
     border {
+        active-gradient from="#$bg_alt" to="#$red" angle=45 relative-to="workspace-view"
         inactive-color "#$bg_alt"
+    }
+    tab-indicator {
+        active-gradient from="#$yellow" to="#$red" angle=45
+        inactive-gradient from="#$border" to="#$muted" angle=45 relative-to="workspace-view"
+        urgent-gradient from="#$red_bright" to="#$red" angle=45
+    }
+    shadow {
+        color "#${shadow}70"
+        inactive-color "#${shadow}54"
     }
 }
 overview {
     backdrop-color "#$bg"
 }
-window-rule {
-    match is-window-cast-target=true
-    focus-ring {
-        active-color "#$red"
-        inactive-color "#$red"
-    }
-    shadow {
-        color "#${red}70"
-        inactive-color "#${red}70"
-    }
-    tab-indicator {
-        active-color "#$red"
-        inactive-color "#$red"
-    }
-}
+EOF
+
+# git's include silently ignores a missing path, so a checkout where darkman
+# has never run simply falls back to delta's own defaults.
+cat >"$state_root/delta.gitconfig" <<EOF
+[delta]
+    dark = $(test "$mode" = dark && printf true || printf false)
+    light = $(test "$mode" = light && printf true || printf false)
+    syntax-theme = $delta_syntax_theme
+    file-style = bold "#$blue"
+    file-decoration-style = "#$border" ul
+    hunk-header-style = file line-number syntax
+    hunk-header-file-style = "#$fg_alt"
+    hunk-header-line-number-style = "#$rust"
+    hunk-header-decoration-style = "#$border" box
+    commit-style = raw
+    commit-decoration-style = "#$border" box
+    zero-style = syntax
+    plus-style = syntax "#$diff_add"
+    plus-non-emph-style = syntax "#$diff_add"
+    plus-emph-style = syntax "#$diff_add_emph"
+    minus-style = syntax "#$diff_del"
+    minus-non-emph-style = syntax "#$diff_del"
+    minus-emph-style = syntax "#$diff_del_emph"
+    line-numbers = true
+    line-numbers-left-style = "#$border"
+    line-numbers-right-style = "#$border"
+    line-numbers-zero-style = "#$muted"
+    line-numbers-minus-style = "#$red"
+    line-numbers-plus-style = "#$green"
+    whitespace-error-style = "#$bg" "#$red"
+    blame-palette = "#$bg #$bg_alt #$bg_soft #$surface"
 EOF
 
 cat >"$state_root/mpv.conf" <<EOF
@@ -194,7 +243,7 @@ set recolor-adjust-lightness true
 set recolor-reverse-video true
 EOF
 
-cp "$script_dir/swayimg-base.ini" "$state_root/swayimg.ini"
+cp "$helper_dir/swayimg-base.ini" "$state_root/swayimg.ini"
 cat >>"$state_root/swayimg.ini" <<EOF
 [viewer]
 window = #${bg}ff
@@ -234,22 +283,36 @@ yellow=#$yellow
 yellow_bright=#$yellow_bright
 red=#$red
 rust=#$rust
+blue_bright=#$blue_bright
+magenta_bright=#$magenta_bright
+red_bright=#$red_bright
 EOF
 
-# RMPC and btop have no Modus ports; recolor the existing layouts while
-# preserving their structure and behavior.
-sed \
-    -e "s/#090E13/#$bg/g" -e "s/#C5C9C7/#$fg/g" \
-    -e "s/#A4A7A4/#$muted/g" -e "s/#393B44/#$border/g" \
-    -e "s/#8ba4b0/#$blue/g" -e "s/#8a9a7b/#$green/g" \
-    -e "s/#c4b28a/#$yellow/g" -e "s/#c4746e/#$red/g" \
-    "$config_root/rmpc/themes/kanso-zen.ron" >"$state_root/rmpc.ron"
-sed \
-    -e "s/#090E13/#$bg/g" -e "s/#C5C9C7/#$fg/g" \
-    -e "s/#A4A7A4/#$muted/g" -e "s/#393B44/#$border/g" \
-    -e "s/#8BA4B0/#$blue/g" -e "s/#8A9A7B/#$green/g" \
-    -e "s/#C4B28A/#$yellow/g" -e "s/#C4746E/#$red/g" \
-    "$config_root/btop/themes/kanso-zen.theme" >"$state_root/btop.theme"
+# rmpc and btop take a whole theme file rather than a palette include, so the
+# literal Kanso Zen themes are recolored into the active mode while their
+# structure and behavior stay intact. In dark mode this is an identity
+# substitution. The templates spell hex digits in mixed case, so every pattern
+# matches case-insensitively.
+recolor_kanso_zen() {
+    sed \
+        -e "s/#090e13/#$bg/gI" \
+        -e "s/#c5c9c7/#$fg/gI" \
+        -e "s/#a4a7a4/#$fg_alt/gI" \
+        -e "s/#393b44/#$border/gI" \
+        -e "s/#8ba4b0/#$blue/gI" \
+        -e "s/#8ea4a2/#$cyan/gI" \
+        -e "s/#8a9a7b/#$green/gI" \
+        -e "s/#a292a3/#$magenta/gI" \
+        -e "s/#c4b28a/#$yellow/gI" \
+        -e "s/#c4746e/#$red/gI" \
+        -e "s/#7fb4ca/#$blue_bright/gI" \
+        -e "s/#938aa9/#$magenta_bright/gI" \
+        -e "s/#e46876/#$red_bright/gI" \
+        "$1"
+}
+
+recolor_kanso_zen "$config_root/rmpc/themes/kanso-zen.ron" >"$state_root/rmpc.ron"
+recolor_kanso_zen "$config_root/btop/themes/kanso-zen.theme" >"$state_root/btop.theme"
 
 gsettings set org.gnome.desktop.interface color-scheme "$color_scheme" 2>/dev/null || true
 gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null || true
@@ -267,7 +330,7 @@ if pgrep -u "$(id -u)" -f '[/]usr/bin/qutebrowser( |$)' >/dev/null; then
 fi
 
 # Keep the wallpaper in step with the rest of the desktop theme.
-setsid -f "$script_dir/set-wallpaper" "$mode" >/dev/null 2>&1
+setsid -f "$helper_dir/set-wallpaper" "$mode" >/dev/null 2>&1
 
 # SwayOSD reads its stylesheet only at startup; its dinit service owns the
 # process and ensures that theme reloads cannot create duplicate servers.

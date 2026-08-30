@@ -63,7 +63,7 @@ vim.api.nvim_create_autocmd('PackChanged', {
 })
 
 vim.pack.add({
-  'https://github.com/miikanissi/modus-themes.nvim',
+  'https://github.com/webhooked/kanso.nvim',
   'https://github.com/nvim-treesitter/nvim-treesitter',
   'https://github.com/RRethy/nvim-treesitter-endwise',
   'https://github.com/nvim-mini/mini.nvim',
@@ -83,15 +83,16 @@ local function setup(name, opts)
   require(name).setup(opts or {})
 end
 
-setup('modus-themes', {
-  style = 'auto',
+setup('kanso', {
+  background = { dark = 'zen', light = 'pearl' },
   transparent = false,
+  compile = false,
 })
 
 local function apply_desktop_mode(mode)
   vim.schedule(function()
     vim.o.background = mode == 'light' and 'light' or 'dark'
-    vim.cmd.colorscheme('modus')
+    vim.cmd.colorscheme('kanso')
   end)
 end
 

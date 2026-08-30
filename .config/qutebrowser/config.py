@@ -31,7 +31,7 @@ c.url.start_pages = ['https://kagi.com']
 # ':open gh' visits github.com instead of searching for the string "gh".
 c.url.open_base_url = True
 
-# --- 2. MODUS THEME ---
+# --- 2. KANSO THEME ---
 c.window.transparent = False
 
 # TABS (Solid & Minimal)
@@ -51,7 +51,7 @@ c.statusbar.widgets = ['keypress', 'url', 'scroll', 'history', 'tabs', 'progress
 c.colors.webpage.preferred_color_scheme = "auto"
 c.content.user_stylesheets = ["/home/evan/.config/qutebrowser/youtube.css"]
 
-# The Modus palette lives in ~/.local/share/darkman/10-modus-theme, which
+# The Kanso palette lives in ~/.local/share/darkman/10-kanso-theme, which
 # regenerates this file on every mode switch. qutebrowser keeps no copy.
 PALETTE_FILE = (
     pathlib.Path(os.environ.get('XDG_STATE_HOME') or pathlib.Path.home()
@@ -62,7 +62,7 @@ PALETTE_KEYS = frozenset({
     'blue', 'green', 'green_alt', 'magenta', 'yellow', 'yellow_bright', 'red',
     'rust',
 })
-HEX_COLOR = re.compile(r'#[0-9a-f]{6}')
+HEX_COLOR = re.compile(r'#[0-9a-fA-F]{6}')
 FALLBACK_MODE = 'dark'
 
 
