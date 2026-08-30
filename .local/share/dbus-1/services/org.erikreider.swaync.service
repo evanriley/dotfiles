@@ -1,0 +1,11 @@
+# Shadows /usr/share/dbus-1/services/org.erikreider.swaync.service.
+# XDG_DATA_HOME precedes XDG_DATA_DIRS in the D-Bus service search path, so
+# this file wins and D-Bus activation can no longer start a second swaync.
+# The dinit user service ~/.config/dinit.d/swaync is the sole owner; an
+# activated competitor would take org.freedesktop.Notifications and leave the
+# dinit-managed instance restarting every 2 s forever.
+# Exec is inert rather than absent: dbus-daemon requires the key, and /bin/true
+# exits without claiming the name.
+[D-BUS Service]
+Name=org.freedesktop.Notifications
+Exec=/bin/true
