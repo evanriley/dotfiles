@@ -333,6 +333,46 @@ pkill -USR2 -x waybar 2>/dev/null || true
 pkill -USR1 -x swayimg 2>/dev/null || true
 swaync-client --reload-css 2>/dev/null || true
 swaync-client --reload-config 2>/dev/null || true
+# btop reads its theme only at startup. SIGUSR1 is handled but does not re-read
+# it, so the scratchpad is restarted instead. niri does the spawning, which is
+# what gives the new window the same environment and window rules as the
+# spawn-at-startup entry that created it -- spawning from here would inherit
+# darkman's environment instead. Only restarts a scratchpad that is already
+# open, so a closed one is not resurrected on every mode change.
+restart_scratchpad() {
+    scratch_app_id=$1
+    shift
+
+    scratch_pid=$(
+        niri msg --json windows 2>/dev/null |
+            jq -r --arg id "$scratch_app_id" \
+                'first(.[] | select(.app_id == $id) | .pid) // empty'
+    )
+    [ -n "$scratch_pid" ] || return 0
+
+    kill "$scratch_pid" 2>/dev/null || return 0
+
+    # Wait for the window to go, so the respawn cannot race the old one and
+    # leave two scratchpads stacked on the workspace.
+    scratch_wait=0
+    while [ "$scratch_wait" -lt 20 ] && kill -0 "$scratch_pid" 2>/dev/null; do
+        sleep 0.1
+        scratch_wait=$((scratch_wait + 1))
+    done
+
+    niri msg action spawn -- "$@" >/dev/null 2>&1 || true
+}
+
+restart_scratchpad scratch_btop foot --app-id=scratch_btop btop
+
+# rmpc replaces its theme in place, so it needs no restart. The remote needs an
+# explicit pid; without one it probes every instance it can find and fails.
+rmpc_pid=$(pgrep -x rmpc | head -1)
+if [ -n "$rmpc_pid" ]; then
+    rmpc remote --pid "$rmpc_pid" set theme "$state_root/rmpc.ron" \
+        >/dev/null 2>&1 || true
+fi
+
 # Reload an existing qutebrowser instance, but never launch one from this
 # synchronous hook: darkman waits for every hook command to exit.
 if pgrep -u "$(id -u)" -f '[/]usr/bin/qutebrowser( |$)' >/dev/null; then
