@@ -218,7 +218,7 @@ c.downloads.location.suggestion = 'both'
 c.downloads.location.prompt = False
 c.downloads.location.directory = '~/Downloads'
 
-c.completion.open_categories = ['quickmarks', 'bookmarks', 'history',
+c.completion.open_categories = ['history', 'quickmarks', 'bookmarks',
                                 'searchengines', 'filesystem']
 
 # The ':open' history completion is ordered by 'ORDER BY last_atime DESC' in
