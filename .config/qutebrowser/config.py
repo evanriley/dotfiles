@@ -220,6 +220,59 @@ c.downloads.location.directory = '~/Downloads'
 
 c.completion.open_categories = ['quickmarks', 'bookmarks', 'history',
                                 'searchengines', 'filesystem']
+
+# The ':open' history completion is ordered by 'ORDER BY last_atime DESC' in
+# completion/models/histcategory.py -- pure recency, with no term for how often
+# a site is visited, so a page opened once yesterday outranks one visited daily
+# for a year. No setting exposes the ordering, so the ORDER BY is rewritten as
+# the query is handed to SQLite.
+#
+# The score is Mozilla's frecency shape: each visit contributes a weight that
+# falls off with the age of that visit, summed per URL. Frequency accumulates
+# while recency still breaks ties.
+#
+# This needs an index on History(url). qutebrowser declares one, but
+# SqlTable.create_index returns early unless the schema version just changed,
+# so a profile that never saw a version bump does not have it. Without the
+# index the sort is a full table scan per candidate row: 2175 ms for an empty
+# pattern, against 8.8 ms with it.
+try:
+    from qutebrowser.misc import sql as _sql
+
+    _FRECENCY = """(SELECT SUM(CASE
+        WHEN h.atime > strftime('%s','now') - 345600  THEN 100
+        WHEN h.atime > strftime('%s','now') - 1209600 THEN 70
+        WHEN h.atime > strftime('%s','now') - 2678400 THEN 50
+        WHEN h.atime > strftime('%s','now') - 7776000 THEN 30
+        ELSE 10 END)
+      FROM History h
+      WHERE h.url = CompletionHistory.url AND NOT h.redirect)"""
+
+    _STOCK_ORDER = 'ORDER BY last_atime DESC'
+    _orig_query = _sql.Database.query
+
+    if not getattr(_orig_query, '_frecency_patched', False):
+        _index_done = []
+
+        def _frecency_query(self, querystr, forward_only=True):
+            # Only the completion query itself. The max_items subquery in
+            # _atime_expr() also selects from CompletionHistory with the same
+            # ORDER BY and must be left alone; it does not select url, title.
+            if querystr.startswith('SELECT url, title,') and _STOCK_ORDER in querystr:
+                if not _index_done:
+                    _index_done.append(True)
+                    _orig_query(self, 'CREATE INDEX IF NOT EXISTS '
+                                      'HistoryIndex ON History (url)').run()
+                querystr = querystr.replace(
+                    _STOCK_ORDER, 'ORDER BY {} DESC, last_atime DESC'.format(_FRECENCY))
+            return _orig_query(self, querystr, forward_only)
+
+        _frecency_query._frecency_patched = True
+        _sql.Database.query = _frecency_query
+except Exception:
+    # An upgrade that moves this seam should cost stock ordering, never a
+    # browser that cannot open a URL.
+    pass
 c.tabs.last_close = 'startpage'
 c.tabs.mode_on_change = 'restore'
 c.confirm_quit = ['downloads']
