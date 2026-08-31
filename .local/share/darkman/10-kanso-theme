@@ -101,7 +101,6 @@ cat >"$state_root/swaylock.conf" <<EOF
 image=$helper_dir/lockscreen-$mode.png
 scaling=fill
 color=$lock_bg
-indicator-idle-visible
 font=Berkeley Mono
 font-size=24
 indicator-radius=72
