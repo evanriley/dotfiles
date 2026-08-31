@@ -95,7 +95,13 @@ initial-color-theme=$mode
 EOF
 
 cat >"$state_root/swaylock.conf" <<EOF
+# Static images, generated once and tracked, not rebuilt per transition: the
+# only thing that varies between modes is which of the two is used. color= is
+# the fallback for anything the image does not cover.
+image=$helper_dir/lockscreen-$mode.png
+scaling=fill
 color=$lock_bg
+indicator-idle-visible
 font=Berkeley Mono
 font-size=24
 indicator-radius=72
