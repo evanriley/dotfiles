@@ -266,19 +266,23 @@ window-rule {
         fixed 620
     }
 }
-// Steam client window only. Games carry their own app id and are matched
-// separately below.
+// Steam client window only, matched positively on its title. Matching every
+// steam window and carving out exceptions sends transient windows -- toasts,
+// dialogs, download popups -- to the game workspace, and warp-mouse-to-focus
+// then drags the pointer off whatever the user was doing. Games carry their
+// own app id and are matched separately below.
 window-rule {
-    match app-id="^steam$"
-    exclude title="^notificationtoasts_\\d+_desktop$"
+    match app-id="^steam$" title="^Steam$"
     open-on-workspace "game"
 }
 // Notification toasts belong wherever the user currently is. Floating is
 // declared here rather than assumed of the client: a tiled toast ignores
-// default-floating-position.
+// default-floating-position. A toast must never take focus -- it is an
+// interruption, and taking focus also warps the pointer to it.
 window-rule {
     match app-id="^steam$" title="^notificationtoasts_\\d+_desktop$"
     open-floating true
+    open-focused false
     default-floating-position x=10 y=10 relative-to="bottom-right"
 }
 window-rule {
