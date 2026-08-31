@@ -317,6 +317,10 @@ window-rule {
     match app-id="scratch_rmpc"
     open-on-workspace "scratch"
     open-floating true
+    // Never pull the view to the scratch workspace. These are spawned at
+    // login and respawned by the theme hook, neither of which the user asked
+    // to be taken to.
+    open-focused false
     default-column-width {
         fixed 1920
     }
@@ -328,6 +332,10 @@ window-rule {
     match app-id="scratch_btop"
     open-on-workspace "scratch"
     open-floating true
+    // Never pull the view to the scratch workspace. These are spawned at
+    // login and respawned by the theme hook, neither of which the user asked
+    // to be taken to.
+    open-focused false
     default-column-width {
         fixed 1920
     }
