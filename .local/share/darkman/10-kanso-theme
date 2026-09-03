@@ -291,19 +291,20 @@ shadow = #${bg}d0
 background = #00000000
 EOF
 
+# Exactly the keys config.py validates in PALETTE_KEYS, plus the mode it
+# reads for forced dark mode. A key this file carries and config.py ignores is
+# a claim that the browser follows it.
 cat >"$state_root/qutebrowser.conf" <<EOF
 mode=$mode
 bg=#$bg
 bg_alt=#$bg_alt
 bg_soft=#$bg_soft
-surface=#$surface
 selection=#$selection
 border=#$border
 muted=#$muted
 fg=#$fg
 fg_alt=#$fg_alt
 blue=#$blue
-cyan=#$cyan
 green=#$green
 green_alt=#$green_alt
 magenta=#$magenta
@@ -311,9 +312,6 @@ yellow=#$yellow
 yellow_bright=#$yellow_bright
 red=#$red
 rust=#$rust
-blue_bright=#$blue_bright
-magenta_bright=#$magenta_bright
-red_bright=#$red_bright
 EOF
 
 # rmpc and btop take a whole theme file rather than a palette include, so the
