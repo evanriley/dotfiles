@@ -105,8 +105,6 @@ layout {
 
 spawn-at-startup "/usr/lib/polkit-kde-authentication-agent-1"
 
-spawn-at-startup "/home/evan/.config/darkman/set-wallpaper"
-
 // Supervise the long-running desktop daemons and retain their logs with dinit.
 spawn-at-startup "dinitctl" "start" "desktop-services"
 

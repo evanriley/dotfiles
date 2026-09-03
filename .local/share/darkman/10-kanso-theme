@@ -508,11 +508,18 @@ if pgrep -u "$(id -u)" -f '[/]usr/bin/qutebrowser( |$)' >/dev/null; then
     qutebrowser ':config-source' >/dev/null 2>&1 || true
 fi
 
-# Keep the wallpaper in step with the rest of the desktop theme.
-setsid -f "$helper_dir/set-wallpaper" "$mode" >/dev/null 2>&1 || report_failure \
-    'failed to start the wallpaper helper' \
-    "the desktop background to follow $mode; it keeps the previous colour." \
-    "$helper_dir/set-wallpaper $mode"
+# Keep the wallpaper in step with the rest of the desktop theme. Detached
+# because the helper waits on dinit, and darkman waits on every hook command.
+# A detached child cannot report its own failure, so the one failure worth
+# naming -- a helper that is missing or not executable -- is checked here.
+if [ -x "$helper_dir/set-wallpaper" ]; then
+    setsid -f "$helper_dir/set-wallpaper" "$mode" >/dev/null 2>&1 || true
+else
+    report_failure \
+        'the wallpaper helper is missing or not executable' \
+        "the desktop background to follow $mode; it keeps the previous colour." \
+        "ls -l $helper_dir/set-wallpaper"
+fi
 
 # SwayOSD reads its stylesheet only at startup; its dinit service owns the
 # process and ensures that theme reloads cannot create duplicate servers.

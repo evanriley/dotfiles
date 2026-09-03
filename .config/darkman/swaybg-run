@@ -1,0 +1,32 @@
+#!/bin/sh
+
+set -eu
+
+# The wallpaper process, owned by dinit. Solid colour rather than an image:
+# bg_alt sits one step off the window background in each mode -- darker in
+# light, lighter in dark -- so the gaps niri leaves between windows stay
+# visible instead of bleeding together.
+#
+# The mode is read from state rather than passed as an argument because dinit
+# owns the command line and restarts this with the same one every time.
+# set-wallpaper writes that file and asks dinit for the restart.
+
+state_root=${XDG_STATE_HOME:-$HOME/.local/state}/darkman
+mode=$(cat "$state_root/wallpaper-mode" 2>/dev/null || darkman get 2>/dev/null || printf dark)
+
+case "$mode" in
+dark)
+    color=1C1E25
+    ;;
+light)
+    color=e2e1df
+    ;;
+*)
+    printf 'swaybg-run: unknown mode: %s.\n' "$mode" >&2
+    printf 'expected light or dark in %s/wallpaper-mode.\n' "$state_root" >&2
+    printf 'check: cat %s/wallpaper-mode\n' "$state_root" >&2
+    exit 2
+    ;;
+esac
+
+exec swaybg -c "$color" -m solid_color
