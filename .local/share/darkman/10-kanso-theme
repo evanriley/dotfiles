@@ -8,6 +8,22 @@ config_root=${XDG_CONFIG_HOME:-$HOME/.config}
 helper_dir=$config_root/darkman
 mkdir -p "$state_root"
 
+# Most of this hook is best-effort: a reload that fails costs one stale window.
+# The failures reported here are the ones that outlast the transition, so they
+# are named rather than swallowed. darkman records hook output, and the
+# notification reaches the user while the cause is still on screen.
+report_failure() {
+    failure_summary=$1
+    failure_expectation=$2
+    failure_check=$3
+
+    printf 'darkman: %s.\n' "$failure_summary" >&2
+    printf 'expected %s\n' "$failure_expectation" >&2
+    printf 'check: %s\n' "$failure_check" >&2
+    notify-send --urgency=critical "$failure_summary" \
+        "$failure_expectation Check: $failure_check" 2>/dev/null || true
+}
+
 case "$mode" in
 dark)
     # Kanso Zen.
@@ -323,8 +339,27 @@ recolor_kanso_zen() {
         "$1"
 }
 
-recolor_kanso_zen "$config_root/rmpc/themes/kanso-zen.ron" >"$state_root/rmpc.ron"
-recolor_kanso_zen "$config_root/btop/themes/kanso-zen.theme" >"$state_root/btop.theme"
+# A redirect truncates its target before sed runs, so a missing or renamed
+# source would leave rmpc or btop reading an empty theme -- and under set -e
+# would abort the hook, stranding the rest of the desktop in the previous mode.
+# Writing beside the target and renaming keeps the last good palette instead.
+write_recolored() {
+    recolor_source=$1
+    recolor_target=$2
+
+    if recolor_kanso_zen "$recolor_source" >"$recolor_target.new"; then
+        mv -f "$recolor_target.new" "$recolor_target"
+    else
+        rm -f "$recolor_target.new"
+        report_failure \
+            "failed to recolor $recolor_source" \
+            "a readable Kanso Zen theme; $recolor_target keeps its previous contents." \
+            "ls -l $recolor_source"
+    fi
+}
+
+write_recolored "$config_root/rmpc/themes/kanso-zen.ron" "$state_root/rmpc.ron"
+write_recolored "$config_root/btop/themes/kanso-zen.theme" "$state_root/btop.theme"
 
 gsettings set org.gnome.desktop.interface color-scheme "$color_scheme" 2>/dev/null || true
 gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null || true
@@ -476,19 +511,25 @@ if pgrep -u "$(id -u)" -f '[/]usr/bin/qutebrowser( |$)' >/dev/null; then
 fi
 
 # Keep the wallpaper in step with the rest of the desktop theme.
-setsid -f "$helper_dir/set-wallpaper" "$mode" >/dev/null 2>&1
+setsid -f "$helper_dir/set-wallpaper" "$mode" >/dev/null 2>&1 || report_failure \
+    'failed to start the wallpaper helper' \
+    "the desktop background to follow $mode; it keeps the previous colour." \
+    "$helper_dir/set-wallpaper $mode"
 
 # SwayOSD reads its stylesheet only at startup; its dinit service owns the
 # process and ensures that theme reloads cannot create duplicate servers.
 # A failure here leaves SwayOSD stopped for the rest of the session, so it is
-# reported rather than swallowed: darkman records hook output, and the desktop
-# notification reaches the user while the cause is still on screen.
-if ! dinitctl restart swayosd >/dev/null 2>&1; then
-    printf 'darkman: failed to restart the swayosd dinit service.\n' >&2
-    printf 'expected SwayOSD to reload its stylesheet; it is now stopped.\n' >&2
-    printf 'check: dinitctl status swayosd\n' >&2
-    notify-send --urgency=critical \
-        'SwayOSD did not restart' \
-        'The theme hook could not restart swayosd. Check: dinitctl status swayosd' \
-        2>/dev/null || true
+# reported rather than swallowed. The first hook of a session can run before
+# niri has issued the dinitctl that brings desktop-services up, and restarting
+# a service that was never started is not the request that was meant.
+if dinitctl is-started swayosd >/dev/null 2>&1; then
+    swayosd_action=restart
+else
+    swayosd_action=start
+fi
+if ! dinitctl "$swayosd_action" swayosd >/dev/null 2>&1; then
+    report_failure \
+        "failed to $swayosd_action the swayosd dinit service" \
+        'SwayOSD to reload its stylesheet; it is now stopped.' \
+        'dinitctl status swayosd'
 fi
