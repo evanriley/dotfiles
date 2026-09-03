@@ -190,7 +190,12 @@ window-rule {
     match app-id="dev.deedles.Trayscale"
     match app-id="org.gnome.World.PikaBackup"
     match app-id="Bitwarden"
-    match app-id="^steam$"
+    // Steam's own windows only. app-id alone also catches the notification
+    // toasts and every transient dialog, which are matched positively by
+    // title below for the same reason: a toast blended with the wallpaper is
+    // harder to read, and it is on screen for three seconds.
+    match app-id="^steam$" title="^Steam$"
+    match app-id="^steam$" title="^Friends List$"
     opacity 0.95
 }
 // Niri can detect individual-window screencasts. Keep the shared target fully
@@ -292,7 +297,7 @@ window-rule {
     }
 }
 window-rule {
-    match app-id="foot"
+    match app-id="^foot$"
     default-column-width {
         proportion 0.25
     }
