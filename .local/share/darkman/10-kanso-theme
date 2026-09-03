@@ -330,7 +330,21 @@ gsettings set org.gnome.desktop.interface color-scheme "$color_scheme" 2>/dev/nu
 gsettings set org.gnome.desktop.interface gtk-theme "$gtk_theme" 2>/dev/null || true
 gsettings set org.gnome.desktop.interface icon-theme "$icon_theme" 2>/dev/null || true
 
-pkill -"$foot_signal" -x foot 2>/dev/null || true
+# foot changes palette on SIGUSR1 and SIGUSR2, but the default disposition of
+# both is Term and foot installs its handlers a few milliseconds after exec.
+# niri's spawn-at-startup races this hook at login, so signalling every foot by
+# name killed the scratchpad terminals outright and took rmpc and btop with
+# them. A foot that young has just read initial-color-theme out of the include
+# written above and is already in the requested mode, so it needs no signal.
+# Process age comes from procps ps; without it no terminal is signalled, which
+# costs a stale palette rather than a killed window.
+foot_settled_seconds=1
+for foot_pid in $(pgrep -x foot 2>/dev/null || true); do
+    foot_age=$(ps -o etimes= -p "$foot_pid" 2>/dev/null | tr -d ' ')
+    if [ "${foot_age:-0}" -ge "$foot_settled_seconds" ]; then
+        kill -"$foot_signal" "$foot_pid" 2>/dev/null || true
+    fi
+done
 # An optional include that did not exist when niri started is not watched, so
 # the first run after a wiped state directory needs an explicit reload.
 niri msg action load-config-file >/dev/null 2>&1 || true
@@ -344,16 +358,45 @@ swaync-client --reload-config 2>/dev/null || true
 # spawn-at-startup entry that created it -- spawning from here would inherit
 # darkman's environment instead. Only restarts a scratchpad that is already
 # open, so a closed one is not resurrected on every mode change.
+#
+# The window rules put a new scratchpad on the scratch workspace unfocused, so
+# a bare respawn takes back a scratchpad the user had toggled out onto a
+# visible workspace. From the user's side that is indistinguishable from the
+# window closing itself on every theme change, so placement and focus are
+# captured first and reapplied to the replacement.
+scratch_workspace=${NS_WORKSPACE:-scratch}
+
+scratch_window_field() {
+    niri msg --json windows 2>/dev/null |
+        jq -r --arg id "$1" --arg field "$2" \
+            'first(.[] | select(.app_id == $id) | .[$field]) // empty'
+}
+
+# Fails while the only window carrying the app id is still the one that was
+# killed, so the caller can poll for the window niri has yet to map.
+scratch_replacement_id() {
+    scratch_candidate=$(scratch_window_field "$1" id)
+    if [ -z "$scratch_candidate" ] || [ "$scratch_candidate" = "$2" ]; then
+        return 1
+    fi
+    printf '%s\n' "$scratch_candidate"
+}
+
 restart_scratchpad() {
     scratch_app_id=$1
     shift
 
-    scratch_pid=$(
-        niri msg --json windows 2>/dev/null |
-            jq -r --arg id "$scratch_app_id" \
-                'first(.[] | select(.app_id == $id) | .pid) // empty'
-    )
+    scratch_pid=$(scratch_window_field "$scratch_app_id" pid)
     [ -n "$scratch_pid" ] || return 0
+    scratch_old_id=$(scratch_window_field "$scratch_app_id" id)
+    scratch_ws_id=$(scratch_window_field "$scratch_app_id" workspace_id)
+    scratch_focused=$(scratch_window_field "$scratch_app_id" is_focused)
+
+    scratch_home=$(
+        niri msg --json workspaces 2>/dev/null |
+            jq -r --argjson ws "${scratch_ws_id:-0}" \
+                'first(.[] | select(.id == $ws) | (.name // (.idx | tostring))) // empty'
+    )
 
     kill "$scratch_pid" 2>/dev/null || return 0
 
@@ -366,6 +409,27 @@ restart_scratchpad() {
     done
 
     niri msg action spawn -- "$@" >/dev/null 2>&1 || true
+
+    if [ -z "$scratch_home" ] || [ "$scratch_home" = "$scratch_workspace" ]; then
+        return 0
+    fi
+
+    scratch_wait=0
+    scratch_new_id=""
+    while [ "$scratch_wait" -lt 30 ]; do
+        if scratch_new_id=$(scratch_replacement_id "$scratch_app_id" "$scratch_old_id"); then
+            break
+        fi
+        sleep 0.1
+        scratch_wait=$((scratch_wait + 1))
+    done
+    [ -n "$scratch_new_id" ] || return 0
+
+    niri msg action move-window-to-workspace --window-id "$scratch_new_id" \
+        --focus=false "$scratch_home" >/dev/null 2>&1 || true
+    if [ "$scratch_focused" = true ]; then
+        niri msg action focus-window --id "$scratch_new_id" >/dev/null 2>&1 || true
+    fi
 }
 
 restart_scratchpad scratch_btop foot --app-id=scratch_btop btop
