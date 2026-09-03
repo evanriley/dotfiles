@@ -259,12 +259,22 @@ try:
             # _atime_expr() also selects from CompletionHistory with the same
             # ORDER BY and must be left alone; it does not select url, title.
             if querystr.startswith('SELECT url, title,') and _STOCK_ORDER in querystr:
-                if not _index_done:
-                    _index_done.append(True)
-                    _orig_query(self, 'CREATE INDEX IF NOT EXISTS '
-                                      'HistoryIndex ON History (url)').run()
-                querystr = querystr.replace(
-                    _STOCK_ORDER, 'ORDER BY {} DESC, last_atime DESC'.format(_FRECENCY))
+                try:
+                    if not _index_done:
+                        _orig_query(self, 'CREATE INDEX IF NOT EXISTS '
+                                          'HistoryIndex ON History (url)').run()
+                        _index_done.append(True)
+                except Exception:
+                    # A locked or read-only history database would otherwise
+                    # raise into the completion itself. Recency also happens
+                    # to be the right fallback: without the index the frecency
+                    # sort is a full table scan per candidate row, 2175ms
+                    # against 8.8ms for an empty pattern.
+                    pass
+                else:
+                    querystr = querystr.replace(
+                        _STOCK_ORDER,
+                        'ORDER BY {} DESC, last_atime DESC'.format(_FRECENCY))
             return _orig_query(self, querystr, forward_only)
 
         _frecency_query._frecency_patched = True
