@@ -47,12 +47,6 @@ add-highlighter global/matching-char show-matching
 # highlight follows the cursor without a hook.
 add-highlighter global/cursor-line line '%val{cursor_line}' CursorLine
 
-# nvim listchars: trail = '.', nbsp = '+', tabs rendered as blanks. Two
-# highlighters because '-only-trailing' is all-or-nothing: it would hide a
-# non-breaking space that is not at the end of a line, which is the case worth
-# seeing.
-add-highlighter global/whitespace-nbsp show-whitespaces \
-    -tab '' -tabpad ' ' -spc '' -lf '' -nbsp '+'
 add-highlighter global/whitespace-trailing show-whitespaces -only-trailing \
     -tab '.' -tabpad ' ' -spc '.' -lf '' -nbsp '+'
 
@@ -264,6 +258,14 @@ hook global ModuleLoaded fzf-file %{
 hook global ModuleLoaded fzf-grep %{
     set-option global fzf_grep_command 'rg'
 }
+
+# Every fzf.kak submodule calls the 'fzf' command and reads options that the
+# core 'fzf' module declares, but none of them require it -- upstream registers
+# its own bindings inside a 'ModuleLoaded fzf' hook, so reaching a submodule
+# through fzf-mode has always loaded the core first. The leader mappings below
+# call the submodules directly and would otherwise fail with 'fzf: no such
+# command'. Loading the core here costs a handful of option declarations.
+require-module fzf
 
 # fzf.kak's recent-files module reads this list; nothing writes it unless the
 # editor does. The upstream README uses moreutils' sponge, which is not
