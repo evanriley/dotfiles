@@ -215,6 +215,85 @@ set -gx FZF_DEFAULT_OPTS \\
     '--color=marker:#$green,spinner:#$yellow,header:#$blue'
 EOF
 
+# Kakoune sources this only if it exists, so an editor started before darkman
+# has ever run falls back to the Kanso Zen scheme bundled in ~/.config/kak.
+# Every face Kakoune, kakoune-lsp and the built-in highlighters read is named
+# here: an undefined face falls through to the terminal's own colors, which in a
+# light session means dark text on a dark ground. The git gutter is deliberately
+# absent -- ':git show-diff' emits the literal face names red, green and blue,
+# which resolve to ANSI slots that foot already carries in the active mode.
+cat >"$state_root/kanso.kak" <<EOF
+set-face global value          rgb:$rust
+set-face global type           rgb:$yellow
+set-face global variable       rgb:$fg
+set-face global module         rgb:$cyan
+set-face global function       rgb:$blue
+set-face global string         rgb:$green
+set-face global keyword        rgb:$magenta_bright
+set-face global operator       rgb:$fg_alt
+set-face global attribute      rgb:$yellow_bright
+set-face global comment        rgb:$muted+i
+set-face global documentation  comment
+set-face global meta           rgb:$magenta
+set-face global builtin        rgb:$blue_bright
+set-face global identifier     rgb:$fg
+set-face global bracket        rgb:$fg_alt
+set-face global delimiter      rgb:$fg_alt
+
+set-face global title   rgb:$blue+b
+set-face global header  rgb:$cyan+b
+set-face global mono    rgb:$green_alt
+set-face global block   rgb:$green_alt
+set-face global link    rgb:$blue+u
+set-face global bullet  rgb:$yellow
+set-face global list    rgb:$fg
+
+set-face global Default            rgb:$fg,rgb:$bg
+set-face global CursorLine         default,rgb:$bg_alt
+set-face global PrimarySelection   default,rgb:$surface+g
+set-face global SecondarySelection default,rgb:$selection+g
+set-face global PrimaryCursor      rgb:$bg,rgb:$fg+fg
+set-face global SecondaryCursor    rgb:$bg,rgb:$muted+fg
+set-face global PrimaryCursorEol   rgb:$bg,rgb:$fg_alt+fg
+set-face global SecondaryCursorEol rgb:$bg,rgb:$border+fg
+set-face global LineNumbers        rgb:$muted,rgb:$bg
+set-face global LineNumberCursor   rgb:$yellow,rgb:$bg_alt+b
+set-face global LineNumbersWrapped rgb:$border,rgb:$bg
+set-face global MenuForeground     rgb:$bg,rgb:$blue
+set-face global MenuBackground     rgb:$fg,rgb:$bg_alt
+set-face global MenuInfo           rgb:$muted+i
+set-face global Information        rgb:$fg,rgb:$bg_alt
+set-face global InlineInformation  rgb:$fg,rgb:$bg_alt
+set-face global Error              rgb:$bg,rgb:$red
+set-face global StatusLine         rgb:$fg,rgb:$bg_alt
+set-face global StatusLineMode     rgb:$bg,rgb:$yellow+b
+set-face global StatusLineInfo     rgb:$cyan
+set-face global StatusLineValue    rgb:$rust
+set-face global StatusCursor       rgb:$bg,rgb:$fg
+set-face global Prompt             rgb:$yellow,rgb:$bg_alt
+set-face global MatchingChar       rgb:$yellow_bright,rgb:$bg_soft+b
+set-face global BufferPadding      rgb:$border,rgb:$bg
+set-face global Whitespace         rgb:$border+f
+set-face global WhitespaceIndent   rgb:$bg_soft+f
+set-face global WrapMarker         rgb:$border+f
+
+set-face global DiagnosticError        default,default,rgb:$red+c
+set-face global DiagnosticWarning      default,default,rgb:$yellow_bright+c
+set-face global DiagnosticInfo         default,default,rgb:$blue+c
+set-face global DiagnosticHint         default,default,rgb:$muted+c
+set-face global InlayDiagnosticError   rgb:$red+d
+set-face global InlayDiagnosticWarning rgb:$yellow_bright+d
+set-face global InlayDiagnosticInfo    rgb:$blue+d
+set-face global InlayDiagnosticHint    rgb:$muted+d
+set-face global LineFlagError          rgb:$red
+set-face global LineFlagWarning        rgb:$yellow_bright
+set-face global LineFlagInfo           rgb:$blue
+set-face global LineFlagHint           rgb:$muted
+set-face global InlayHint              rgb:$muted+d
+set-face global InlayCodeLens          rgb:$muted+d
+set-face global Reference              default,rgb:$surface
+EOF
+
 cat >"$state_root/mpv.conf" <<EOF
 osd-color='#$fg'
 osd-border-color='#$bg'
@@ -507,6 +586,16 @@ fi
 if pgrep -u "$(id -u)" -f '[/]usr/bin/qutebrowser( |$)' >/dev/null; then
     qutebrowser ':config-source' >/dev/null 2>&1 || true
 fi
+
+# Kakoune only reads its colorscheme at startup, so every live session is told
+# to re-source the file it already sources from its kakrc. 'kak -l' prints
+# nothing and exits non-zero when no session exists, which is the common case,
+# and a session that ends between the listing and the send costs one stale
+# window -- both are best-effort rather than reportable.
+for kak_session in $(kak -l 2>/dev/null || true); do
+    printf 'source %s\n' "$state_root/kanso.kak" |
+        kak -p "$kak_session" >/dev/null 2>&1 || true
+done
 
 # Keep the wallpaper in step with the rest of the desktop theme. Detached
 # because the helper waits on dinit, and darkman waits on every hook command.
