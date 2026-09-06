@@ -259,14 +259,6 @@ hook global ModuleLoaded fzf-grep %{
     set-option global fzf_grep_command 'rg'
 }
 
-# Every fzf.kak submodule calls the 'fzf' command and reads options that the
-# core 'fzf' module declares, but none of them require it -- upstream registers
-# its own bindings inside a 'ModuleLoaded fzf' hook, so reaching a submodule
-# through fzf-mode has always loaded the core first. The leader mappings below
-# call the submodules directly and would otherwise fail with 'fzf: no such
-# command'. Loading the core here costs a handful of option declarations.
-require-module fzf
-
 # fzf.kak's recent-files module reads this list; nothing writes it unless the
 # editor does. The upstream README uses moreutils' sponge, which is not
 # installed -- a temporary file beside the target does the same job and, unlike
@@ -276,9 +268,12 @@ require-module fzf
 declare-option -docstring 'number of paths kept in the recent-files list' \
     int recent_files_limit 200
 
+declare-option -docstring 'file holding the recent-files list' \
+    str recent_files_path %sh{ printf '%s/kak-mru' "${XDG_CACHE_HOME:-$HOME/.cache}" }
+
 hook global BufCreate ^[^*].* %{
     nop %sh{
-        recent_files=$HOME/.cache/kak-mru
+        recent_files=$kak_opt_recent_files_path
         mkdir -p "${recent_files%/*}"
         touch "$recent_files"
         if printf '%s\n' "$kak_buffile" |
@@ -308,6 +303,86 @@ map global surround T ': change-surrounding-tag<ret>' -docstring 'change surroun
 map global surround D ': delete-surrounding-tag<ret>' -docstring 'delete surrounding tag'
 map global surround A ': select-surrounding-tag<ret>' -docstring 'select surrounding tag'
 
+# ── Pickers ──────────────────────────────────────────────────────────────────
+# mini.pick. 'prompt -menu' draws its candidate list in the status area and
+# ranks it with Kakoune's own fuzzy matcher, so a picker costs no window at all.
+# The fzf.kak submodules do the same job by spawning a terminal that runs a
+# second Kakoune client, which under a scrolling compositor is a new column on
+# every invocation. The plugin stays vendored for <space>F, the one route that
+# wants fzf's preview pane.
+#
+# '-shell-script-candidates' runs its script once, when the prompt opens, and
+# filters the cached list in process on every keystroke; that is what a file
+# list wants. '-shell-script-completion' re-runs its script on every keystroke
+# and passes it the prompt content as "$1"; that is what a live grep wants, and
+# what a file list would spend a process per keystroke on.
+
+declare-option -docstring 'command listing candidates for the file picker' \
+    str picker_file_command 'fd --type f --follow --strip-cwd-prefix'
+
+declare-option -docstring 'command listing candidates for the git file picker' \
+    str picker_git_command 'git ls-files --cached --others --exclude-standard'
+
+declare-option -docstring 'command run by the grep picker, given the query and the search root as its trailing arguments' \
+    str picker_grep_command 'rg --line-number --column --no-heading --color=never --smart-case --'
+
+declare-option -docstring 'number of matches the grep picker offers for one query' \
+    int picker_grep_limit 200
+
+define-command -hidden picker-file -docstring 'fuzzy-select a file below the working directory' %{
+    prompt -menu -shell-script-candidates %{
+        $kak_opt_picker_file_command
+    } 'file: ' %{ edit -existing %val{text} }
+}
+
+define-command -hidden picker-git -docstring 'fuzzy-select a file git knows about' %{
+    prompt -menu -shell-script-candidates %{
+        $kak_opt_picker_git_command 2>/dev/null
+    } 'git file: ' %{ edit -existing %val{text} }
+}
+
+define-command -hidden picker-buffer -docstring 'fuzzy-select an open buffer' %{
+    prompt -menu -buffer-completion 'buffer: ' %{ buffer %val{text} }
+}
+
+define-command -hidden picker-recent -docstring 'fuzzy-select a recently opened file' %{
+    prompt -menu -shell-script-candidates %{
+        [ -r "$kak_opt_recent_files_path" ] || exit 0
+        # The list is only ever prepended to, so it outlives the files in it. A
+        # path whose file has since been deleted or renamed would be offered
+        # and then fail to open.
+        while IFS= read -r recorded_path; do
+            [ -f "$recorded_path" ] && printf '%s\n' "$recorded_path"
+        done < "$kak_opt_recent_files_path"
+    } 'recent: ' %{ edit -existing %val{text} }
+}
+
+define-command -hidden picker-grep -docstring 'search the working directory and jump to a match' %{
+    prompt -menu -shell-script-completion %{
+        [ -n "$1" ] || exit 0
+        $kak_opt_picker_grep_command "$1" . 2>/dev/null |
+            head -n "$kak_opt_picker_grep_limit"
+    } 'grep: ' %{ picker-grep-open %val{text} }
+}
+
+# rg emits 'path:line:column:text'. Position is read from the left, so a match
+# whose text contains a colon still resolves. A path containing one does not,
+# which is a limit of rg's output format rather than of this parse.
+define-command -hidden picker-grep-open -params 1 %{
+    evaluate-commands %sh{
+        kakquote() { printf "'%s'" "$(printf %s "$1" | sed "s/'/''/g")"; }
+
+        entry=$1
+        path=${entry%%:*}
+        entry=${entry#*:}
+        line=${entry%%:*}
+        entry=${entry#*:}
+        column=${entry%%:*}
+
+        printf 'edit -existing %s %s %s\n' "$(kakquote "$path")" "$line" "$column"
+    }
+}
+
 # ── Leader mappings ──────────────────────────────────────────────────────────
 # Every mapping carries a -docstring: entering a user mode renders them as a
 # menu, which is what mini.clue provided.
@@ -329,12 +404,12 @@ map global ocaml u ': dune-run utop<ret>' -docstring 'dune utop'
 # only while an OCaml buffer is displayed.
 map global ocaml a ': alt<ret>' -docstring 'switch between .ml and .mli'
 
-map global user <space> ': require-module fzf-file; fzf-file<ret>' -docstring 'find files'
-map global user / ': require-module fzf-grep; fzf-grep<ret>' -docstring 'live grep'
-map global user b ': require-module fzf-buffer; fzf-buffer<ret>' -docstring 'buffers'
-map global user o ': require-module fzf-recent; fzf-recent<ret>' -docstring 'recent files'
-map global user g ': require-module fzf-git; fzf-git<ret>' -docstring 'git files'
-map global user F ': fzf-mode<ret>' -docstring 'fzf modes…'
+map global user <space> ': picker-file<ret>' -docstring 'find files'
+map global user / ': picker-grep<ret>' -docstring 'live grep'
+map global user b ': picker-buffer<ret>' -docstring 'buffers'
+map global user o ': picker-recent<ret>' -docstring 'recent files'
+map global user g ': picker-git<ret>' -docstring 'git files'
+map global user F ': fzf-mode<ret>' -docstring 'fzf modes… (spawns a window)'
 
 map global user w ': write<ret>' -docstring 'write buffer'
 map global user k ': delete-buffer<ret>' -docstring 'kill buffer'
