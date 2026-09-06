@@ -350,6 +350,88 @@ c.content.javascript.log_message.excludes['userscript:_qute_js'] = [
     '*TrustedHTML*',
 ]
 
+# --- QT 6.11 SCRIPT-INJECTION WORKAROUND ---
+# QtWebEngine 6.11 sometimes drops the DocumentCreation injection of
+# qutebrowser's own JavaScript; a redirecting URL opened in a new tab
+# (':open -t http://duckduckgo.com') reproduces it. window._qutebrowser is then
+# undefined in the application world, so 'f' fails with "Unknown error while
+# getting elements" and j/k, <Ctrl-d>/<Ctrl-u> and caret mode stay dead until
+# the tab is reloaded. Upstream: qutebrowser#8925, fix pending in #8940.
+#
+# find_css is the only affected path that reports an error, so it is the hook:
+# on that specific failure the bundle is re-evaluated into the application
+# world and the lookup retried once. Scrolling and caret mode come back with
+# it, since the whole bundle is restored.
+#
+# Both steps are posted to the event loop. A runJavaScript issued from inside
+# a runJavaScript callback never has its result delivered.
+#
+# stylesheet.js is deliberately left out of the bundle: injecting it here
+# never returns, and user stylesheets do not error out visibly anyway.
+#
+# WebEngineElements is imported after config.py runs, and configfiles.py drops
+# every module config.py imports back out of sys.modules, so the class cannot
+# be reached directly. __init_subclass__ on its already-imported base catches
+# the class as it is defined instead.
+try:
+    from qutebrowser.browser import browsertab as _browsertab
+    from qutebrowser.utils import resources as _resources
+    from qutebrowser.qt.core import QTimer as _QTimer
+
+    _MISSING = 'Unknown error while getting elements'
+
+    def _reinject_code():
+        return ('(function() {{ "use strict";\n'
+                'if (!window.hasOwnProperty("_qutebrowser")) {{'
+                ' window._qutebrowser = {{"initialized": {{}}}}; }}\n'
+                '{}\n'
+                'window._qutebrowser.initialized["scripts"] = true;\n'
+                '}})();').format('\n'.join(
+                    _resources.read_file('javascript/' + name)
+                    for name in ('scroll.js', 'webelem.js', 'caret.js')))
+
+    def _patch_elements(cls):
+        if getattr(cls.find_css, '_reinjects', False):
+            return
+        orig = cls.find_css
+
+        def find_css(self, selector, callback, error_cb, *,
+                     only_visible=False, _retry=True):
+            def on_error(err):
+                if not (_retry and _MISSING in str(err)):
+                    error_cb(err)
+                    return
+
+                def retry():
+                    find_css(self, selector, callback, error_cb,
+                             only_visible=only_visible, _retry=False)
+
+                def reinject():
+                    self._tab.run_js_async(_reinject_code())
+                    _QTimer.singleShot(0, retry)
+
+                _QTimer.singleShot(0, reinject)
+
+            orig(self, selector, callback, on_error, only_visible=only_visible)
+
+        find_css._reinjects = True
+        cls.find_css = find_css
+
+    def _on_subclass(cls, **kwargs):
+        super(_browsertab.AbstractElements, cls).__init_subclass__(**kwargs)
+        if cls.__name__ == 'WebEngineElements':
+            _patch_elements(cls)
+
+    _browsertab.AbstractElements.__init_subclass__ = classmethod(_on_subclass)
+    # ':config-source' re-runs this file after the class already exists.
+    for _sub in _browsertab.AbstractElements.__subclasses__():
+        if _sub.__name__ == 'WebEngineElements':
+            _patch_elements(_sub)
+except Exception:
+    # A qutebrowser upgrade that moves this seam should cost the workaround,
+    # never a browser that fails to start.
+    pass
+
 # Password manager
 config.bind('<Space>pl', 'spawn --userscript qute-bitwarden-fuzzel')
 config.bind('<Space>pu', 'spawn --userscript qute-bitwarden-fuzzel --username-only')
