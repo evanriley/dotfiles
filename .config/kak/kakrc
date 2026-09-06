@@ -146,70 +146,68 @@ define-command -hidden run-in-terminal -params 1.. \
     }
 }
 
-# nvim resolved the zig project root with vim.fs.root; build.zig.zon is listed
-# because a package without a build script still has one.
-define-command -hidden zig-run -params 1.. -docstring 'zig-run <arguments>: run zig from the project root in a terminal window' %{
+# ── Projects ─────────────────────────────────────────────────────────────────
+# One set of verbs for every language. ':build', ':test', ':run', ':test-file'
+# and ':repl' each read a window option that a filetype hook fills in, so the
+# keys under <space>c stay the same whatever the buffer holds and adding a
+# language is one hook rather than another user mode.
+#
+# Leaving an option unset is a supported state: the verb then reports which
+# option to set for the filetype in front of you, which is more useful than a
+# key that silently does nothing.
+
+declare-option -docstring 'file names, glob patterns allowed, marking the root of a project' \
+    str-list project_root_files '.git'
+
+declare-option -docstring 'command run by :build' str-list build_command
+declare-option -docstring 'command run by :test' str-list test_command
+declare-option -docstring 'command run by :run' str-list run_command
+declare-option -docstring 'command run by :repl' str-list repl_command
+declare-option -docstring 'command run by :test-file, given the buffer path as its last argument' \
+    str-list test_file_command
+
+# The verb is a parameter rather than a separate command per verb because
+# Kakoune exports an option to a shell block only when the block's text names
+# it literally, so the error message cannot look its own option up by name.
+define-command -hidden project-run -params 1.. \
+    -docstring 'project-run <verb> [<program> [<arguments>]]: run a command in a terminal window from the root of the current project' %{
     evaluate-commands %sh{
         kakquote() { printf "'%s'" "$(printf %s "$1" | sed "s/'/''/g")"; }
 
-        root=${kak_buffile:-$PWD/.}
-        root=${root%/*}
-        [ -n "$root" ] || root=/
-        while [ "$root" != / ]; do
-            if [ -e "$root/build.zig" ] || [ -e "$root/build.zig.zon" ] || [ -e "$root/.git" ]; then
-                break
-            fi
-            root=${root%/*}
-            [ -n "$root" ] || root=/
-        done
-        [ "$root" != / ] || root=$PWD
-
-        printf 'run-in-terminal sh -c %s' "$(kakquote 'cd "$1" && shift && exec "$@"')"
-        printf ' _ %s %s' "$(kakquote "$root")" "$(kakquote "$kak_opt_zig_command")"
-        for argument; do
-            printf ' %s' "$(kakquote "$argument")"
-        done
-        printf '\n'
-    }
-}
-
-# ── OCaml ────────────────────────────────────────────────────────────────────
-
-# dune, ocamllsp and ocamlformat are installed into an opam switch whose bin
-# directory joins PATH only for a shell that has evaluated 'opam env'. Kakoune
-# inherits the environment of whatever started it, and a niri spawn-at-startup
-# entry has not evaluated anything. Going through 'opam exec' resolves the
-# switch when the command runs -- including a project-local switch in ./_opam --
-# rather than naming a path that changing switch would invalidate. A checkout
-# without opam falls through to whatever 'dune' PATH already resolves to.
-define-command -hidden dune-run -params 1.. \
-    -docstring 'dune-run <arguments>: run dune from the project root in a terminal window' %{
-    evaluate-commands %sh{
-        kakquote() { printf "'%s'" "$(printf %s "$1" | sed "s/'/''/g")"; }
-
-        # A 'dune' file sits in every directory of a project, so it is not a
-        # root marker; dune-project, dune-workspace and the opam package
-        # metadata are. The glob runs in a subshell because 'set --' is the only
-        # way to test one, and the outer positional arguments are the command
-        # line still to be emitted.
-        root=${kak_buffile:-$PWD/.}
-        root=${root%/*}
-        [ -n "$root" ] || root=/
-        while [ "$root" != / ]; do
-            if [ -e "$root/dune-project" ] || [ -e "$root/dune-workspace" ] ||
-               ( set -- "$root"/*.opam; [ -e "$1" ] ) || [ -e "$root/.git" ]; then
-                break
-            fi
-            root=${root%/*}
-            [ -n "$root" ] || root=/
-        done
-        [ "$root" != / ] || root=$PWD
-
-        if command -v opam >/dev/null 2>&1; then
-            set -- opam exec -- dune "$@"
-        else
-            set -- dune "$@"
+        verb=$1
+        shift
+        if [ $# -eq 0 ]; then
+            filetype=${kak_opt_filetype:-none}
+            printf 'fail %s\n' "$(kakquote "no ${verb} command for filetype '${filetype}': expected ${verb}_command to be set. add it to a 'hook global WinSetOption filetype=${filetype}' block in the kakrc")"
+            exit 0
         fi
+
+        # Each marker is tested with the glob left unquoted so that a pattern
+        # such as '*.opam' matches, inside a subshell because 'set --' is the
+        # only portable way to test one and the outer positional arguments are
+        # the command line still to be emitted.
+        markers=$(eval "set -- $kak_quoted_opt_project_root_files; printf '%s\n' \"\$@\"")
+        has_marker() {
+            directory=$1
+            printf '%s\n' "$markers" | {
+                while IFS= read -r marker; do
+                    [ -n "$marker" ] || continue
+                    set -- "$directory"/$marker
+                    [ -e "$1" ] && exit 0
+                done
+                exit 1
+            }
+        }
+
+        root=${kak_buffile:-$PWD/.}
+        root=${root%/*}
+        [ -n "$root" ] || root=/
+        while [ "$root" != / ]; do
+            has_marker "$root" && break
+            root=${root%/*}
+            [ -n "$root" ] || root=/
+        done
+        [ "$root" != / ] || root=$PWD
 
         printf 'run-in-terminal sh -c %s' "$(kakquote 'cd "$1" && shift && exec "$@"')"
         printf ' _ %s' "$(kakquote "$root")"
@@ -217,6 +215,71 @@ define-command -hidden dune-run -params 1.. \
             printf ' %s' "$(kakquote "$argument")"
         done
         printf '\n'
+    }
+}
+
+define-command build -docstring 'build the project the current buffer belongs to' %{
+    project-run build %opt{build_command}
+}
+define-command test -docstring 'run the tests of the project the current buffer belongs to' %{
+    project-run test %opt{test_command}
+}
+define-command run -docstring 'run the project the current buffer belongs to' %{
+    project-run run %opt{run_command}
+}
+define-command repl -docstring 'open a repl for the current buffer' %{
+    project-run repl %opt{repl_command}
+}
+
+# The buffer path is appended here rather than baked into the option, so that
+# the option stays a plain command line. Its own guard, because an unset option
+# would otherwise leave the path as the only argument and be run as a program.
+define-command test-file -docstring 'run the tests in the current file' %{
+    evaluate-commands %sh{
+        [ -n "$kak_opt_test_file_command" ] && exit 0
+        printf 'fail %%{%s}\n' "no test_file command for filetype '${kak_opt_filetype:-none}': expected test_file_command to be set"
+    }
+    project-run test_file %opt{test_file_command} %val{buffile}
+}
+
+# nvim resolved the zig project root with vim.fs.root; build.zig.zon is listed
+# because a package without a build script still has one.
+hook global WinSetOption filetype=zig %{
+    set-option window project_root_files 'build.zig' 'build.zig.zon' '.git'
+    set-option window build_command %opt{zig_command} build
+    set-option window test_command %opt{zig_command} build test
+    set-option window run_command %opt{zig_command} build run
+    set-option window test_file_command %opt{zig_command} test
+}
+
+# A 'dune' file sits in every directory of a project that builds anything, so it
+# is not a root marker; dune-project, dune-workspace and the opam package
+# metadata are.
+#
+# dune, ocamllsp and ocamlformat are installed into an opam switch whose bin
+# directory joins PATH only for a shell that has evaluated 'opam env'. Kakoune
+# inherits the environment of whatever started it, and a niri spawn-at-startup
+# entry has not evaluated anything. Going through 'opam exec' resolves the
+# switch when the command runs -- including a project-local switch in ./_opam --
+# rather than naming a path that changing switch would invalidate. A checkout
+# without opam falls through to whatever 'dune' PATH already resolves to.
+#
+# run_command is deliberately unset: 'dune exec' needs the name of an
+# executable that only the project knows, so there is nothing correct to put
+# here. :run says so when it is pressed in an OCaml buffer.
+hook global WinSetOption filetype=ocaml %{
+    set-option window project_root_files 'dune-project' 'dune-workspace' '*.opam' '.git'
+    evaluate-commands %sh{
+        if command -v opam >/dev/null 2>&1; then
+            opam_prefix='opam exec --'
+        else
+            opam_prefix=''
+        fi
+        cat <<EOF
+set-option window build_command $opam_prefix dune build
+set-option window test_command $opam_prefix dune runtest
+set-option window repl_command $opam_prefix dune utop
+EOF
     }
 }
 
@@ -389,20 +452,15 @@ define-command -hidden picker-grep-open -params 1 %{
 
 declare-user-mode code
 map global code w ': trim-whitespace<ret>' -docstring 'trim trailing whitespace'
-
-declare-user-mode zig
-map global zig b ': zig-run build<ret>' -docstring 'zig build'
-map global zig t ': zig-run build test<ret>' -docstring 'zig build test'
-map global zig f ': zig-run test %val{buffile}<ret>' -docstring 'zig test current file'
-
-declare-user-mode ocaml
-map global ocaml b ': dune-run build<ret>' -docstring 'dune build'
-map global ocaml t ': dune-run runtest<ret>' -docstring 'dune runtest'
-map global ocaml f ': dune-run fmt<ret>' -docstring 'dune fmt (whole project)'
-map global ocaml u ': dune-run utop<ret>' -docstring 'dune utop'
-# 'alt' is aliased to ocaml-alternative-file by the bundled ocaml filetype, and
-# only while an OCaml buffer is displayed.
-map global ocaml a ': alt<ret>' -docstring 'switch between .ml and .mli'
+map global code b ': build<ret>' -docstring 'build project'
+map global code t ': test<ret>' -docstring 'test project'
+map global code T ': test-file<ret>' -docstring 'test current file'
+map global code r ': run<ret>' -docstring 'run project'
+map global code u ': repl<ret>' -docstring 'repl'
+# 'alt' is aliased by the bundled ocaml filetype, and only while an OCaml buffer
+# is displayed; the bundled c-family filetype aliases it to its own header
+# switcher the same way.
+map global code a ': alt<ret>' -docstring 'switch to the alternative file'
 
 map global user <space> ': picker-file<ret>' -docstring 'find files'
 map global user / ': picker-grep<ret>' -docstring 'live grep'
@@ -416,8 +474,6 @@ map global user k ': delete-buffer<ret>' -docstring 'kill buffer'
 map global user B ': enter-buffers-mode<ret>' -docstring 'buffers…'
 map global user s ': enter-user-mode surround<ret>' -docstring 'surround…'
 map global user c ': enter-user-mode code<ret>' -docstring 'code…'
-map global user z ': enter-user-mode zig<ret>' -docstring 'zig…'
-map global user O ': enter-user-mode ocaml<ret>' -docstring 'ocaml…'
 
 map global user p ': clipboard-paste p<ret>' -docstring 'paste clipboard after'
 map global user P ': clipboard-paste P<ret>' -docstring 'paste clipboard before'
