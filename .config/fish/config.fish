@@ -72,9 +72,6 @@ if command -q mise
     mise activate fish | source
 end
 
-# opam installs the OCaml toolchain -- dune, ocamllsp, ocamlformat, utop -- into
-# a switch under ~/.opam, which is on PATH only once this has run. Silent before
-# 'opam init' has created a switch, when opam has nothing to report.
 if command -q opam
     opam env --shell=fish 2>/dev/null | source
 end
