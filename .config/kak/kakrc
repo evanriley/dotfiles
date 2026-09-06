@@ -1,0 +1,375 @@
+# Kakoune configuration, carried over in spirit from ~/.config/nvim/init.lua.
+#
+# Anything the nvim config solved with a plugin that Kakoune already solves is
+# not reproduced here: text objects (<a-a>/<a-i>), the undo tree (u/U/<a-u>),
+# the diff gutter (:git show-diff), the mode line (modelinefmt) and the
+# which-key menu (any user mode renders its own -docstring list). Four plugins
+# remain, vendored by ./install-plugins into ./autoload.
+
+# ── Leader ───────────────────────────────────────────────────────────────────
+# No remapping. Kakoune 2026.04 already binds <space> to the user mode and ','
+# to "keep only the main selection", which is the arrangement the nvim config
+# reaches for with mapleader = ' '. Swapping them would only move ',' onto
+# <space> and back again.
+
+# ── Options ──────────────────────────────────────────────────────────────────
+
+set-option global tabstop 2
+set-option global indentwidth 2
+set-option global scrolloff 8,8
+set-option global ui_options terminal_assistant=none
+
+declare-option -docstring 'shell spawned by the <space>t mapping' \
+    str terminal_shell %sh{ printf %s "${SHELL:-/bin/sh}" }
+
+# zig is installed by zvm, which puts ~/.zvm/bin on PATH for interactive shells
+# only. Kakoune spawns commands from its own environment, which is whatever
+# started it -- a niri spawn-at-startup entry does not have it. The absolute
+# path is used when it resolves, so the mappings work from any parent process.
+declare-option -docstring 'zig executable used by the <space>z mappings' \
+    str zig_command %sh{
+        if [ -x "$HOME/.zvm/bin/zig" ]; then
+            printf %s "$HOME/.zvm/bin/zig"
+        else
+            printf zig
+        fi
+    }
+
+# ── Display ──────────────────────────────────────────────────────────────────
+
+# nvim: number + relativenumber. '-relative' leaves the cursor line absolute,
+# which is exactly that pair; '-full-relative' would show it as 0.
+add-highlighter global/line-numbers number-lines -relative -hlcursor -separator ' '
+
+add-highlighter global/matching-char show-matching
+
+# nvim: cursorline. The line number is re-expanded on every redraw, so the
+# highlight follows the cursor without a hook.
+add-highlighter global/cursor-line line '%val{cursor_line}' CursorLine
+
+# nvim listchars: trail = '.', nbsp = '+', tabs rendered as blanks. Two
+# highlighters because '-only-trailing' is all-or-nothing: it would hide a
+# non-breaking space that is not at the end of a line, which is the case worth
+# seeing.
+add-highlighter global/whitespace-nbsp show-whitespaces \
+    -tab '' -tabpad ' ' -spc '' -lf '' -nbsp '+'
+add-highlighter global/whitespace-trailing show-whitespaces -only-trailing \
+    -tab '.' -tabpad ' ' -spc '.' -lf '' -nbsp '+'
+
+# ── Search ───────────────────────────────────────────────────────────────────
+
+# nvim: ignorecase + smartcase. Kakoune has no case option, so the search
+# prompts are seeded with the inline flag instead. That is ignorecase without
+# the smart half -- an uppercase letter in the pattern no longer forces a
+# case-sensitive match. Typing '(?I)' after the prefix restores it per search.
+map global normal / '/(?i)' -docstring 'search (case-insensitive)'
+map global normal <a-/> '<a-/>(?i)' -docstring 'search backward (case-insensitive)'
+map global normal ? '?(?i)' -docstring 'extend search (case-insensitive)'
+map global normal <a-?> '<a-?>(?i)' -docstring 'extend search backward (case-insensitive)'
+
+# ── System clipboard ─────────────────────────────────────────────────────────
+# nvim: clipboard = 'unnamedplus'. Kakoune has no clipboard integration, so the
+# yank register is mirrored outwards on every write and pulled in on demand.
+# Mirroring on RegisterModified rather than on a remapped 'y' also covers 'd',
+# 'c' and every command that fills the register, which is what unnamedplus does.
+
+# wl-copy leaves a daemon behind that owns the selection until another
+# application claims it, and Kakoune reads a shell block until end-of-file. The
+# block redirects its own stdout and stderr before spawning anything so that the
+# daemon inherits /dev/null: a descendant holding the pipe would stall the
+# editor on every yank for as long as the clipboard is unclaimed.
+hook -group clipboard global RegisterModified '"' %{
+    nop %sh{
+        clipboard_text=$kak_main_reg_dquote
+        exec >/dev/null 2>&1
+        printf %s "$clipboard_text" | wl-copy --type text/plain
+    }
+}
+
+# Pulling the other way is a mapping rather than a hook: Kakoune has no
+# "clipboard changed" event, and polling wl-paste on every keystroke would spawn
+# a process per key.
+define-command -hidden clipboard-paste -params 1 %{
+    evaluate-commands -save-regs c %{
+        set-register c %sh{ wl-paste --no-newline --type text/plain 2>/dev/null }
+        execute-keys '"c' %arg{1}
+    }
+}
+
+# ── Editing commands ─────────────────────────────────────────────────────────
+
+# mini.trailspace
+define-command trim-whitespace -docstring 'remove trailing whitespace from every line' %{
+    try %{ execute-keys -draft '%s\h+$<ret>"_d' }
+}
+
+# mini.move. A named register rather than the default one, because the default
+# one is mirrored to the system clipboard and moving a line is not a copy.
+define-command -hidden move-lines-down -docstring 'move the selected lines one line down' %{
+    try %{ execute-keys -save-regs m 'x"mdx"m<a-p>' }
+}
+define-command -hidden move-lines-up -docstring 'move the selected lines one line up' %{
+    try %{ execute-keys -save-regs m 'x"mdkx"m<a-P>' }
+}
+map global normal <a-down> ': move-lines-down<ret>' -docstring 'move lines down'
+map global normal <a-up> ': move-lines-up<ret>' -docstring 'move lines up'
+
+# niri is a scrolling compositor: its "vertical" placement consumes the new
+# window into the current column, which is the closest analogue of the nvim
+# config's splitbelow. Only some windowing modules define a vertical placement
+# -- niri does, the bare wayland fallback that Kakoune picks outside a supported
+# compositor does not -- so an unknown placement command falls back to a plain
+# new window rather than failing the mapping over ssh or in a tty.
+define-command -hidden split-terminal -params 1.. \
+    -docstring 'split-terminal <program> [<arguments>]: open a terminal beside the current window' %{
+    set-option local windowing_placement vertical
+    try %{
+        terminal %arg{@}
+    } catch %{
+        set-option local windowing_placement window
+        terminal %arg{@}
+    }
+}
+
+# nvim ran the terminal, lazygit and the zig commands in a split terminal
+# buffer. Kakoune has no terminal buffer; the equivalent is a real window.
+define-command -hidden run-in-terminal -params 1.. \
+    -docstring 'run-in-terminal <program> [<arguments>]: run a command in a new terminal window, keeping it open afterwards' %{
+    evaluate-commands %sh{
+        shquote() { printf "'%s'" "$(printf %s "$1" | sed "s/'/'\\\\''/g")"; }
+        kakquote() { printf "'%s'" "$(printf %s "$1" | sed "s/'/''/g")"; }
+
+        command_line=$(shquote "$1")
+        shift
+        for argument; do
+            command_line="$command_line $(shquote "$argument")"
+        done
+        # Without the read the window closes the instant the command exits,
+        # taking a compiler error with it.
+        command_line="$command_line; printf '\\n[exit %s] ' \"\$?\"; read -r _"
+
+        printf 'split-terminal sh -c %s\n' "$(kakquote "$command_line")"
+    }
+}
+
+# nvim resolved the zig project root with vim.fs.root; build.zig.zon is listed
+# because a package without a build script still has one.
+define-command -hidden zig-run -params 1.. -docstring 'zig-run <arguments>: run zig from the project root in a terminal window' %{
+    evaluate-commands %sh{
+        kakquote() { printf "'%s'" "$(printf %s "$1" | sed "s/'/''/g")"; }
+
+        root=${kak_buffile:-$PWD/.}
+        root=${root%/*}
+        [ -n "$root" ] || root=/
+        while [ "$root" != / ]; do
+            if [ -e "$root/build.zig" ] || [ -e "$root/build.zig.zon" ] || [ -e "$root/.git" ]; then
+                break
+            fi
+            root=${root%/*}
+            [ -n "$root" ] || root=/
+        done
+        [ "$root" != / ] || root=$PWD
+
+        printf 'run-in-terminal sh -c %s' "$(kakquote 'cd "$1" && shift && exec "$@"')"
+        printf ' _ %s %s' "$(kakquote "$root")" "$(kakquote "$kak_opt_zig_command")"
+        for argument; do
+            printf ' %s' "$(kakquote "$argument")"
+        done
+        printf '\n'
+    }
+}
+
+# ── OCaml ────────────────────────────────────────────────────────────────────
+
+# dune, ocamllsp and ocamlformat are installed into an opam switch whose bin
+# directory joins PATH only for a shell that has evaluated 'opam env'. Kakoune
+# inherits the environment of whatever started it, and a niri spawn-at-startup
+# entry has not evaluated anything. Going through 'opam exec' resolves the
+# switch when the command runs -- including a project-local switch in ./_opam --
+# rather than naming a path that changing switch would invalidate. A checkout
+# without opam falls through to whatever 'dune' PATH already resolves to.
+define-command -hidden dune-run -params 1.. \
+    -docstring 'dune-run <arguments>: run dune from the project root in a terminal window' %{
+    evaluate-commands %sh{
+        kakquote() { printf "'%s'" "$(printf %s "$1" | sed "s/'/''/g")"; }
+
+        # A 'dune' file sits in every directory of a project, so it is not a
+        # root marker; dune-project, dune-workspace and the opam package
+        # metadata are. The glob runs in a subshell because 'set --' is the only
+        # way to test one, and the outer positional arguments are the command
+        # line still to be emitted.
+        root=${kak_buffile:-$PWD/.}
+        root=${root%/*}
+        [ -n "$root" ] || root=/
+        while [ "$root" != / ]; do
+            if [ -e "$root/dune-project" ] || [ -e "$root/dune-workspace" ] ||
+               ( set -- "$root"/*.opam; [ -e "$1" ] ) || [ -e "$root/.git" ]; then
+                break
+            fi
+            root=${root%/*}
+            [ -n "$root" ] || root=/
+        done
+        [ "$root" != / ] || root=$PWD
+
+        if command -v opam >/dev/null 2>&1; then
+            set -- opam exec -- dune "$@"
+        else
+            set -- dune "$@"
+        fi
+
+        printf 'run-in-terminal sh -c %s' "$(kakquote 'cd "$1" && shift && exec "$@"')"
+        printf ' _ %s' "$(kakquote "$root")"
+        for argument; do
+            printf ' %s' "$(kakquote "$argument")"
+        done
+        printf '\n'
+    }
+}
+
+# ── Filetypes ────────────────────────────────────────────────────────────────
+
+# Kakoune detects .ml, .mli, .mll and .mly on its own. dune's own files carry no
+# extension to detect, and an opam package description is named after the
+# package. All of them are s-expressions with ';' line comments, which is what
+# the bundled lisp filetype already provides.
+hook global BufCreate (.*/)?(dune|dune-project|dune-workspace)$ %{
+    set-option buffer filetype lisp
+}
+hook global BufCreate (.*/)?[^/]+\.opam$ %{
+    set-option buffer filetype lisp
+}
+
+# comment.kak assigns comment tokens by filetype and has no ocaml entry, so
+# ':comment-line' and ':comment-block' would otherwise insert '#'. OCaml has no
+# line comment: an empty comment_line makes ':comment-line' fail with a message
+# instead of writing a '#' that would not parse.
+hook global BufSetOption filetype=ocaml %{
+    set-option buffer comment_line ''
+    set-option buffer comment_block_begin '(*'
+    set-option buffer comment_block_end '*)'
+}
+
+# ── Plugins ──────────────────────────────────────────────────────────────────
+# Everything under ./autoload is sourced automatically; only configuration that
+# has to run after the plugin is loaded lives here.
+
+# mini.pairs
+enable-auto-pairs
+
+# mini.pick. fd and rg are installed; the defaults are GNU find and GNU grep,
+# neither of which honours .gitignore.
+hook global ModuleLoaded fzf-file %{
+    set-option global fzf_file_command 'fd'
+}
+hook global ModuleLoaded fzf-grep %{
+    set-option global fzf_grep_command 'rg'
+}
+
+# fzf.kak's recent-files module reads this list; nothing writes it unless the
+# editor does. The upstream README uses moreutils' sponge, which is not
+# installed -- a temporary file beside the target does the same job and, unlike
+# sponge, cannot truncate the list if the machine loses power mid-write. The cap
+# is here because nothing else prunes the file: without it a list that is only
+# ever prepended to grows for the life of the machine.
+declare-option -docstring 'number of paths kept in the recent-files list' \
+    int recent_files_limit 200
+
+hook global BufCreate ^[^*].* %{
+    nop %sh{
+        recent_files=$HOME/.cache/kak-mru
+        mkdir -p "${recent_files%/*}"
+        touch "$recent_files"
+        if printf '%s\n' "$kak_buffile" |
+            awk -v limit="$kak_opt_recent_files_limit" \
+                '!seen[$0]++ { if (++kept <= limit) print }' \
+                - "$recent_files" >"$recent_files.new"
+        then
+            mv -f "$recent_files.new" "$recent_files"
+        else
+            rm -f "$recent_files.new"
+        fi
+    }
+}
+
+# mini.tabline: the buffer list is an info box on demand rather than a
+# permanent tab bar, so it is shown when a window is first displayed.
+hook global WinDisplay .* info-buffers
+
+# mini.surround
+declare-user-mode surround
+map global surround s ': surround<ret>' -docstring 'surround selection'
+map global surround c ': change-surround<ret>' -docstring 'change surrounding pair'
+map global surround d ': delete-surround<ret>' -docstring 'delete surrounding pair'
+map global surround a ': select-surround<ret>' -docstring 'select surrounding pair'
+map global surround t ': surround-with-tag<ret>' -docstring 'surround with tag'
+map global surround T ': change-surrounding-tag<ret>' -docstring 'change surrounding tag'
+map global surround D ': delete-surrounding-tag<ret>' -docstring 'delete surrounding tag'
+map global surround A ': select-surrounding-tag<ret>' -docstring 'select surrounding tag'
+
+# ── Leader mappings ──────────────────────────────────────────────────────────
+# Every mapping carries a -docstring: entering a user mode renders them as a
+# menu, which is what mini.clue provided.
+
+declare-user-mode code
+map global code w ': trim-whitespace<ret>' -docstring 'trim trailing whitespace'
+
+declare-user-mode zig
+map global zig b ': zig-run build<ret>' -docstring 'zig build'
+map global zig t ': zig-run build test<ret>' -docstring 'zig build test'
+map global zig f ': zig-run test %val{buffile}<ret>' -docstring 'zig test current file'
+
+declare-user-mode ocaml
+map global ocaml b ': dune-run build<ret>' -docstring 'dune build'
+map global ocaml t ': dune-run runtest<ret>' -docstring 'dune runtest'
+map global ocaml f ': dune-run fmt<ret>' -docstring 'dune fmt (whole project)'
+map global ocaml u ': dune-run utop<ret>' -docstring 'dune utop'
+# 'alt' is aliased to ocaml-alternative-file by the bundled ocaml filetype, and
+# only while an OCaml buffer is displayed.
+map global ocaml a ': alt<ret>' -docstring 'switch between .ml and .mli'
+
+map global user <space> ': require-module fzf-file; fzf-file<ret>' -docstring 'find files'
+map global user / ': require-module fzf-grep; fzf-grep<ret>' -docstring 'live grep'
+map global user b ': require-module fzf-buffer; fzf-buffer<ret>' -docstring 'buffers'
+map global user o ': require-module fzf-recent; fzf-recent<ret>' -docstring 'recent files'
+map global user g ': require-module fzf-git; fzf-git<ret>' -docstring 'git files'
+map global user F ': fzf-mode<ret>' -docstring 'fzf modes…'
+
+map global user w ': write<ret>' -docstring 'write buffer'
+map global user k ': delete-buffer<ret>' -docstring 'kill buffer'
+map global user B ': enter-buffers-mode<ret>' -docstring 'buffers…'
+map global user s ': enter-user-mode surround<ret>' -docstring 'surround…'
+map global user c ': enter-user-mode code<ret>' -docstring 'code…'
+map global user z ': enter-user-mode zig<ret>' -docstring 'zig…'
+map global user O ': enter-user-mode ocaml<ret>' -docstring 'ocaml…'
+
+map global user p ': clipboard-paste p<ret>' -docstring 'paste clipboard after'
+map global user P ': clipboard-paste P<ret>' -docstring 'paste clipboard before'
+
+map global user t ': split-terminal %opt{terminal_shell}<ret>' -docstring 'terminal'
+map global user G ': run-in-terminal lazygit<ret>' -docstring 'lazygit'
+
+map global user d ': git show-diff<ret>' -docstring 'show diff gutter'
+
+# ── Language servers ─────────────────────────────────────────────────────────
+# kakoune-lsp emits its own Kakoune script; there is no file to source. Guarded
+# because a kakrc that errors out leaves the editor half-configured, and this
+# package can legitimately be absent on a machine that has not installed it yet.
+evaluate-commands %sh{
+    command -v kak-lsp >/dev/null 2>&1 || exit 0
+    kak-lsp
+    printf 'source %%{%s/kak/lsp-config.kak}\n' "${XDG_CONFIG_HOME:-$HOME/.config}"
+}
+
+# ── Colors ───────────────────────────────────────────────────────────────────
+# The active palette is written by the darkman hook
+# (~/.local/share/darkman/10-kanso-theme) and re-sourced on every mode change.
+# The bundled scheme is what a checkout where darkman has never run falls back
+# to, the same way the fish config falls back to fzf's own colors.
+evaluate-commands %sh{
+    darkman_colors=${XDG_STATE_HOME:-$HOME/.local/state}/darkman/kanso.kak
+    if [ -r "$darkman_colors" ]; then
+        printf 'source %%{%s}\n' "$darkman_colors"
+    else
+        printf 'colorscheme kanso-zen\n'
+    fi
+}

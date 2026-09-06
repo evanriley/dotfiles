@@ -7,3 +7,9 @@ __pycache__/
 *.swo
 *~
 .DS_Store
+
+# Kakoune plugins, vendored by .config/kak/install-plugins at pinned commits
+.config/kak/autoload/fzf.kak/
+.config/kak/autoload/auto-pairs.kak/
+.config/kak/autoload/kakoune-surround/
+.config/kak/autoload/kakoune-buffers/

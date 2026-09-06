@@ -1,0 +1,76 @@
+#!/bin/sh
+
+# Vendor the Kakoune plugins into the autoload directory at pinned commits.
+#
+# Kakoune has no plugin manager here: anything under the autoload directory is
+# sourced recursively at startup, so a checkout in the right place *is* the
+# installation. What that leaves out is version control, which is why every
+# plugin is pinned to an exact commit rather than a branch -- a plugin that
+# silently moves under the config is a config that breaks on a day the user
+# changed nothing.
+#
+# The checkouts themselves are gitignored in the dotfiles repo. This script and
+# the SHAs below are the tracked representation of them, so a fresh machine runs
+# this once and lands on byte-identical plugin trees.
+
+set -eu
+
+autoload_dir=${KAK_AUTOLOAD_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/kak/autoload}
+
+# A shallow fetch of a bare SHA needs the server to honour uploadpack
+# want-ref/allow-reachable-sha1; GitHub does. A host that does not would need a
+# full clone followed by a checkout instead.
+install_plugin() {
+    plugin_name=$1
+    plugin_url=$2
+    plugin_commit=$3
+    plugin_dir=$autoload_dir/$plugin_name
+
+    if [ "$(git -C "$plugin_dir" rev-parse HEAD 2>/dev/null || true)" = "$plugin_commit" ]; then
+        printf '%s: already at %s\n' "$plugin_name" "$plugin_commit"
+        return 0
+    fi
+
+    if [ ! -d "$plugin_dir/.git" ]; then
+        git init --quiet "$plugin_dir"
+    fi
+
+    # set-url rather than add, so a changed upstream in this file is honoured
+    # instead of failing on a remote that already exists.
+    if git -C "$plugin_dir" remote get-url origin >/dev/null 2>&1; then
+        git -C "$plugin_dir" remote set-url origin "$plugin_url"
+    else
+        git -C "$plugin_dir" remote add origin "$plugin_url"
+    fi
+
+    git -C "$plugin_dir" fetch --quiet --depth 1 origin "$plugin_commit"
+    # Detached: nothing here tracks a branch, so a stray `git pull` in the
+    # checkout cannot quietly move it off the pin.
+    git -C "$plugin_dir" checkout --quiet --detach FETCH_HEAD
+    printf '%s: %s\n' "$plugin_name" "$plugin_commit"
+}
+
+mkdir -p "$autoload_dir"
+
+# The system autoload directory is *replaced* by ~/.config/kak/autoload once
+# that directory exists, so the stock filetype, tool and windowing scripts only
+# stay loaded because of this link.
+if [ ! -e "$autoload_dir/system" ]; then
+    ln -s /usr/share/kak/autoload "$autoload_dir/system"
+fi
+
+install_plugin fzf.kak \
+    https://github.com/andreyorst/fzf.kak \
+    9df5ca534bbc55ff64e86a0a8b2167f23b63ec77
+
+install_plugin auto-pairs.kak \
+    https://github.com/alexherbo2/auto-pairs.kak \
+    e812ee6006b1c3d8c9afa45a0a90d28714636f81
+
+install_plugin kakoune-surround \
+    https://github.com/h-youhei/kakoune-surround \
+    efe74c6f434d1e30eff70d4b0d737f55bf6c5022
+
+install_plugin kakoune-buffers \
+    https://github.com/Delapouite/kakoune-buffers \
+    2630f05b288eb1a1bcedfb3db071ab9dc68074fa
