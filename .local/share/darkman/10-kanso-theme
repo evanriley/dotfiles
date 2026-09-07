@@ -493,7 +493,8 @@ signal_settled "$foot_signal" foot
 # An optional include that did not exist when niri started is not watched, so
 # the first run after a wiped state directory needs an explicit reload.
 niri msg action load-config-file >/dev/null 2>&1 || true
-signal_settled USR2 waybar
+# Waybar watches colors.css via reload_style_on_change. Its user signals
+# are reserved for overview visibility.
 signal_settled USR1 swayimg
 swaync-client --reload-css 2>/dev/null || true
 swaync-client --reload-config 2>/dev/null || true

@@ -458,7 +458,7 @@ config.bind('ss', 'open -t {primary}')
 # Edit form fields in Neovim with Ctrl+E while in insert mode.
 c.editor.command = [
     'foot', '--app-id=qute-editor', 'nvim', '-f', '{file}',
-    '-c', 'normal {line}G{column0}l',
+    '-c', 'call cursor({line}, {column})',
 ]
 
 # Readability (ZR)

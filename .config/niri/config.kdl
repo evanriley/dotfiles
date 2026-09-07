@@ -422,9 +422,6 @@ binds {
     Mod+Return hotkey-overlay-title="Open Terminal: foot" {
         spawn "foot"
     }
-    Mod+Shift+Return hotkey-overlay-title="Open Terminla: foot (in column)" {
-      spawn "foot-in-column"
-    }
     Mod+Space hotkey-overlay-title="Run an Application: fuzzel" {
         spawn "fuzzel"
     }

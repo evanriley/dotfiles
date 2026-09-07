@@ -1,28 +1,57 @@
-#!/bin/sh
+#!/usr/bin/python3
+"""Reconcile Waybar with niri's overview, including reconnects and bar restarts."""
 
-# Keep Waybar's visibility synchronized with niri's overview.
-# Waybar starts hidden; SIGUSR1 toggles its visibility.
-while :; do
-    first_event=true
+import json
+import os
+from pathlib import Path
+import select
+import signal
+import subprocess
+import time
 
-    niri msg --json event-stream 2>/dev/null |
-    while IFS= read -r event; do
-        case "$event" in
-            *'"OverviewOpenedOrClosed":{"is_open":true}'*)
-                # The first overview event is niri's current state. Since Waybar
-                # starts hidden, only toggle it when that state is open.
-                pkill -USR1 -x waybar 2>/dev/null || :
-                first_event=false
-                ;;
-            *'"OverviewOpenedOrClosed":{"is_open":false}'*)
-                if [ "$first_event" = false ]; then
-                    pkill -USR1 -x waybar 2>/dev/null || :
-                fi
-                first_event=false
-                ;;
-        esac
-    done
 
-    # Reconnect if niri reloads or its event stream is interrupted.
-    sleep 1
-done
+def set_visible(visible):
+    signum = signal.SIGUSR1 if visible else signal.SIGUSR2
+    for status in Path('/proc').glob('[0-9]*/status'):
+        try:
+            fields = dict(line.split(':', 1) for line in status.read_text().splitlines())
+            if fields['Name'].strip() != 'waybar':
+                continue
+            if int(fields['Uid'].split()[0]) != os.getuid():
+                continue
+            # User signals terminate a process before it installs its handlers.
+            if int(fields['SigCgt'].strip(), 16) & (1 << (signum - 1)):
+                os.kill(int(status.parent.name), signum)
+        except (OSError, KeyError, ValueError):
+            pass  # A process can exit while /proc is being read.
+
+
+def watch():
+    while True:
+        with subprocess.Popen(['niri', 'msg', '--json', 'event-stream'],
+                              stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) as stream:
+            pending = b''
+            visible = None
+            try:
+                while True:
+                    ready, _, _ = select.select([stream.stdout], [], [], 1)
+                    if ready:
+                        chunk = os.read(stream.stdout.fileno(), 65536)
+                        if not chunk:
+                            break
+                        pending += chunk
+                        while b'\n' in pending:
+                            line, pending = pending.split(b'\n', 1)
+                            event = json.loads(line).get('OverviewOpenedOrClosed')
+                            if event is not None:
+                                visible = event['is_open']
+                    if visible is not None:
+                        # Explicit show/hide is safe to repeat and repairs bar restarts.
+                        set_visible(visible)
+            finally:
+                stream.terminate()
+        time.sleep(1)
+
+
+if __name__ == '__main__':
+    watch()
