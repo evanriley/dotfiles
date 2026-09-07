@@ -5,8 +5,16 @@ end
 set -gx SHELL /usr/bin/fish
 set -gx XDG_CONFIG_HOME $HOME/.config
 set -gx ZVM_INSTALL $HOME/.zvm/self
-set -gx EDITOR kak
-set -gx VISUAL kak
+set -gx EDITOR nvim
+set -gx VISUAL nvim
+
+# Set the mode before fzf installs its bindings. New prompts start in insert.
+fish_vi_key_bindings insert
+set -g fish_cursor_default block
+set -g fish_cursor_insert line
+set -g fish_cursor_replace_one underscore
+set -g fish_cursor_replace underscore
+set -g fish_cursor_visual block
 
 # Colors for the current darkman mode. Absent until darkman has run at least
 # once, in which case fzf keeps its own defaults. Read at shell startup only, so
