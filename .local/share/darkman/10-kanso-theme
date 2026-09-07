@@ -73,6 +73,25 @@ light)
     ;;
 esac
 
+# Atomic replacement lets a tmux server start while darkman is changing mode.
+cat >"$state_root/tmux.conf.new" <<EOF
+set -g @kanso-bg '#$bg'
+set -g @kanso-bg-alt '#$bg_alt'
+set -g @kanso-selection '#$selection'
+set -g @kanso-border '#$border'
+set -g @kanso-muted '#$muted'
+set -g @kanso-fg '#$fg'
+set -g @kanso-blue '#$blue'
+set -g @kanso-red '#$red'
+set -g display-panes-colour '#$muted'
+set -g display-panes-active-colour '#$blue'
+EOF
+mv "$state_root/tmux.conf.new" "$state_root/tmux.conf"
+# Do not start a server just to recolor it. Named servers refresh on attach.
+if tmux -L default list-sessions >/dev/null 2>&1; then
+    tmux -L default source-file "$state_root/tmux.conf" >/dev/null 2>&1 || true
+fi
+
 cat >"$state_root/palette.css" <<EOF
 @define-color background #$bg;
 @define-color background_alt #$bg_alt;
