@@ -25,6 +25,13 @@ vim.o.inccommand = 'split'
 vim.o.updatetime = 250
 vim.o.timeoutlen = 300
 vim.o.completeopt = 'menuone,noselect,popup,fuzzy'
+vim.o.autocomplete = true
+vim.o.autocompletedelay = 100
+vim.opt.complete = { 'o', '.', 'w', 'b' }
+vim.o.foldmethod = 'expr'
+vim.o.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.o.foldlevelstart = 99
+vim.o.foldlevel = 99
 vim.o.pumheight = 10
 vim.o.scrolloff = 8
 vim.o.sidescrolloff = 8
@@ -38,6 +45,8 @@ vim.o.showtabline = 2
 vim.o.laststatus = 3
 
 vim.g['conjure#filetypes'] = { 'clojure' }
+vim.g.parinfer_filetypes = { 'clojure' }
+vim.g.parinfer_no_maps = true
 
 vim.api.nvim_create_autocmd('PackChanged', {
   callback = function(ev)
@@ -111,6 +120,8 @@ vim.api.nvim_create_autocmd('VimLeavePre', {
 setup('oil', { default_file_explorer = true })
 setup('render-markdown')
 
+setup('mini.input')
+setup('mini.sessions', { autoread = false, autowrite = false, file = '' })
 setup('mini.ai')
 setup('mini.bracketed')
 setup('mini.bufremove')
@@ -119,9 +130,22 @@ setup('mini.extra')
 setup('mini.git')
 setup('mini.jump')
 setup('mini.jump2d')
-setup('mini.move')
+-- Corne Nav + Alt + arrows moves text; Alt-h/j/k/l resizes windows below.
+setup('mini.move', {
+  mappings = {
+    left = '<M-Left>', right = '<M-Right>', down = '<M-Down>', up = '<M-Up>',
+    line_left = '<M-Left>', line_right = '<M-Right>',
+    line_down = '<M-Down>', line_up = '<M-Up>',
+  },
+})
 setup('mini.notify')
 setup('mini.pairs')
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'Parinfer',
+  callback = function()
+    vim.b.minipairs_disable = vim.b.parinfer_enabled == true or vim.b.parinfer_enabled == 1
+  end,
+})
 setup('mini.pick')
 setup('mini.statusline', { use_icons = true })
 setup('mini.surround')
@@ -139,17 +163,16 @@ snippets.setup({
   snippets = { snippets.gen_loader.from_lang() },
 })
 
-setup('mini.completion', {
-  delay = { completion = 50, info = 100, signature = 50 },
-  lsp_completion = { source_func = 'omnifunc', auto_setup = true },
-  fallback_action = '<C-n>',
-  mappings = { force_twostep = '<C-Space>', force_fallback = '<M-Space>' },
-})
-
-vim.g.parinfer_filetypes = { 'clojure' }
+-- Native completion collects LSP and buffer candidates in one menu.
+vim.keymap.set('i', '<C-Space>', '<C-x><C-o>', { desc = 'LSP completion' })
+vim.keymap.set('i', '<M-Space>', function()
+  return (vim.fn.pumvisible() == 1 and '<C-e>' or '') .. '<C-x><C-n>'
+end, { expr = true, desc = 'Current buffer word completion' })
 
 local pick = require('mini.pick')
 local extra = require('mini.extra')
+local workflow = require('workflow')
+workflow.setup()
 
 -- Swap the current buffer with the one in the given direction, leaving the
 -- cursor in the window it started in.
@@ -186,14 +209,16 @@ vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 
 local treesitter = require('nvim-treesitter')
 local treesitter_languages = {
-  'bash', 'c', 'clojure', 'cpp', 'lua', 'markdown', 'markdown_inline', 'python', 'rust', 'vimdoc', 'zig',
+  'bash', 'c', 'clojure', 'cpp', 'fish', 'lua', 'markdown', 'markdown_inline',
+  'ocaml', 'ocaml_interface', 'python', 'rust', 'vimdoc', 'zig',
 }
 treesitter.setup()
 treesitter.install(treesitter_languages)
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = { 'bash', 'c', 'clojure', 'cpp', 'help', 'lua', 'markdown', 'python', 'rust', 'zig' },
+  pattern = { 'sh', 'bash', 'c', 'clojure', 'cpp', 'fish', 'help', 'lua', 'markdown', 'ocaml', 'ocamlinterface', 'python', 'rust', 'zig' },
   callback = function()
-    vim.treesitter.start()
+    -- A newly installed parser may still be compiling on first startup.
+    if not pcall(vim.treesitter.start) then return end
     if vim.bo.filetype ~= 'clojure' and vim.bo.filetype ~= 'help' then
       vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
     end
@@ -208,7 +233,7 @@ vim.lsp.config('zls', {
     },
   },
 })
-vim.lsp.enable({ 'rust_analyzer', 'ruff', 'zls', 'clangd', 'clojure_lsp', 'lua_ls' })
+vim.lsp.enable({ 'rust_analyzer', 'ruff', 'zls', 'clangd', 'clojure_lsp', 'lua_ls', 'ocamllsp' })
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('lsp-attach', {}),
@@ -217,30 +242,32 @@ vim.api.nvim_create_autocmd('LspAttach', {
     if not client then return end
     local buf = args.buf
 
-    if client:supports_method('textDocument/formatting') then
-      vim.api.nvim_create_autocmd('BufWritePre', {
-        group = vim.api.nvim_create_augroup('lsp-format-' .. buf, {}),
-        buffer = buf,
-        callback = function()
-          vim.lsp.buf.format({ bufnr = buf, id = client.id, timeout_ms = 1000 })
-        end,
-      })
+    if client:supports_method('textDocument/completion') then
+      vim.lsp.completion.enable(true, client.id, buf, { autotrigger = false })
+      vim.bo[buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
     end
 
     local map = function(mode, lhs, rhs, desc)
       vim.keymap.set(mode, lhs, rhs, { buffer = buf, desc = desc })
     end
     map('n', 'gd', vim.lsp.buf.definition, 'Go to definition')
-    map('n', '<leader>f', function() vim.lsp.buf.format({ async = true }) end, 'Format buffer')
+    map('n', '<leader>f', function() workflow.format(buf) end, 'Format buffer')
     map('n', '<leader>e', vim.diagnostic.open_float, 'Show diagnostic')
   end,
 })
 
+-- Start after LspAttach is registered so snippets use native completion too.
+snippets.start_lsp_server({ match = false })
+
 vim.keymap.set('i', '<Tab>', function()
   if vim.fn.pumvisible() == 1 then
     return '<C-n>'
+  elseif snippets.session.get() then
+    return '<Cmd>lua MiniSnippets.session.jump("next")<CR>'
   elseif vim.snippet.active({ direction = 1 }) then
     return '<Cmd>lua vim.snippet.jump(1)<CR>'
+  elseif vim.b.parinfer_enabled == true or vim.b.parinfer_enabled == 1 then
+    return '<Plug>(parinfer-tab)'
   else
     return '<Tab>'
   end
@@ -249,8 +276,12 @@ end, { expr = true })
 vim.keymap.set('i', '<S-Tab>', function()
   if vim.fn.pumvisible() == 1 then
     return '<C-p>'
+  elseif snippets.session.get() then
+    return '<Cmd>lua MiniSnippets.session.jump("prev")<CR>'
   elseif vim.snippet.active({ direction = -1 }) then
     return '<Cmd>lua vim.snippet.jump(-1)<CR>'
+  elseif vim.b.parinfer_enabled == true or vim.b.parinfer_enabled == 1 then
+    return '<Plug>(parinfer-backtab)'
   else
     return '<S-Tab>'
   end
@@ -260,6 +291,7 @@ vim.keymap.set('i', '<CR>', function()
   if vim.fn.pumvisible() == 1 and vim.fn.complete_info().selected ~= -1 then
     return '<C-y>'
   end
+  if vim.b.minipairs_disable then return '<CR>' end
   local line = vim.api.nvim_get_current_line()
   local col = vim.api.nvim_win_get_cursor(0)[2]
   local before = line:sub(col, col)
@@ -297,27 +329,15 @@ local function toggle_terminal()
     vim.cmd('startinsert')
   end
 end
-vim.keymap.set({ 'n', 't' }, '<leader>t', toggle_terminal, { desc = 'Toggle terminal' })
+-- Space must reach the shell unchanged. Leave terminal mode before toggling.
+vim.keymap.set('n', '<leader>t', toggle_terminal, { desc = 'Toggle terminal' })
 
-local function zig_root()
-  local root = vim.fs.root(0, { 'build.zig', 'build.zig.zon', '.git' })
-  return root or vim.fn.getcwd()
-end
+local function zig_root() return workflow.root() end
 
-local function run_zig(args)
-  vim.cmd('botright 15split')
-  vim.fn.jobstart(vim.list_extend({ 'zig' }, args), {
-    cwd = zig_root(),
-    term = true,
-  })
-  vim.cmd('startinsert')
-end
-
-vim.keymap.set('n', '<leader>zb', function() run_zig({ 'build' }) end, { desc = 'Zig build' })
-vim.keymap.set('n', '<leader>zt', function() run_zig({ 'build', 'test' }) end, { desc = 'Zig build test' })
-vim.keymap.set('n', '<leader>zf', function()
-  run_zig({ 'test', vim.api.nvim_buf_get_name(0) })
-end, { desc = 'Zig test current file' })
+-- Preserve the existing Zig shortcuts alongside the common project menu.
+vim.keymap.set('n', '<leader>zb', function() workflow.run('build') end, { desc = 'Project build' })
+vim.keymap.set('n', '<leader>zt', function() workflow.run('test') end, { desc = 'Project test' })
+vim.keymap.set('n', '<leader>zf', function() workflow.run('test_file') end, { desc = 'Test current file' })
 
 local dap = require('dap')
 dap.adapters.lldb = {
@@ -346,13 +366,13 @@ vim.keymap.set('n', '<leader>do', dap.step_out, { desc = 'Debug step out' })
 vim.keymap.set('n', '<leader>dr', dap.repl.open, { desc = 'Debug REPL' })
 vim.keymap.set('n', '<leader>dt', dap.terminate, { desc = 'Debug terminate' })
 
-vim.keymap.set('n', '<leader><leader>', pick.builtin.files, { desc = 'Find files' })
-vim.keymap.set('n', '<leader>/', pick.builtin.grep_live, { desc = 'Live grep' })
+vim.keymap.set('n', '<leader><leader>', function() pick.builtin.files(nil, { source = { cwd = workflow.root() } }) end, { desc = 'Find project files' })
+vim.keymap.set('n', '<leader>/', function() pick.builtin.grep_live(nil, { source = { cwd = workflow.root() } }) end, { desc = 'Grep project' })
 vim.keymap.set('n', '<leader>b', pick.builtin.buffers, { desc = 'Buffers' })
 vim.keymap.set('n', '<leader>h', pick.builtin.help, { desc = 'Help' })
 vim.keymap.set('n', '<leader>r', pick.builtin.resume, { desc = 'Resume picker' })
 vim.keymap.set('n', '<leader>o', extra.pickers.oldfiles, { desc = 'Recent files' })
-vim.keymap.set('n', '<leader>g', extra.pickers.git_files, { desc = 'Git files' })
+vim.keymap.set('n', '<leader>g', function() extra.pickers.git_files(nil, { source = { cwd = workflow.root() } }) end, { desc = 'Git project files' })
 vim.keymap.set('n', '<leader>q', extra.pickers.list, { desc = 'Lists' })
 
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
