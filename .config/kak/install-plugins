@@ -74,3 +74,24 @@ install_plugin kakoune-surround \
 install_plugin kakoune-buffers \
     https://github.com/Delapouite/kakoune-buffers \
     2630f05b288eb1a1bcedfb3db071ab9dc68074fa
+
+install_plugin parinfer-rust \
+    https://github.com/eraserhd/parinfer-rust \
+    0d334950099cd30a8e1ca520026f8da9ea1382fa
+
+install_plugin kak-rainbow \
+    https://github.com/Bodhizafa/kak-rainbow \
+    9c3d0aa62514134ee5cb86e80855d9712c4e8c4b
+
+install_plugin kakoune-repl-mode \
+    https://github.com/jordan-yee/kakoune-repl-mode \
+    3be57a31bf390791fb8aab414e244e3f62ea73f6
+
+# Build binaries separately from startup; no compiler runs when opening Kakoune.
+cargo install --locked --path "$autoload_dir/parinfer-rust"
+install_plugin rep \
+    https://github.com/eraserhd/rep \
+    0770336b916d8f99c8509f6f8cf4ee2bcb9c435f
+make -C "$autoload_dir/rep" rep
+mkdir -p "$HOME/.local/bin"
+install -m 755 "$autoload_dir/rep/rep" "$HOME/.local/bin/rep"

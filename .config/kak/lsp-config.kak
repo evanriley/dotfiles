@@ -1,11 +1,17 @@
+# Keep the generated Kakscript and daemon on the same installed version.
+set-option global lsp_cmd %sh{
+    python3 - <<'PYCODE'
+from pathlib import Path
+import os, shlex, shutil
+binary = Path.home() / '.local/bin/kak-lsp'
+print(shlex.quote(str(binary) if os.access(binary, os.X_OK) else shutil.which('kak-lsp')))
+PYCODE
+}
+
 # Language server configuration. Sourced from kakrc only when kak-lsp is on
 # PATH, so nothing here needs its own guard.
 #
-# kakoune-lsp ships an 'lsp-filetype-*' hook per language with a working default
-# server, so only the two places where the nvim config disagreed are overridden.
-# The hooks for servers that are not installed here (rust-analyzer, lua-ls,
-# clojure-lsp) are left alone: they cost nothing until the server exists, and
-# removing them would mean editing this file again after an apk add.
+# Override defaults where this setup needs a specific server or project root.
 
 # A hook registered after kakoune-lsp's runs after it, and setting lsp_servers
 # replaces the value rather than adding to it, so these win without having to
@@ -25,17 +31,26 @@ hook -group lsp-filetype-python-ruff global BufSetOption filetype=python %{
     }
 }
 
-# nvim set zls.enable_build_on_save. zls reads its configuration from the "zls"
-# section, so that is both the settings sub-table and the section name sent at
-# initialization. build.zig.zon is a root marker as well because a package
-# without a build script still has one.
+# Use the same Zig executable as builds, including desktop launches.
 hook -group lsp-filetype-zig-settings global BufSetOption filetype=zig %{
-    set-option buffer lsp_servers %{
-        [zls]
-        root_globs = ["build.zig", "build.zig.zon", ".git"]
-        settings_section = "zls"
-        [zls.settings.zls]
-        enable_build_on_save = true
+    set-option buffer lsp_servers %sh{
+        : "$kak_opt_zig_command"
+        python3 "$kak_opt_config_support" zls
+    }
+}
+
+hook -group lsp-filetype-clojure-project global BufSetOption filetype=clojure %{
+    set-option buffer lsp_servers %sh{
+        python3 - <<'PYCODE'
+import json, os
+from pathlib import Path
+binary = Path.home() / '.local/bin/clojure-lsp'
+print('[clojure-lsp]')
+print('command = "env"')
+path = str(Path.home() / '.local/bin') + ':' + os.environ['PATH']
+print('args = ' + json.dumps(['PATH=' + path, str(binary) if os.access(binary, os.X_OK) else 'clojure-lsp']))
+print('root_globs = ["deps.edn", "bb.edn", "project.clj", ".git", ".hg"]')
+PYCODE
     }
 }
 
@@ -80,15 +95,15 @@ lsp-inlay-diagnostics-enable global
 # nvim formatted on BufWritePre through the LSP client. The filetype list is
 # explicit rather than '.*' because a blocking format request against a server
 # that is not installed stalls the write until it times out.
-declare-option -docstring 'filetypes whose buffers are formatted by the language server on write' \
-    str lsp_format_on_save_filetypes 'c|cpp|objc|ocaml|python|zig'
+declare-option -docstring 'filetypes formatted on write (native tools for Zig, OCaml and Clojure)' \
+    str lsp_format_on_save_filetypes 'c|cpp|objc|ocaml|python|zig|clojure'
 
 # ocamllsp answers a formatting request by shelling out to ocamlformat, which
 # refuses to run unless the project root holds a .ocamlformat file. A project
 # without one gets an error in the status line and an otherwise normal write.
 
 hook global WinSetOption "filetype=(%opt{lsp_format_on_save_filetypes})" %{
-    hook window -group lsp-format-on-save BufWritePre .* lsp-formatting-sync
+    hook window -group lsp-format-on-save BufWritePre .* code-format-sync
     hook -once -always window WinSetOption filetype=.* %{
         remove-hooks window lsp-format-on-save
     }
@@ -96,6 +111,68 @@ hook global WinSetOption "filetype=(%opt{lsp_format_on_save_filetypes})" %{
 
 # nvim's LspAttach mappings. 'gd' is already bound to lsp-definition by
 # kakoune-lsp's own 'goto' mode mapping, so only the leader pair is added here.
-map global user f ': lsp-formatting<ret>' -docstring 'format buffer'
+map global user f ': code-format<ret>' -docstring 'format buffer'
 map global user e ': lsp-hover<ret>' -docstring 'show diagnostics for cursor'
 map global user l ': enter-user-mode lsp<ret>' -docstring 'lsp…'
+
+# Diagnostics are visible by default; type hints are opt-in per window.
+declare-option bool show_inlay_diagnostics true
+declare-option bool show_type_hints false
+define-command toggle-inlay-diagnostics %{
+    evaluate-commands %sh{
+        if [ "$kak_opt_show_inlay_diagnostics" = true ]; then
+            printf 'lsp-inlay-diagnostics-disable global
+set-option global show_inlay_diagnostics false
+'
+        else
+            printf 'lsp-inlay-diagnostics-enable global
+set-option global show_inlay_diagnostics true
+'
+        fi
+    }
+}
+define-command toggle-type-hints %{
+    evaluate-commands %sh{
+        if [ "$kak_opt_show_type_hints" = true ]; then
+            printf 'lsp-inlay-hints-disable window
+set-option window show_type_hints false
+'
+        else
+            printf 'lsp-inlay-hints-enable window
+set-option window show_type_hints true
+'
+        fi
+    }
+}
+map global display-options d ': toggle-inlay-diagnostics<ret>' -docstring 'toggle diagnostic messages'
+map global display-options i ': toggle-type-hints<ret>' -docstring 'toggle type hints'
+map global code A ': lsp-code-actions<ret>' -docstring 'code actions'
+map global code s ': lsp-selection-range<ret>' -docstring 'expand syntax selection'
+map global code R ': lsp-rename-prompt<ret>' -docstring 'rename symbol'
+map global code S ': lsp-goto-document-symbol<ret>' -docstring 'document symbols'
+map global code D ': lsp-diagnostics<ret>' -docstring 'project diagnostics'
+
+
+# Whole-buffer filters avoid Kakoune 2026.04's last-line change behavior,
+# which can join lines when applying an LSP formatting edit at EOF.
+define-command -hidden native-format %{
+    evaluate-commands -draft -save-regs '/|"' %{
+        execute-keys '%|python3 "$kak_opt_config_support" format "$kak_buffile" "$kak_opt_filetype" "$kak_opt_zig_command"<ret>'
+    }
+}
+define-command code-format-sync %{
+    evaluate-commands %sh{
+        case "$kak_opt_filetype" in
+            zig|ocaml|clojure) printf 'native-format\n';;
+            *) printf 'lsp-formatting-sync\n';;
+        esac
+    }
+}
+define-command code-format %{
+    evaluate-commands %sh{
+        case "$kak_opt_filetype" in
+            zig|ocaml|clojure) printf 'native-format\n';;
+            *) printf 'lsp-formatting\n';;
+        esac
+    }
+}

@@ -3,8 +3,8 @@
 # Anything the nvim config solved with a plugin that Kakoune already solves is
 # not reproduced here: text objects (<a-a>/<a-i>), the undo tree (u/U/<a-u>),
 # the diff gutter (:git show-diff), the mode line (modelinefmt) and the
-# which-key menu (any user mode renders its own -docstring list). Four plugins
-# remain, vendored by ./install-plugins into ./autoload.
+# which-key menu (any user mode renders its own -docstring list). Plugins
+# are vendored by ./install-plugins into ./autoload.
 
 # ── Leader ───────────────────────────────────────────────────────────────────
 # No remapping. Kakoune 2026.04 already binds <space> to the user mode and ','
@@ -26,7 +26,7 @@ declare-option -docstring 'shell spawned by the <space>t mapping' \
 # only. Kakoune spawns commands from its own environment, which is whatever
 # started it -- a niri spawn-at-startup entry does not have it. The absolute
 # path is used when it resolves, so the mappings work from any parent process.
-declare-option -docstring 'zig executable used by the <space>z mappings' \
+declare-option -docstring 'zig executable used by project commands and ZLS' \
     str zig_command %sh{
         if [ -x "$HOME/.zvm/bin/zig" ]; then
             printf %s "$HOME/.zvm/bin/zig"
@@ -34,6 +34,13 @@ declare-option -docstring 'zig executable used by the <space>z mappings' \
             printf zig
         fi
     }
+
+# Helpers are kept outside autoload so they are never sourced as Kakscript.
+declare-option str config_support "%val{config}/support.py"
+
+declare-option str rep_command %sh{
+    if [ -x "$HOME/.local/bin/rep" ]; then printf %s "$HOME/.local/bin/rep"; else printf rep; fi
+}
 
 # ── Display ──────────────────────────────────────────────────────────────────
 
@@ -74,9 +81,14 @@ map global normal <a-?> '<a-?>(?i)' -docstring 'extend search backward (case-ins
 # editor on every yank for as long as the clipboard is unclaimed.
 hook -group clipboard global RegisterModified '"' %{
     nop %sh{
-        clipboard_text=$kak_main_reg_dquote
+        # Keep each selection intact, separating selections with one newline.
+        eval "set -- $kak_quoted_reg_dquote"
         exec >/dev/null 2>&1
-        printf %s "$clipboard_text" | wl-copy --type text/plain
+        { separator=''; for selection; do
+            printf '%s%s' "$separator" "$selection"
+            separator='
+'
+        done; } | wl-copy --type text/plain
     }
 }
 
@@ -97,17 +109,29 @@ define-command trim-whitespace -docstring 'remove trailing whitespace from every
     try %{ execute-keys -draft '%s\h+$<ret>"_d' }
 }
 
-# mini.move. A named register rather than the default one, because the default
-# one is mirrored to the system clipboard and moving a line is not a copy.
-define-command -hidden move-lines-down -docstring 'move the selected lines one line down' %{
-    try %{ execute-keys -save-regs m 'x"mdx"m<a-p>' }
+# Adjacent/overlapping selections move as a single block. Boundary blocks stay put.
+declare-option -hidden str move_line_ranges
+declare-option -hidden int move_line_count
+define-command -hidden move-lines -params 1 %{
+    evaluate-commands -save-regs '/|"' %{
+        set-option buffer move_line_ranges "%val{selections_desc}"
+        set-option buffer move_line_count %val{buf_line_count}
+        evaluate-commands -draft %{
+            execute-keys '%'
+            execute-keys '|python3 "$kak_opt_config_support" move ' %arg{1} ' "$kak_opt_move_line_ranges" "$kak_opt_move_line_count" text<ret>'
+        }
+        evaluate-commands %sh{
+            python3 "$kak_opt_config_support" move "$1" "$kak_opt_move_line_ranges" "$kak_opt_move_line_count" select
+        }
+    }
 }
-define-command -hidden move-lines-up -docstring 'move the selected lines one line up' %{
-    try %{ execute-keys -save-regs m 'x"mdkx"m<a-P>' }
-}
+define-command -hidden move-lines-down %{ move-lines 1 }
+define-command -hidden move-lines-up %{ move-lines -1 }
 map global normal <a-down> ': move-lines-down<ret>' -docstring 'move lines down'
 map global normal <a-up> ': move-lines-up<ret>' -docstring 'move lines up'
 
+# Kakoune detects tmux before niri: vertical opens a pane below inside tmux.
+# Pass the editor's directory explicitly; tmux otherwise uses its session path.
 # niri is a scrolling compositor: its "vertical" placement consumes the new
 # window into the current column, which is the closest analogue of the nvim
 # config's splitbelow. Only some windowing modules define a vertical placement
@@ -118,10 +142,10 @@ define-command -hidden split-terminal -params 1.. \
     -docstring 'split-terminal <program> [<arguments>]: open a terminal beside the current window' %{
     set-option local windowing_placement vertical
     try %{
-        terminal %arg{@}
+        terminal sh -c 'cd "$1" && shift && exec "$@"' _ %sh{ pwd } %arg{@}
     } catch %{
         set-option local windowing_placement window
-        terminal %arg{@}
+        terminal sh -c 'cd "$1" && shift && exec "$@"' _ %sh{ pwd } %arg{@}
     }
 }
 
@@ -146,154 +170,30 @@ define-command -hidden run-in-terminal -params 1.. \
     }
 }
 
-# ── Projects ─────────────────────────────────────────────────────────────────
-# One set of verbs for every language. ':build', ':test', ':run', ':test-file'
-# and ':repl' each read a window option that a filetype hook fills in, so the
-# keys under <space>c stay the same whatever the buffer holds and adding a
-# language is one hook rather than another user mode.
-#
-# Leaving an option unset is a supported state: the verb then reports which
-# option to set for the filetype in front of you, which is more useful than a
-# key that silently does nothing.
-
-declare-option -docstring 'file names, glob patterns allowed, marking the root of a project' \
-    str-list project_root_files '.git'
-
-declare-option -docstring 'command run by :build' str-list build_command
-declare-option -docstring 'command run by :test' str-list test_command
-declare-option -docstring 'command run by :run' str-list run_command
-declare-option -docstring 'command run by :repl' str-list repl_command
-declare-option -docstring 'command run by :test-file, given the buffer path as its last argument' \
-    str-list test_file_command
-
-# The verb is a parameter rather than a separate command per verb because
-# Kakoune exports an option to a shell block only when the block's text names
-# it literally, so the error message cannot look its own option up by name.
-define-command -hidden project-run -params 1.. \
-    -docstring 'project-run <verb> [<program> [<arguments>]]: run a command in a terminal window from the root of the current project' %{
-    evaluate-commands %sh{
-        kakquote() { printf "'%s'" "$(printf %s "$1" | sed "s/'/''/g")"; }
-
-        verb=$1
-        shift
-        if [ $# -eq 0 ]; then
-            filetype=${kak_opt_filetype:-none}
-            printf 'fail %s\n' "$(kakquote "no ${verb} command for filetype '${filetype}': expected ${verb}_command to be set. add it to a 'hook global WinSetOption filetype=${filetype}' block in the kakrc")"
-            exit 0
-        fi
-
-        # Each marker is tested with the glob left unquoted so that a pattern
-        # such as '*.opam' matches, inside a subshell because 'set --' is the
-        # only portable way to test one and the outer positional arguments are
-        # the command line still to be emitted.
-        markers=$(eval "set -- $kak_quoted_opt_project_root_files; printf '%s\n' \"\$@\"")
-        has_marker() {
-            directory=$1
-            printf '%s\n' "$markers" | {
-                while IFS= read -r marker; do
-                    [ -n "$marker" ] || continue
-                    set -- "$directory"/$marker
-                    [ -e "$1" ] && exit 0
-                done
-                exit 1
-            }
-        }
-
-        root=${kak_buffile:-$PWD/.}
-        root=${root%/*}
-        [ -n "$root" ] || root=/
-        while [ "$root" != / ]; do
-            has_marker "$root" && break
-            root=${root%/*}
-            [ -n "$root" ] || root=/
-        done
-        [ "$root" != / ] || root=$PWD
-
-        printf 'run-in-terminal sh -c %s' "$(kakquote 'cd "$1" && shift && exec "$@"')"
-        printf ' _ %s' "$(kakquote "$root")"
-        for argument; do
-            printf ' %s' "$(kakquote "$argument")"
-        done
-        printf '\n'
-    }
-}
-
-define-command build -docstring 'build the project the current buffer belongs to' %{
-    project-run build %opt{build_command}
-}
-define-command test -docstring 'run the tests of the project the current buffer belongs to' %{
-    project-run test %opt{test_command}
-}
-define-command run -docstring 'run the project the current buffer belongs to' %{
-    project-run run %opt{run_command}
-}
-define-command repl -docstring 'open a repl for the current buffer' %{
-    project-run repl %opt{repl_command}
-}
-
-# The buffer path is appended here rather than baked into the option, so that
-# the option stays a plain command line. Its own guard, because an unset option
-# would otherwise leave the path as the only argument and be run as a program.
-define-command test-file -docstring 'run the tests in the current file' %{
-    evaluate-commands %sh{
-        [ -n "$kak_opt_test_file_command" ] && exit 0
-        printf 'fail %%{%s}\n' "no test_file command for filetype '${kak_opt_filetype:-none}': expected test_file_command to be set"
-    }
-    project-run test_file %opt{test_file_command} %val{buffile}
-}
-
-# nvim resolved the zig project root with vim.fs.root; build.zig.zon is listed
-# because a package without a build script still has one.
-hook global WinSetOption filetype=zig %{
-    set-option window project_root_files 'build.zig' 'build.zig.zon' '.git'
-    set-option window build_command %opt{zig_command} build
-    set-option window test_command %opt{zig_command} build test
-    set-option window run_command %opt{zig_command} build run
-    set-option window test_file_command %opt{zig_command} test
-}
-
-# A 'dune' file sits in every directory of a project that builds anything, so it
-# is not a root marker; dune-project, dune-workspace and the opam package
-# metadata are.
-#
-# dune, ocamllsp and ocamlformat are installed into an opam switch whose bin
-# directory joins PATH only for a shell that has evaluated 'opam env'. Kakoune
-# inherits the environment of whatever started it, and a niri spawn-at-startup
-# entry has not evaluated anything. Going through 'opam exec' resolves the
-# switch when the command runs -- including a project-local switch in ./_opam --
-# rather than naming a path that changing switch would invalidate. A checkout
-# without opam falls through to whatever 'dune' PATH already resolves to.
-#
-# run_command is deliberately unset: 'dune exec' needs the name of an
-# executable that only the project knows, so there is nothing correct to put
-# here. :run says so when it is pressed in an OCaml buffer.
-hook global WinSetOption filetype=ocaml %{
-    set-option window project_root_files 'dune-project' 'dune-workspace' '*.opam' '.git'
-    evaluate-commands %sh{
-        if command -v opam >/dev/null 2>&1; then
-            opam_prefix='opam exec --'
-        else
-            opam_prefix=''
-        fi
-        cat <<EOF
-set-option window build_command $opam_prefix dune build
-set-option window test_command $opam_prefix dune runtest
-set-option window repl_command $opam_prefix dune utop
-EOF
-    }
-}
-
 # ── Filetypes ────────────────────────────────────────────────────────────────
 
-# Kakoune detects .ml, .mli, .mll and .mly on its own. dune's own files carry no
-# extension to detect, and an opam package description is named after the
-# package. All of them are s-expressions with ';' line comments, which is what
-# the bundled lisp filetype already provides.
+hook global BufCreate .*\.bb$ %{ set-option buffer filetype clojure }
+
+# Dune uses s-expressions. Opam has its own syntax and comment tokens.
 hook global BufCreate (.*/)?(dune|dune-project|dune-workspace)$ %{
     set-option buffer filetype lisp
 }
-hook global BufCreate (.*/)?[^/]+\.opam$ %{
-    set-option buffer filetype lisp
+hook global BufCreate (.*/)?([^/]+\.opam|opam)$ %{
+    set-option buffer filetype opam
+}
+hook global BufSetOption filetype=opam %{
+    set-option buffer comment_line '#'
+    set-option buffer comment_block_begin '(*'
+    set-option buffer comment_block_end '*)'
+}
+hook global WinSetOption filetype=opam %{
+    add-highlighter window/opam regions
+    add-highlighter window/opam/code default-region group
+    add-highlighter window/opam/string region '"' '(?<!\\)(\\\\)*"' fill string
+    add-highlighter window/opam/comment region '#' '$' fill comment
+    add-highlighter window/opam/block-comment region -recurse \Q(* \Q(* \Q*) fill comment
+    add-highlighter window/opam/code/field regex '^\h*[a-zA-Z][a-zA-Z0-9_-]*:' 0:keyword
+    hook -once -always window WinSetOption filetype=.* %{ remove-highlighter window/opam }
 }
 
 # comment.kak assigns comment tokens by filetype and has no ocaml entry, so
@@ -305,6 +205,8 @@ hook global BufSetOption filetype=ocaml %{
     set-option buffer comment_block_begin '(*'
     set-option buffer comment_block_end '*)'
 }
+
+source "%val{config}/projects.kak"
 
 # ── Plugins ──────────────────────────────────────────────────────────────────
 # Everything under ./autoload is sourced automatically; only configuration that
@@ -322,38 +224,17 @@ hook global ModuleLoaded fzf-grep %{
     set-option global fzf_grep_command 'rg'
 }
 
-# fzf.kak's recent-files module reads this list; nothing writes it unless the
-# editor does. The upstream README uses moreutils' sponge, which is not
-# installed -- a temporary file beside the target does the same job and, unlike
-# sponge, cannot truncate the list if the machine loses power mid-write. The cap
-# is here because nothing else prunes the file: without it a list that is only
-# ever prepended to grows for the life of the machine.
-declare-option -docstring 'number of paths kept in the recent-files list' \
-    int recent_files_limit 200
-
-declare-option -docstring 'file holding the recent-files list' \
-    str recent_files_path %sh{ printf '%s/kak-mru' "${XDG_CACHE_HOME:-$HOME/.cache}" }
-
-hook global BufCreate ^[^*].* %{
+# Record visits, not just opens. The helper locks the complete update and
+# atomically replaces the list from a unique temporary file.
+declare-option int recent_files_limit 200
+declare-option str recent_files_path %sh{ printf '%s/kak-mru' "${XDG_CACHE_HOME:-$HOME/.cache}" }
+hook global WinDisplay .* %{
     nop %sh{
-        recent_files=$kak_opt_recent_files_path
-        mkdir -p "${recent_files%/*}"
-        touch "$recent_files"
-        if printf '%s\n' "$kak_buffile" |
-            awk -v limit="$kak_opt_recent_files_limit" \
-                '!seen[$0]++ { if (++kept <= limit) print }' \
-                - "$recent_files" >"$recent_files.new"
-        then
-            mv -f "$recent_files.new" "$recent_files"
-        else
-            rm -f "$recent_files.new"
-        fi
+        python3 "$kak_opt_config_support" recent "$kak_opt_recent_files_path" "$kak_buffile" "$kak_opt_recent_files_limit"
     }
 }
 
-# mini.tabline: the buffer list is an info box on demand rather than a
-# permanent tab bar, so it is shown when a window is first displayed.
-hook global WinDisplay .* info-buffers
+source "%val{config}/editing.kak"
 
 # mini.surround
 declare-user-mode surround
@@ -381,7 +262,7 @@ map global surround A ': select-surrounding-tag<ret>' -docstring 'select surroun
 # what a file list would spend a process per keystroke on.
 
 declare-option -docstring 'command listing candidates for the file picker' \
-    str picker_file_command 'fd --type f --follow --strip-cwd-prefix'
+    str picker_file_command 'fd --type f --hidden --exclude .git --follow --strip-cwd-prefix'
 
 declare-option -docstring 'command listing candidates for the git file picker' \
     str picker_git_command 'git ls-files --cached --others --exclude-standard'
@@ -392,16 +273,20 @@ declare-option -docstring 'command run by the grep picker, given the query and t
 declare-option -docstring 'number of matches the grep picker offers for one query' \
     int picker_grep_limit 200
 
-define-command -hidden picker-file -docstring 'fuzzy-select a file below the working directory' %{
+define-command -hidden picker-file -docstring 'fuzzy-select a project file' %{
+    project-update-root
     prompt -menu -shell-script-candidates %{
+        cd "$kak_opt_project_root" || exit
         $kak_opt_picker_file_command
-    } 'file: ' %{ edit -existing %val{text} }
+    } 'file: ' %{ edit -existing "%opt{project_root}/%val{text}" }
 }
 
 define-command -hidden picker-git -docstring 'fuzzy-select a file git knows about' %{
+    project-update-root
     prompt -menu -shell-script-candidates %{
+        cd "$kak_opt_project_root" || exit
         $kak_opt_picker_git_command 2>/dev/null
-    } 'git file: ' %{ edit -existing %val{text} }
+    } 'git file: ' %{ edit -existing "%opt{project_root}/%val{text}" }
 }
 
 define-command -hidden picker-buffer -docstring 'fuzzy-select an open buffer' %{
@@ -420,29 +305,20 @@ define-command -hidden picker-recent -docstring 'fuzzy-select a recently opened 
     } 'recent: ' %{ edit -existing %val{text} }
 }
 
-define-command -hidden picker-grep -docstring 'search the working directory and jump to a match' %{
+define-command -hidden picker-grep -docstring 'search the project and jump to a match' %{
+    project-update-root
     prompt -menu -shell-script-completion %{
         [ -n "$1" ] || exit 0
+        cd "$kak_opt_project_root" || exit
         $kak_opt_picker_grep_command "$1" . 2>/dev/null |
             head -n "$kak_opt_picker_grep_limit"
     } 'grep: ' %{ picker-grep-open %val{text} }
 }
 
-# rg emits 'path:line:column:text'. Position is read from the left, so a match
-# whose text contains a colon still resolves. A path containing one does not,
-# which is a limit of rg's output format rather than of this parse.
+# Validate the selected result before emitting a command.
 define-command -hidden picker-grep-open -params 1 %{
     evaluate-commands %sh{
-        kakquote() { printf "'%s'" "$(printf %s "$1" | sed "s/'/''/g")"; }
-
-        entry=$1
-        path=${entry%%:*}
-        entry=${entry#*:}
-        line=${entry%%:*}
-        entry=${entry#*:}
-        column=${entry%%:*}
-
-        printf 'edit -existing %s %s %s\n' "$(kakquote "$path")" "$line" "$column"
+        python3 "$kak_opt_config_support" grep-open "$kak_opt_project_root" "$1"
     }
 }
 
@@ -456,7 +332,11 @@ map global code b ': build<ret>' -docstring 'build project'
 map global code t ': test<ret>' -docstring 'test project'
 map global code T ': test-file<ret>' -docstring 'test current file'
 map global code r ': run<ret>' -docstring 'run project'
-map global code u ': repl<ret>' -docstring 'repl'
+map global code u ': project-repl<ret>' -docstring 'open project REPL'
+map global code W ': watch<ret>' -docstring 'watch build (terminal; Ctrl-C stops)'
+map global code C ': project-config<ret>' -docstring 'load project .kakrc'
+map global code n ': make-next-error<ret>' -docstring 'next build error'
+map global code p ': make-previous-error<ret>' -docstring 'previous build error'
 # 'alt' is aliased by the bundled ocaml filetype, and only while an OCaml buffer
 # is displayed; the bundled c-family filetype aliases it to its own header
 # switcher the same way.
@@ -488,10 +368,16 @@ map global user d ': git show-diff<ret>' -docstring 'show diff gutter'
 # because a kakrc that errors out leaves the editor half-configured, and this
 # package can legitimately be absent on a machine that has not installed it yet.
 evaluate-commands %sh{
-    command -v kak-lsp >/dev/null 2>&1 || exit 0
-    kak-lsp
+    if [ -x "$HOME/.local/bin/kak-lsp" ]; then
+        "$HOME/.local/bin/kak-lsp"
+    else
+        command -v kak-lsp >/dev/null 2>&1 || exit 0
+        kak-lsp
+    fi
     printf 'source %%{%s/kak/lsp-config.kak}\n' "${XDG_CONFIG_HOME:-$HOME/.config}"
 }
+
+source "%val{config}/repl.kak"
 
 # ── Colors ───────────────────────────────────────────────────────────────────
 # The active palette is written by the darkman hook

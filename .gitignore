@@ -13,3 +13,8 @@ __pycache__/
 .config/kak/autoload/auto-pairs.kak/
 .config/kak/autoload/kakoune-surround/
 .config/kak/autoload/kakoune-buffers/
+
+.config/kak/autoload/parinfer-rust/
+.config/kak/autoload/kak-rainbow/
+.config/kak/autoload/kakoune-repl-mode/
+.config/kak/autoload/rep/
