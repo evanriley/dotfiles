@@ -1,0 +1,10 @@
+# Truncates the container logs once per session, before any container starts.
+# Growth is otherwise unbounded (~160 KB/day for navidrome alone) because
+# dinit does not rotate a logfile and Chimera ships no logrotate.
+#
+# Deliberately a dependency rather than a `: > log` prefixed to each
+# container's own command: `restart = yes` would re-run that on every restart
+# and erase the crash output of a looping container. A dependency starts once
+# and is not re-run when the dependent process restarts.
+type = scripted
+command = /home/evan/.config/scripts/truncate-container-logs

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -eu
+
+# Truncate the container logs once per session, before any container starts.
+# dinit does not rotate a logfile and Chimera ships no logrotate, so growth is
+# otherwise unbounded.
+#
+# A directory rather than a list: a new container service drops its logfile in
+# here and is covered without editing this script.
+
+log_dir=${CONTAINER_LOG_DIR:-${XDG_STATE_HOME:-$HOME/.local/state}/containers}
+
+mkdir -p "$log_dir"
+
+for log in "$log_dir"/*.log; do
+    [ -f "$log" ] || continue
+    : >"$log"
+done

@@ -1,0 +1,35 @@
+#!/bin/sh
+
+set -eu
+
+# Block until the tailnet address the container services publish on has been
+# assigned. Rootless podman cannot bind an address that does not exist yet,
+# and tailscaled is a system service that a user dinit service has no way to
+# depend on, so the ordering is enforced here instead.
+
+address=${TAILNET_ADDRESS:-}
+timeout=${TAILNET_WAIT_SECONDS:-90}
+
+if [ -z "$address" ]; then
+    printf 'wait-for-tailnet: TAILNET_ADDRESS is unset.\n' >&2
+    printf 'expected it from dinit.d/tailnet.env; without it the container\n' >&2
+    printf 'services bind 127.0.0.1 and no tailnet device can reach them.\n' >&2
+    printf 'check: tailscale ip -4\n' >&2
+    exit 1
+fi
+
+waited=0
+while [ "$waited" -lt "$timeout" ]; do
+    # -F because an address is not a pattern: the dots would otherwise match
+    # any character and accept a neighbouring address on the same interface.
+    if ip -4 -oneline addr show 2>/dev/null | grep -qF " inet $address/"; then
+        exit 0
+    fi
+    sleep 1
+    waited=$((waited + 1))
+done
+
+printf 'wait-for-tailnet: %s was not assigned within %ss.\n' "$address" "$timeout" >&2
+printf 'expected tailscaled to have brought the interface up by now.\n' >&2
+printf 'check: tailscale status; tailscale ip -4\n' >&2
+exit 1
