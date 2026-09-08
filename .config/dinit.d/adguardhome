@@ -11,9 +11,12 @@ command += --security-opt no-new-privileges
 # container fails to start with "Listen failed for HOST UDP port .../53".
 command += --publish ${TAILNET_ADDRESS:-127.0.0.1}:53:53/udp
 command += --publish ${TAILNET_ADDRESS:-127.0.0.1}:53:53/tcp
-# The setup wizard serves on 3000 and offers to move the admin interface to
-# 80 afterwards. Keeping it on 3000 means one published port for the life of
-# the service and no second privileged port.
+# The setup wizard serves on 3000, then writes whichever admin port it was
+# given into http.address. Its default there is 80, which this service does
+# not publish, and the result is an admin interface reachable from nowhere.
+# Keeping it on 3000 means one published port for the life of the service; a
+# fresh install that lands on 80 is fixed by setting http.address to
+# 0.0.0.0:3000 in AdGuardHome.yaml and restarting.
 command += --publish ${TAILNET_ADDRESS:-127.0.0.1}:3000:3000/tcp
 command += --volume /home/evan/.local/share/adguardhome/work:/opt/adguardhome/work:rw
 command += --volume /home/evan/.local/share/adguardhome/conf:/opt/adguardhome/conf:rw
