@@ -289,19 +289,10 @@ end, { expr = true })
 
 vim.keymap.set('i', '<CR>', function()
   if vim.fn.pumvisible() == 1 and vim.fn.complete_info().selected ~= -1 then
-    return '<C-y>'
+    return vim.keycode('<C-y>')
   end
-  if vim.b.minipairs_disable then return '<CR>' end
-  local line = vim.api.nvim_get_current_line()
-  local col = vim.api.nvim_win_get_cursor(0)[2]
-  local before = line:sub(col, col)
-  local after = line:sub(col + 1, col + 1)
-  local pairs = { ['('] = ')', ['['] = ']', ['{'] = '}' }
-  if pairs[before] == after then
-    return '<CR><CR><Up><End><C-f>'
-  end
-  return '<CR>'
-end, { expr = true })
+  return MiniPairs.cr()
+end, { expr = true, replace_keycodes = false })
 
 vim.diagnostic.config({
   virtual_text = { spacing = 4, prefix = '' },
