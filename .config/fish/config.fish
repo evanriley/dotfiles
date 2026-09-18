@@ -5,8 +5,8 @@ end
 set -gx SHELL /usr/bin/fish
 set -gx XDG_CONFIG_HOME $HOME/.config
 set -gx ZVM_INSTALL $HOME/.zvm/self
-set -gx EDITOR nvim
-set -gx VISUAL nvim
+set -gx EDITOR kak
+set -gx VISUAL kak
 
 # Set the mode before fzf installs its bindings. New prompts start in insert.
 fish_vi_key_bindings insert
@@ -45,6 +45,7 @@ alias la='ls -A'
 alias l='ls -CF'
 
 alias clj-repl='clj "-J-Dclojure.server.repl={:port 5555 :accept clojure.core.server/repl :server-daemon false}"'
+alias nrepl "clojure -Sdeps '{:deps {nrepl/nrepl {:mvn/version \"1.7.0\"}}}' -M -m nrepl.cmdline --interactive"
 
 function mkcd --description 'Create a directory and enter it'
     if test (count $argv) -ne 1
