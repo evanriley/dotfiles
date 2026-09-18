@@ -54,6 +54,15 @@ PYCODE
     }
 }
 
+hook -group lsp-filetype-gleam-project global BufSetOption filetype=gleam %{
+    set-option buffer lsp_servers %{
+        [gleam]
+        command = "gleam"
+        args = ["lsp"]
+        root_globs = ["gleam.toml"]
+    }
+}
+
 # ocamllsp lives in an opam switch, whose bin directory joins PATH only for a
 # shell that has evaluated 'opam env'; kakoune-lsp spawns the server from
 # Kakoune's own environment, which under a niri spawn-at-startup entry has not.
@@ -95,8 +104,8 @@ lsp-inlay-diagnostics-enable global
 # nvim formatted on BufWritePre through the LSP client. The filetype list is
 # explicit rather than '.*' because a blocking format request against a server
 # that is not installed stalls the write until it times out.
-declare-option -docstring 'filetypes formatted on write (native tools for Zig, OCaml and Clojure)' \
-    str lsp_format_on_save_filetypes 'c|cpp|objc|ocaml|python|zig|clojure'
+declare-option -docstring 'filetypes formatted on write (native tools for Gleam, Zig, OCaml and Clojure)' \
+    str lsp_format_on_save_filetypes 'c|cpp|objc|gleam|ocaml|python|zig|clojure'
 
 # ocamllsp answers a formatting request by shelling out to ocamlformat, which
 # refuses to run unless the project root holds a .ocamlformat file. A project
@@ -163,7 +172,7 @@ define-command -hidden native-format %{
 define-command code-format-sync %{
     evaluate-commands %sh{
         case "$kak_opt_filetype" in
-            zig|ocaml|clojure) printf 'native-format\n';;
+            gleam|zig|ocaml|clojure) printf 'native-format\n';;
             *) printf 'lsp-formatting-sync\n';;
         esac
     }
@@ -171,7 +180,7 @@ define-command code-format-sync %{
 define-command code-format %{
     evaluate-commands %sh{
         case "$kak_opt_filetype" in
-            zig|ocaml|clojure) printf 'native-format\n';;
+            gleam|zig|ocaml|clojure) printf 'native-format\n';;
             *) printf 'lsp-formatting\n';;
         esac
     }

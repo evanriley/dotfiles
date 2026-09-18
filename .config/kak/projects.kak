@@ -1,5 +1,5 @@
 # Project roots are shared by pickers, builds and REPL commands.
-declare-option str-list project_root_files 'build.zig' 'build.zig.zon' 'dune-project' 'dune-workspace' '*.opam' 'deps.edn' 'bb.edn' 'project.clj' '.git' '.hg'
+declare-option str-list project_root_files 'build.zig' 'build.zig.zon' 'gleam.toml' 'dune-project' 'dune-workspace' '*.opam' 'deps.edn' 'bb.edn' 'project.clj' '.git' '.hg'
 declare-option str project_root
 
 declare-option str-list build_command
@@ -37,6 +37,12 @@ hook global BufSetOption filetype=zig %{
     set-option buffer test_command %opt{zig_command} build test
     set-option buffer run_command %opt{zig_command} build run
     set-option buffer test_file_command %opt{zig_command} test
+}
+
+hook global BufSetOption filetype=gleam %{
+    set-option buffer build_command gleam build
+    set-option buffer test_command gleam test
+    set-option buffer run_command gleam run
 }
 
 hook global BufSetOption filetype=(ocaml|opam) %{

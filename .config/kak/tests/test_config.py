@@ -25,6 +25,8 @@ class Helpers(unittest.TestCase):
             (root / 'src').mkdir()
             (root / 'deps.edn').touch()
             self.assertEqual(support.root_for(root/'src/file.clj', ['deps.edn']), root)
+            (root / 'gleam.toml').touch()
+            self.assertEqual(support.root_for(root/'src/file.gleam', ['gleam.toml']), root)
             self.assertEqual(support.root_for(root/'src/file.ml', ['dune-project']), root/'src')
             (root / 'example.opam').touch()
             self.assertEqual(support.root_for(root/'src/file.ml', ['*.opam']), root)
@@ -150,6 +152,9 @@ try %{{ toggle-inlay-diagnostics; toggle-inlay-diagnostics; toggle-type-hints; t
         dune.write_text('(library (name hello))\n')
         opam = self.path/'hello.opam'
         opam.write_text('opam-version: "2.0"\n')
+        gleam = self.path/'main.gleam'
+        gleam.write_text('pub fn main() { Nil }\n')
+        (self.path/'gleam.toml').write_text('name = "example"\nversion = "1.0.0"\n')
         debug = self.start(f'''edit -scratch options
 set-option buffer filetype zig
 set-option buffer filetype ocaml
@@ -158,10 +163,18 @@ edit {q(dune)}
 echo -debug DUNE %opt{{filetype}} %opt{{build_command}}
 edit {q(opam)}
 echo -debug OPAM %opt{{filetype}} %opt{{comment_line}}
+edit {q(gleam)}
+echo -debug GLEAM %opt{{filetype}} %opt{{build_command}} %opt{{test_command}} %opt{{run_command}}
+echo -debug GLEAM-LSP %opt{{lsp_servers}}
 ''')
         self.assertIn('RESET 2', debug)
         self.assertIn('DUNE lisp opam exec -- dune build', debug)
         self.assertIn('OPAM opam #', debug)
+        self.assertIn('GLEAM gleam gleam build gleam test gleam run', debug)
+        self.assertIn('[gleam]', debug)
+        self.assertIn('command = "gleam"', debug)
+        self.assertIn('args = ["lsp"]', debug)
+        self.assertIn('root_globs = ["gleam.toml"]', debug)
 
     def test_build_saves_project_and_jumps(self):
         project = self.path/"project's files"
@@ -197,6 +210,7 @@ quit!
     def test_native_formatting_and_invalid_input(self):
         for suffix, text, expected, config in [
             ('clj', '(let [x 1]\n(+ x 2))\n', '(let [x 1]\n  (+ x 2))\n', {}),
+            ('gleam', 'pub fn main(){Nil}\n', 'pub fn main() {\n  Nil\n}\n', {}),
             ('zig', 'const value=1;\n', 'const value = 1;\n', {}),
             ('ml', 'let value=1\n', 'let value = 1\n', {'.ocamlformat': 'version=0.29.0\n'}),
         ]:

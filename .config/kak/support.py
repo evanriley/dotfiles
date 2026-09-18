@@ -151,7 +151,9 @@ def format_code(filename, filetype, zig):
     """Use whole-buffer replacement to avoid Kakoune's last-line c behavior."""
     original = sys.stdin.buffer.read()
     root = Path(filename).absolute().parent if filename else Path.cwd()
-    if filetype == 'zig':
+    if filetype == 'gleam':
+        command = ['gleam', 'format', '--stdin']
+    elif filetype == 'zig':
         command = [zig, 'fmt', '--stdin']
     elif filetype == 'ocaml':
         command = ['ocamlformat', '--name', filename or 'stdin.ml', '-']
