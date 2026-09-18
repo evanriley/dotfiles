@@ -89,9 +89,3 @@ install_plugin kakoune-repl-mode \
 
 # Build binaries separately from startup; no compiler runs when opening Kakoune.
 cargo install --locked --path "$autoload_dir/parinfer-rust"
-install_plugin rep \
-    https://github.com/eraserhd/rep \
-    0770336b916d8f99c8509f6f8cf4ee2bcb9c435f
-make -C "$autoload_dir/rep" rep
-mkdir -p "$HOME/.local/bin"
-install -m 755 "$autoload_dir/rep/rep" "$HOME/.local/bin/rep"

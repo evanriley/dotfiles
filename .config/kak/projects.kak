@@ -82,12 +82,28 @@ from pathlib import Path
 import sys
 root = Path(sys.argv[1])
 bin_dir = Path.home() / '.local/bin'
+# Pinned like every other tool in this config. cider-nrepl and refactor-nrepl
+# supply the test, refresh, completion and doc ops the editor commands call.
+nrepl_version = '1.7.0'
+cider_nrepl_version = '0.62.2'
+refactor_nrepl_version = '3.14.0'
+middleware = '[cider.nrepl/cider-middleware,refactor-nrepl.middleware/wrap-refactor]'
 if (root/'bb.edn').exists() and not (root/'deps.edn').exists():
+    # Babashka ships no cider-nrepl build; it runs with its own nREPL alone.
     command = ['python3', sys.argv[2], 'bb-server', str(bin_dir/'bb')]
 elif (root/'project.clj').exists() and not (root/'deps.edn').exists():
-    command = ['lein', 'repl']
+    # update-in injects the middleware without editing the project's project.clj.
+    command = ['lein',
+               'update-in', ':dependencies', 'conj', f'[nrepl/nrepl "{nrepl_version}"]', '--',
+               'update-in', ':plugins', 'conj', f'[cider/cider-nrepl "{cider_nrepl_version}"]', '--',
+               'update-in', ':plugins', 'conj', f'[refactor-nrepl/refactor-nrepl "{refactor_nrepl_version}"]', '--',
+               'repl']
 else:
-    command = [str(bin_dir/'clojure'), '-Sdeps', '{:deps {nrepl/nrepl {:mvn/version "1.7.0"}}}', '-M', '-m', 'nrepl.cmdline', '--interactive']
+    deps = ('{:deps {nrepl/nrepl {:mvn/version "' + nrepl_version + '"}'
+            ' cider/cider-nrepl {:mvn/version "' + cider_nrepl_version + '"}'
+            ' refactor-nrepl/refactor-nrepl {:mvn/version "' + refactor_nrepl_version + '"}}}')
+    command = [str(bin_dir/'clojure'), '-Sdeps', deps, '-M', '-m', 'nrepl.cmdline',
+               '--middleware', middleware, '--interactive']
 def q(s): return "'" + s.replace("'", "''") + "'"
 print('set-option buffer repl_command ' + ' '.join(map(q, command)))
 PYCODE

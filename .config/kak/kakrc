@@ -38,10 +38,6 @@ declare-option -docstring 'zig executable used by project commands and ZLS' \
 # Helpers are kept outside autoload so they are never sourced as Kakscript.
 declare-option str config_support "%val{config}/support.py"
 
-declare-option str rep_command %sh{
-    if [ -x "$HOME/.local/bin/rep" ]; then printf %s "$HOME/.local/bin/rep"; else printf rep; fi
-}
-
 # ── Display ──────────────────────────────────────────────────────────────────
 
 # nvim: number + relativenumber. '-relative' leaves the cursor line absolute,
