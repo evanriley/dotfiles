@@ -1,6 +1,6 @@
 local M = {}
 local jobs = {}
-local markers = { 'build.zig', 'build.zig.zon', 'dune-project', 'dune-workspace', 'deps.edn', 'bb.edn', 'project.clj', '.git' }
+local markers = { 'build.zig', 'build.zig.zon', 'gleam.toml', 'dune-project', 'dune-workspace', 'deps.edn', 'bb.edn', 'project.clj', '.git' }
 
 function M.root(buf)
   buf = buf or 0
@@ -30,6 +30,9 @@ function M.command(action, buf)
   if ft == 'zig' or vim.uv.fs_stat(root .. '/build.zig') then
     local commands = { build = { 'zig', 'build' }, test = { 'zig', 'build', 'test' },
       run = { 'zig', 'build', 'run' }, test_file = { 'zig', 'test', vim.api.nvim_buf_get_name(buf) } }
+    if commands[action] then return commands[action], root end
+  elseif ft == 'gleam' or vim.uv.fs_stat(root .. '/gleam.toml') then
+    local commands = { build = { 'gleam', 'build' }, test = { 'gleam', 'test' }, run = { 'gleam', 'run' } }
     if commands[action] then return commands[action], root end
   elseif ft == 'ocaml' or ft == 'ocamlinterface' or ft == 'dune' or vim.uv.fs_stat(root .. '/dune-project') then
     local commands = { build = { 'dune', 'build' }, test = { 'dune', 'runtest' }, run = { 'dune', 'exec' },
@@ -106,7 +109,7 @@ function M.run(action)
   M.execute(cmd, root, action)
 end
 
-local preferred = { zig = 'zls', clojure = 'clojure_lsp', ocaml = 'ocamllsp',
+local preferred = { zig = 'zls', clojure = 'clojure_lsp', gleam = 'gleam', ocaml = 'ocamllsp',
   ocamlinterface = 'ocamllsp', python = 'ruff', lua = 'lua_ls', c = 'clangd', cpp = 'clangd', rust = 'rust_analyzer' }
 
 function M.formatter(buf)

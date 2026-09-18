@@ -209,13 +209,13 @@ vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
 
 local treesitter = require('nvim-treesitter')
 local treesitter_languages = {
-  'bash', 'c', 'clojure', 'cpp', 'fish', 'lua', 'markdown', 'markdown_inline',
+  'bash', 'c', 'clojure', 'cpp', 'fish', 'gleam', 'lua', 'markdown', 'markdown_inline',
   'ocaml', 'ocaml_interface', 'python', 'rust', 'vimdoc', 'zig',
 }
 treesitter.setup()
 treesitter.install(treesitter_languages)
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = { 'sh', 'bash', 'c', 'clojure', 'cpp', 'fish', 'help', 'lua', 'markdown', 'ocaml', 'ocamlinterface', 'python', 'rust', 'zig' },
+  pattern = { 'sh', 'bash', 'c', 'clojure', 'cpp', 'fish', 'gleam', 'help', 'lua', 'markdown', 'ocaml', 'ocamlinterface', 'python', 'rust', 'zig' },
   callback = function()
     -- A newly installed parser may still be compiling on first startup.
     if not pcall(vim.treesitter.start) then return end
@@ -226,6 +226,7 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 vim.lsp.config('*', { root_markers = { '.git' } })
+vim.lsp.config('gleam', { root_markers = { 'gleam.toml' } })
 vim.lsp.config('zls', {
   settings = {
     zls = {
@@ -233,7 +234,7 @@ vim.lsp.config('zls', {
     },
   },
 })
-vim.lsp.enable({ 'rust_analyzer', 'ruff', 'zls', 'clangd', 'clojure_lsp', 'lua_ls', 'ocamllsp' })
+vim.lsp.enable({ 'rust_analyzer', 'ruff', 'zls', 'clangd', 'clojure_lsp', 'gleam', 'lua_ls', 'ocamllsp' })
 
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('lsp-attach', {}),

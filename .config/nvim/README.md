@@ -3,9 +3,10 @@
 Neovim 0.12.5, native package management and native automatic completion.
 The existing plugin lockfile is retained. Kakoune is independent and unchanged.
 
-Start `ta` in fish, then `nvim`. Fish's EDITOR/VISUAL select Neovim. Fish starts
-in vi insert mode: Escape enters normal mode; `i` resumes insertion. Ctrl-R
-searches history and Alt-E edits the current command in Neovim.
+Start `ta` in fish, then `nvim`. Fish's EDITOR/VISUAL select Kakoune; invoke
+Neovim explicitly. Fish starts in vi insert mode: Escape enters normal mode;
+`i` resumes insertion. Ctrl-R searches history and Alt-E edits the current
+command in Kakoune.
 
 ## Completion and editing
 
@@ -33,7 +34,7 @@ and [LSP completion](https://neovim.io/doc/user/lsp/#lsp-completion).
 ## Project commands and navigation
 
 File, grep and Git pickers, builds, tests and runs share the nearest project
-root above the source file: Zig, Dune, Clojure/Babashka or Git markers. A file
+root above the source file: Zig, Gleam, Dune, Clojure/Babashka or Git markers. A file
 outside a recognized project uses its directory. Scratch and terminal buffers
 use Neovim's working directory. The global working directory is not changed.
 
@@ -63,6 +64,9 @@ Zig defaults: `zig build`, `zig build test`, `zig test <file>`, `zig build run`.
 The project must define the relevant build steps. Standalone file tests do not
 inherit build.zig module imports.
 
+Gleam defaults: `gleam build`, `gleam test`, and `gleam run`. The nearest
+`gleam.toml` is both the project-command root and the language-server root.
+
 OCaml defaults: `dune build`, `dune runtest`, `dune build --watch`, `dune utop`;
 all run through `opam exec --` when available. Run prompts for the Dune
 executable target, such as `bin/main.exe`. Current-file tests are project-specific.
@@ -88,7 +92,7 @@ use an explicit `sh -c` command only when shell syntax is intended.
 
 ## Formatting, folds and sessions
 
-Space f and format-on-save use the same formatter: ZLS for Zig, Clojure-LSP,
+Space f and format-on-save use the same formatter: ZLS for Zig, Gleam LSP, Clojure-LSP,
 OCaml-LSP, Ruff for Python, clangd for C/C++, Rust Analyzer or Lua LS. A sole
 available formatter is the fallback; ambiguous multiple clients are not all run.
 Set `vim.b.format_client = 'server_name'` to choose another explicitly.
