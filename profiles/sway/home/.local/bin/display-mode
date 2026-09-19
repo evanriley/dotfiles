@@ -19,7 +19,7 @@ def choose_mode(output):
         return None
     if output.get("power") is False or output.get("dpms") is False:
         return None
-    for width, height, refresh, scale in [(3072, 1728, 330000, 1),
+    for width, height, refresh, scale in [(3072, 1728, 240000, 1),
                                            (6144, 3456, 165000, 2)]:
         modes = [m for m in output.get("modes", [])
                  if m["width"] == width and m["height"] == height

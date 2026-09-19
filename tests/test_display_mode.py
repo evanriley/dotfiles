@@ -11,12 +11,13 @@ importlib.machinery.SourceFileLoader(module.__name__, str(path)).exec_module(mod
 
 class DisplayModeTest(unittest.TestCase):
     def setUp(self):
-        self.gaming = {"width": 3072, "height": 1728, "refresh": 329990}
+        self.gaming = {"width": 3072, "height": 1728, "refresh": 239977}
         self.desktop = {"width": 6144, "height": 3456, "refresh": 164997}
         self.output = {"name": "DP-2", "model": "Odyssey G80HS", "active": True,
                        "power": True, "scale": 2,
                        "current_mode": {**self.desktop, "refresh": 35499},
-                       "modes": [self.gaming, {**self.desktop, "refresh": 35499}]}
+                       "modes": [self.gaming, {**self.gaming, "refresh": 329990},
+                                 {**self.desktop, "refresh": 35499}]}
 
     def test_gaming_mode_uses_advertised_refresh_and_scale(self):
         self.assertEqual(module.choose_mode(self.output), (self.gaming, 1))
@@ -42,7 +43,7 @@ class DisplayModeTest(unittest.TestCase):
         run.return_value.stdout = '[{"success": true}]'
         module.apply_outputs([self.output])
         self.assertEqual(run.call_args.args[0],
-                         ["swaymsg", "-r", 'output "DP-2" mode 3072x1728@329.990Hz scale 1'])
+                         ["swaymsg", "-r", 'output "DP-2" mode 3072x1728@239.977Hz scale 1'])
 
     @patch.object(module.subprocess, "run")
     def test_failed_apply_is_reported(self, run):
