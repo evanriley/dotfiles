@@ -70,14 +70,15 @@ if command -q zoxide
     zoxide init fish | source
 end
 
-if command -q direnv
-    direnv hook fish | source
-end
-
 if command -q mise
     mise activate fish | source
 end
 
 if command -q opam
     opam env --shell=fish 2>/dev/null | source
+end
+
+# Apply project environments after the other shell integrations.
+if command -q direnv
+    direnv hook fish | source
 end
