@@ -41,7 +41,7 @@ hook global WinSetOption filetype=(clojure|lisp) %{
     }
 }
 
-# Use existing theme faces so both darkman palettes remain consistent.
+# Use existing theme faces to match the editor palette.
 set-option global rainbow_colors MatchingChar type string function keyword module
 hook global WinSetOption filetype=(clojure|lisp) %{
     rainbow-enable-window

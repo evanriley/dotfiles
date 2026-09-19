@@ -20,7 +20,6 @@ c.url.searchengines = {
     'DEFAULT': 'https://kagi.com/search?q={}',
     'g':  'https://google.com/search?q={}',
     'aw': 'https://wiki.archlinux.org/?search={}',
-    'ch': 'https://kagi.com/search?q=site%3Achimera-linux.org%2Fdocs+{}',
     'yt': 'https://www.youtube.com/results?search_query={}',
     'gh': 'https://github.com/search?q={}'
 }

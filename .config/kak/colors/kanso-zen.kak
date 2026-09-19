@@ -1,11 +1,4 @@
-# Kanso Zen for Kakoune.
-#
-# The live colorscheme is generated per desktop mode by the darkman hook
-# (~/.local/share/darkman/10-kanso-theme) into
-# $XDG_STATE_HOME/darkman/kanso.kak, and kakrc sources that in preference to
-# this file. This copy exists so a checkout where darkman has never run still
-# gets Kanso rather than Kakoune's default palette; it is the dark branch of
-# that hook, and the face list below has to be kept in step with it.
+# Static Kanso Zen for Kakoune.
 
 evaluate-commands %sh{
     bg=rgb:090E13; bg_alt=rgb:1C1E25; bg_soft=rgb:22262D; surface=rgb:393B44

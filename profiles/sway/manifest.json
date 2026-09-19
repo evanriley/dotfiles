@@ -154,10 +154,6 @@
       "destination": ".config/swayosd/style.css"
     },
     {
-      "source": ".config/tmux/load-theme",
-      "destination": ".config/tmux/load-theme"
-    },
-    {
       "source": ".config/tmux/theme.conf",
       "destination": ".config/tmux/theme.conf"
     },

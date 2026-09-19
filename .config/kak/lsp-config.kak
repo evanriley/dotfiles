@@ -65,7 +65,7 @@ hook -group lsp-filetype-gleam-project global BufSetOption filetype=gleam %{
 
 # ocamllsp lives in an opam switch, whose bin directory joins PATH only for a
 # shell that has evaluated 'opam env'; kakoune-lsp spawns the server from
-# Kakoune's own environment, which under a niri spawn-at-startup entry has not.
+# Kakoune's own environment, which may not have evaluated the shell setup.
 # 'opam exec' resolves the switch at spawn time, project-local switches
 # included. The value is computed once rather than per buffer, and degrades to a
 # bare 'ocamllsp' so that a distribution-packaged server still works.

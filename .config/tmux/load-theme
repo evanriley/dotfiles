@@ -1,6 +1,0 @@
-#!/bin/sh
-set -eu
-theme=${XDG_STATE_HOME:-$HOME/.local/state}/darkman/tmux.conf
-if [ -r "$theme" ]; then
-    tmux source-file "$theme"
-fi

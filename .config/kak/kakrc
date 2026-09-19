@@ -24,7 +24,7 @@ declare-option -docstring 'shell spawned by the <space>t mapping' \
 
 # zig is installed by zvm, which puts ~/.zvm/bin on PATH for interactive shells
 # only. Kakoune spawns commands from its own environment, which is whatever
-# started it -- a niri spawn-at-startup entry does not have it. The absolute
+# started it; desktop launches may not have that path. The absolute
 # path is used when it resolves, so the mappings work from any parent process.
 declare-option -docstring 'zig executable used by project commands and ZLS' \
     str zig_command %sh{
@@ -126,14 +126,9 @@ define-command -hidden move-lines-up %{ move-lines -1 }
 map global normal <a-down> ': move-lines-down<ret>' -docstring 'move lines down'
 map global normal <a-up> ': move-lines-up<ret>' -docstring 'move lines up'
 
-# Kakoune detects tmux before niri: vertical opens a pane below inside tmux.
-# Pass the editor's directory explicitly; tmux otherwise uses its session path.
-# niri is a scrolling compositor: its "vertical" placement consumes the new
-# window into the current column, which is the closest analogue of the nvim
-# config's splitbelow. Only some windowing modules define a vertical placement
-# -- niri does, the bare wayland fallback that Kakoune picks outside a supported
-# compositor does not -- so an unknown placement command falls back to a plain
-# new window rather than failing the mapping over ssh or in a tty.
+# Use a tmux split when available, otherwise open a terminal window.
+# Pass the editor directory explicitly and fall back if vertical placement
+# is unsupported by the current windowing module.
 define-command -hidden split-terminal -params 1.. \
     -docstring 'split-terminal <program> [<arguments>]: open a terminal beside the current window' %{
     set-option local windowing_placement vertical
@@ -376,15 +371,5 @@ evaluate-commands %sh{
 source "%val{config}/repl.kak"
 
 # ── Colors ───────────────────────────────────────────────────────────────────
-# The active palette is written by the darkman hook
-# (~/.local/share/darkman/10-kanso-theme) and re-sourced on every mode change.
-# The bundled scheme is what a checkout where darkman has never run falls back
-# to, the same way the fish config falls back to fzf's own colors.
-evaluate-commands %sh{
-    darkman_colors=${XDG_STATE_HOME:-$HOME/.local/state}/darkman/kanso.kak
-    if [ -r "$darkman_colors" ]; then
-        printf 'source %%{%s}\n' "$darkman_colors"
-    else
-        printf 'colorscheme kanso-zen\n'
-    fi
-}
+# Static Kanso Zen palette.
+colorscheme kanso-zen
