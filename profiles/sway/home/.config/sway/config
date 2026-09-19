@@ -88,6 +88,7 @@ bindsym $mod+Mod1+l exec $tools lock
 bindsym $mod+Ctrl+t exec $tools scratch-btop
 bindsym $mod+Ctrl+n exec swaync-client -t
 bindsym $mod+Ctrl+b exec pkill -USR1 -x waybar
+bindsym $mod+Ctrl+m exec ~/.local/bin/display-mode
 bindsym $mod+Mod1+v exec $tools clipboard
 bindsym $mod+Mod1+m exec ~/.config/scripts/watch-media
 bindsym $mod+q kill
@@ -184,6 +185,9 @@ bindsym --locked XF86AudioPlay exec swayosd-client --playerctl play-pause
 bindsym --locked XF86AudioStop exec swayosd-client --playerctl stop
 bindsym --locked XF86AudioPrev exec swayosd-client --playerctl prev
 bindsym --locked XF86AudioNext exec swayosd-client --playerctl next
+
+# The watcher holds a per-session lock, so reloads cannot duplicate it.
+exec_always ~/.local/bin/display-mode --watch
 
 # Plain exec runs once per session, not on every reload.
 exec /usr/lib/mate-polkit/polkit-mate-authentication-agent-1

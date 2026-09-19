@@ -1,0 +1,127 @@
+#!/usr/bin/env python3
+"""Match the Odyssey G80HS desktop to its advertised dual-mode timings."""
+
+import argparse
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import select
+import socket
+import struct
+import subprocess
+import sys
+
+
+def choose_mode(output):
+    if output.get("model") != "Odyssey G80HS" or not output.get("active"):
+        return None
+    if output.get("power") is False or output.get("dpms") is False:
+        return None
+    for width, height, refresh, scale in [(3072, 1728, 330000, 1),
+                                           (6144, 3456, 165000, 2)]:
+        modes = [m for m in output.get("modes", [])
+                 if m["width"] == width and m["height"] == height
+                 and abs(m["refresh"] - refresh) < 1000]
+        if modes:
+            return max(modes, key=lambda m: m["refresh"]), scale
+    return None
+
+
+def apply_outputs(outputs, dry_run=False):
+    for output in outputs:
+        selected = choose_mode(output)
+        if selected is None:
+            continue
+        mode, scale = selected
+        current = output.get("current_mode") or {}
+        matches = all(current.get(k) == mode[k] for k in ("width", "height", "refresh"))
+        if matches and output.get("scale") == scale:
+            continue
+        timing = f'{mode["width"]}x{mode["height"]}@{mode["refresh"] / 1000:.3f}Hz'
+        command = f'output {json.dumps(output["name"])} mode {timing} scale {scale}'
+        if dry_run:
+            print(command)
+            continue
+        result = subprocess.run(["swaymsg", "-r", command], check=True,
+                                capture_output=True, text=True, timeout=5)
+        replies = json.loads(result.stdout)
+        if not replies or not all(r.get("success") for r in replies):
+            raise RuntimeError(f"Sway rejected display mode: {result.stdout.strip()}")
+        print(f"display-mode: {timing}, scale {scale}", flush=True)
+
+
+class IPC:
+    def __init__(self, path):
+        self.sock = socket.socket(socket.AF_UNIX)
+        self.sock.settimeout(5)
+        self.sock.connect(path)
+
+    def read_exact(self, count):
+        data = b""
+        while len(data) < count:
+            part = self.sock.recv(count - len(data))
+            if not part:
+                raise EOFError("Sway closed the connection")
+            data += part
+        return data
+
+    def request(self, kind, payload=""):
+        data = payload.encode()
+        self.sock.sendall(struct.pack("=6sII", b"i3-ipc", len(data), kind) + data)
+        while True:
+            magic, length, reply_kind = struct.unpack("=6sII", self.read_exact(14))
+            if magic != b"i3-ipc":
+                raise RuntimeError("Invalid Sway IPC reply")
+            reply = json.loads(self.read_exact(length))
+            if reply_kind == 0x80000006:
+                raise EOFError("Sway is shutting down")
+            if reply_kind == kind:
+                return reply
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--watch", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
+    args = parser.parse_args()
+    path = os.environ["SWAYSOCK"]
+    if args.watch:
+        session = hashlib.sha256(path.encode()).hexdigest()[:16]
+        lock = (Path(os.environ["XDG_RUNTIME_DIR"]) / f"display-mode-{session}.lock").open("w")
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return 0
+    ipc = IPC(path)
+    try:
+        if args.watch:
+            reply = ipc.request(2, '["output", "shutdown"]')
+            if not reply.get("success"):
+                raise RuntimeError("Sway rejected output subscription")
+        while True:
+            outputs = ipc.request(3)
+            try:
+                apply_outputs(outputs, args.dry_run)
+            except (subprocess.SubprocessError, RuntimeError, ValueError) as error:
+                if not args.watch:
+                    raise
+                print(f"display-mode: {error}", file=sys.stderr, flush=True)
+            if not args.watch:
+                return 0
+            # Output events trigger immediately. Poll as well because changes to
+            # EDID/mode lists do not always produce a Sway output event.
+            select.select([ipc.sock], [], [], 3)
+    except (EOFError, BrokenPipeError, ConnectionResetError):
+        return 0 if args.watch else 1
+    finally:
+        ipc.sock.close()
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except (OSError, KeyError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
+        print(f"display-mode: {error}", file=sys.stderr)
+        sys.exit(1)

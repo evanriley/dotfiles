@@ -194,6 +194,10 @@
       "destination": ".local/bin/start-sway"
     },
     {
+      "source": "profiles/sway/home/.local/bin/display-mode",
+      "destination": ".local/bin/display-mode"
+    },
+    {
       "source": "profiles/sway/home/.config/gtk-3.0/settings.ini",
       "destination": ".config/gtk-3.0/settings.ini"
     },
