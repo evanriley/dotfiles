@@ -1,0 +1,334 @@
+#!/usr/bin/env python3
+"""Small, argument-safe helpers used by the Arch/Sway profile."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import shlex
+import subprocess
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+from typing import Any
+
+LOCK_ARGUMENTS = [
+    "swaylock", "-f", "-C", "/dev/null", "-c", "090e13",
+    "-i", str(Path.home() / ".config/swaylock/lockscreen.png"), "-s", "fill",
+]
+LOCK_COMMAND = shlex.join(LOCK_ARGUMENTS)
+SCRATCH_CRITERIA = '[app_id="^scratch_btop$"]'
+
+
+def run_lock() -> int:
+    return subprocess.run(LOCK_ARGUMENTS, check=False).returncode
+
+
+def run_idle() -> int:
+    marker = Path.home() / ".local/state/sway/lock-tested"
+    if not marker.is_file():
+        return 0
+    arguments = [
+        "swayidle",
+        "-w",
+        "timeout",
+        "300",
+        LOCK_COMMAND,
+        "timeout",
+        "600",
+        "swaymsg output '*' power off",
+        "resume",
+        "swaymsg output '*' power on",
+        "timeout",
+        "1800",
+        "systemctl suspend --no-block",
+        "before-sleep",
+        LOCK_COMMAND,
+    ]
+    os.execvp(arguments[0], arguments)
+    return 2
+
+
+def menu(prompt: str, choices: list[str]) -> str | None:
+    result = subprocess.run(
+        ["fuzzel", "--dmenu", "--prompt", prompt],
+        input=("\n".join(choices) + "\n").encode(),
+        stdout=subprocess.PIPE,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    selected = result.stdout.decode(errors="replace").strip()
+    return selected if selected in choices else None
+
+
+def confirmed(action: str) -> bool:
+    return menu(f"Confirm {action}: ", ["Yes", "No"]) == "Yes"
+
+
+def run_power() -> int:
+    choice = menu("Power: ", ["Lock", "Suspend", "Logout", "Reboot", "Power Off"])
+    if choice is None:
+        return 0
+    if choice == "Lock":
+        return run_lock()
+    if choice == "Suspend":
+        locked = run_lock()
+        if locked != 0:
+            return locked
+        return subprocess.run(["systemctl", "suspend"], check=False).returncode
+    if choice == "Logout":
+        if not confirmed(choice):
+            return 0
+        return subprocess.run(["swaymsg", "exit"], check=False).returncode
+    if choice == "Reboot":
+        if not confirmed(choice):
+            return 0
+        return subprocess.run(["systemctl", "reboot"], check=False).returncode
+    if choice == "Power Off":
+        if not confirmed(choice):
+            return 0
+        return subprocess.run(["systemctl", "poweroff"], check=False).returncode
+    return 0
+
+
+def run_clipboard() -> int:
+    history = subprocess.run(["cliphist", "list"], stdout=subprocess.PIPE, check=False)
+    if history.returncode != 0:
+        return history.returncode
+    selection = subprocess.run(
+        ["fuzzel", "--dmenu", "--prompt", "Clipboard: "],
+        input=history.stdout,
+        stdout=subprocess.PIPE,
+        check=False,
+    )
+    if selection.returncode != 0 or not selection.stdout.strip():
+        return 0
+    decoded = subprocess.run(
+        ["cliphist", "decode"],
+        input=selection.stdout,
+        stdout=subprocess.PIPE,
+        check=False,
+    )
+    if decoded.returncode != 0:
+        return decoded.returncode
+    return subprocess.run(["wl-copy"], input=decoded.stdout, check=False).returncode
+
+
+def sway_json(message_type: str) -> Any | None:
+    result = subprocess.run(
+        ["swaymsg", "-t", message_type, "-r"],
+        stdout=subprocess.PIPE,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    try:
+        return json.loads(result.stdout)
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return None
+
+
+def focused_output() -> str | None:
+    outputs = sway_json("get_outputs")
+    if not isinstance(outputs, list):
+        return None
+    for output in outputs:
+        if isinstance(output, dict) and output.get("focused") is True:
+            name = output.get("name")
+            return name if isinstance(name, str) and name else None
+
+    workspaces = sway_json("get_workspaces")
+    if isinstance(workspaces, list):
+        for workspace in workspaces:
+            if isinstance(workspace, dict) and workspace.get("focused") is True:
+                name = workspace.get("output")
+                return name if isinstance(name, str) and name else None
+    return None
+
+
+def focused_leaf(node: Any) -> dict[str, Any] | None:
+    if not isinstance(node, dict):
+        return None
+    children: list[Any] = []
+    for key in ("nodes", "floating_nodes"):
+        value = node.get(key, [])
+        if isinstance(value, list):
+            children.extend(value)
+    for child in children:
+        found = focused_leaf(child)
+        if found is not None:
+            return found
+    if node.get("focused") is True and not children:
+        return node
+    return None
+
+
+def window_geometry() -> str | None:
+    node = focused_leaf(sway_json("get_tree"))
+    if node is None or not isinstance(node.get("rect"), dict):
+        return None
+    rect = node["rect"]
+    values = [rect.get(key) for key in ("x", "y", "width", "height")]
+    if any(type(value) is not int for value in values):
+        return None
+    x, y, width, height = values
+    if width <= 0 or height <= 0:
+        return None
+    return f"{x},{y} {width}x{height}"
+
+
+def screenshot_path() -> Path:
+    directory = Path.home() / "Pictures/Screenshots"
+    directory.mkdir(mode=0o700, parents=True, exist_ok=True)
+    stem = datetime.now().astimezone().strftime("%Y-%m-%d_%H-%M-%S")
+    candidate = directory / f"{stem}.png"
+    counter = 1
+    while candidate.exists():
+        candidate = directory / f"{stem}_{counter}.png"
+        counter += 1
+    return candidate
+
+
+def run_screenshot(kind: str) -> int:
+    grim_arguments = ["grim"]
+    if kind == "region":
+        selected = subprocess.run(["slurp"], stdout=subprocess.PIPE, check=False)
+        geometry = selected.stdout.decode(errors="replace").strip()
+        if selected.returncode != 0 or not geometry:
+            return 0
+        grim_arguments.extend(["-g", geometry])
+    elif kind == "output":
+        output = focused_output()
+        if output is None:
+            print(
+                "desktopctl: could not determine the focused output", file=sys.stderr
+            )
+            return 1
+        grim_arguments.extend(["-o", output])
+    elif kind == "window":
+        geometry = window_geometry()
+        if geometry is None:
+            print(
+                "desktopctl: could not determine the focused window", file=sys.stderr
+            )
+            return 1
+        grim_arguments.extend(["-g", geometry])
+
+    destination = screenshot_path()
+    grim_arguments.append(os.fspath(destination))
+    captured = subprocess.run(grim_arguments, check=False)
+    if captured.returncode != 0:
+        return captured.returncode
+    try:
+        image = destination.read_bytes()
+    except OSError as error:
+        print(f"desktopctl: cannot read screenshot: {error}", file=sys.stderr)
+        return 1
+    copied = subprocess.run(
+        ["wl-copy", "--type", "image/png"], input=image, check=False
+    )
+    if copied.returncode != 0:
+        return copied.returncode
+    if shutil.which("notify-send") is not None:
+        subprocess.run(
+            ["notify-send", "Screenshot saved", os.fspath(destination)], check=False
+        )
+    return 0
+
+
+def find_app(node: Any, app_id: str) -> dict[str, Any] | None:
+    if not isinstance(node, dict):
+        return None
+    if node.get("app_id") == app_id:
+        return node
+    for key in ("nodes", "floating_nodes"):
+        children = node.get(key, [])
+        if isinstance(children, list):
+            for child in children:
+                found = find_app(child, app_id)
+                if found is not None:
+                    return found
+    return None
+
+
+def find_app_id(node: Any, app_id: str) -> bool:
+    return find_app(node, app_id) is not None
+
+
+def show_scratch_btop() -> int:
+    result = subprocess.run(
+        ["swaymsg", SCRATCH_CRITERIA, "scratchpad", "show"], check=False
+    ).returncode
+    if result != 0:
+        return result
+    node = find_app(sway_json("get_tree"), "scratch_btop")
+    # Sway chooses fresh scratchpad geometry on first show. Resize only once
+    # it is visible, then preserve the user's size on later toggles.
+    if node and node.get("visible") and "desktopctl_btop_sized" not in node.get("marks", []):
+        return subprocess.run(
+            ["swaymsg", SCRATCH_CRITERIA,
+             "resize set width 80 ppt height 80 ppt, move position center, mark --add desktopctl_btop_sized"],
+            check=False,
+        ).returncode
+    return 0
+
+
+def run_scratch_btop() -> int:
+    if find_app_id(sway_json("get_tree"), "scratch_btop"):
+        return show_scratch_btop()
+    subprocess.Popen(
+        ["foot", "--app-id=scratch_btop", "btop"],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+    deadline = time.monotonic() + 3.0
+    while time.monotonic() < deadline:
+        if find_app_id(sway_json("get_tree"), "scratch_btop"):
+            return show_scratch_btop()
+        time.sleep(0.1)
+    print("desktopctl: scratch_btop did not appear within 3 seconds", file=sys.stderr)
+    return 1
+
+
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers.add_parser("lock")
+    subparsers.add_parser("idle")
+    subparsers.add_parser("power")
+    subparsers.add_parser("clipboard")
+    screenshot = subparsers.add_parser("screenshot")
+    screenshot.add_argument("kind", choices=("region", "output", "window"))
+    subparsers.add_parser("scratch-btop")
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    try:
+        if args.command == "lock":
+            return run_lock()
+        if args.command == "idle":
+            return run_idle()
+        if args.command == "power":
+            return run_power()
+        if args.command == "clipboard":
+            return run_clipboard()
+        if args.command == "screenshot":
+            return run_screenshot(args.kind)
+        if args.command == "scratch-btop":
+            return run_scratch_btop()
+    except OSError as error:
+        print(f"desktopctl: {error}", file=sys.stderr)
+        return 2
+    return 2
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

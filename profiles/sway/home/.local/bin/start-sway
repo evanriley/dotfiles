@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+if [ -n "${WAYLAND_DISPLAY-}" ] || [ -n "${DISPLAY-}" ]; then
+    printf '%s\n' 'Start Sway from a local TTY after leaving the current graphical session.' >&2
+    exit 1
+fi
+export XDG_CURRENT_DESKTOP=sway XDG_SESSION_DESKTOP=sway XDG_SESSION_TYPE=wayland
+export PATH="$HOME/.local/bin:$PATH"
+# Publish the dark preference for GTK, libadwaita and portal-aware apps.
+gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark
+exec sway "$@"
