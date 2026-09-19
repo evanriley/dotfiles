@@ -49,8 +49,8 @@ set $ws6 6:extra
 
 # Match both native Wayland app IDs and Xwayland classes.
 # PiP stays on the workspace where it was opened.
-assign [app_id="(?i)^(firefox|org\.mozilla\.firefox|librewolf|qutebrowser|org\.qutebrowser\.qutebrowser|com\.brave\.Browser|brave-browser)$" title="^(?!Picture-in-Picture$)"] workspace $ws1
-assign [class="(?i)^(firefox|librewolf|qutebrowser|brave-browser)$" title="^(?!Picture-in-Picture$)"] workspace $ws1
+assign [app_id="(?i)^(firefox|org\.mozilla\.firefox|librewolf|com\.brave\.Browser|brave-browser)$" title="^(?!Picture-in-Picture$)"] workspace $ws1
+assign [class="(?i)^(firefox|librewolf|brave-browser)$" title="^(?!Picture-in-Picture$)"] workspace $ws1
 assign [app_id="(?i)^(discord|com\.discordapp\.Discord)$"] workspace $ws2
 assign [class="(?i)^(discord|com\.discordapp\.Discord)$"] workspace $ws2
 assign [app_id="org.gnome.World.PikaBackup"] workspace $ws5
@@ -72,7 +72,6 @@ for_window [app_id="(?i)(firefox|librewolf)$" title="^Picture-in-Picture$"] floa
 for_window [class="(?i)(firefox|librewolf)$" title="^Picture-in-Picture$"] floating enable
 for_window [app_id="^(org\.gnome\.Nautilus|nautilus)$"] floating enable, resize set width 1400 px height 900 px, move position center
 for_window [app_id="^dev\.deedles\.Trayscale$"] floating enable, resize set width 520 px height 620 px, move position center
-for_window [app_id="^qute-editor$"] floating enable, resize set width 1200 px height 900 px, move position center
 for_window [app_id="^mpv$"] floating enable, resize set width 1920 px height 1080 px, move position center
 for_window [class="^mpv$"] floating enable, resize set width 1920 px height 1080 px, move position center
 for_window [app_id="^swayimg$"] floating enable, resize set width 1280 px height 800 px, move position center

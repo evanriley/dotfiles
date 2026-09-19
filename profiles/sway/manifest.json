@@ -114,14 +114,6 @@
       "destination": ".config/nvim/nvim-pack-lock.json"
     },
     {
-      "source": "profiles/sway/home/.config/qutebrowser/config.py",
-      "destination": ".config/qutebrowser/config.py"
-    },
-    {
-      "source": ".config/qutebrowser/youtube.css",
-      "destination": ".config/qutebrowser/youtube.css"
-    },
-    {
       "source": ".config/scripts/watch-media",
       "destination": ".config/scripts/watch-media"
     },
