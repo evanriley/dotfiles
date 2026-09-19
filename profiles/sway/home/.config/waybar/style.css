@@ -1,0 +1,21 @@
+@define-color background #090e13;
+@define-color background_alt #1f1f28;
+@define-color background_soft #22262d;
+@define-color foreground #c5c9c7;
+@define-color border #393b44;
+@define-color primary #8ba4b0;
+@define-color accent #a292a3;
+@define-color success #8a9a7b;
+@define-color error #c4746e;
+
+* { border: none; border-radius: 0; font-family: "Berkeley Mono", "Noto Sans", monospace; font-size: 12px; min-height: 0; }
+window#waybar { background: @background; color: @foreground; }
+tooltip { background: @background_alt; color: @foreground; border: 1px solid @border; }
+#workspaces button { padding: 0 8px; color: @foreground; background: transparent; }
+#workspaces button.focused { background: @background_soft; color: @primary; border-bottom: 2px solid @primary; }
+#workspaces button.urgent { background: @error; color: @background; }
+#workspaces button:hover { background: @background_alt; }
+#mode { color: @accent; padding: 0 8px; }
+#window { padding: 0 8px; }
+#cpu, #memory, #network, #pulseaudio, #tray, #clock, #custom-notifications { padding: 0 6px; }
+#network.disconnected, #pulseaudio.muted { color: @error; }

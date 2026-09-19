@@ -1,0 +1,64 @@
+@define-color background #090e13;
+@define-color background_alt #1f1f28;
+@define-color background_soft #22262d;
+@define-color foreground #c5c9c7;
+@define-color border #393b44;
+@define-color primary #8ba4b0;
+@define-color accent #a292a3;
+@define-color success #8a9a7b;
+@define-color error #c4746e;
+
+window#osd {
+    padding: 10px;
+    border: 1px solid @border;
+    border-radius: 20px;
+    background: alpha(@background, 0.94);
+    color: @foreground;
+}
+
+#container {
+    margin: 20px;
+}
+
+image,
+label {
+    color: @foreground;
+}
+
+progressbar:disabled,
+segmentedprogress:disabled,
+image:disabled {
+    opacity: 0.5;
+}
+
+progressbar,
+segmentedprogress {
+    min-height: 6px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+}
+
+trough,
+segment {
+    min-height: inherit;
+    border: none;
+    border-radius: inherit;
+    background: @background_soft;
+}
+
+progress,
+segment.active {
+    min-height: inherit;
+    border: none;
+    border-radius: inherit;
+    background: @primary;
+}
+
+segment {
+    margin-left: 8px;
+}
+
+segment:first-child {
+    margin-left: 0;
+}
