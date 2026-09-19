@@ -204,6 +204,10 @@
     {
       "source": ".config/darkman/lockscreen-dark.png",
       "destination": ".config/swaylock/lockscreen.png"
+    },
+    {
+      "source": ".config/pipewire/pipewire.conf.d/clock.rate.conf",
+      "destination": ".config/pipewire/pipewire.conf.d/clock.rate.conf"
     }
   ]
 }
