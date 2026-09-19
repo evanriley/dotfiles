@@ -2,7 +2,7 @@
   "version": 1,
   "links": [
     {
-      "source": "profiles/sway/home/.config/btop/btop.conf",
+      "source": ".config/btop/btop.conf",
       "destination": ".config/btop/btop.conf"
     },
     {
@@ -10,7 +10,7 @@
       "destination": ".config/btop/themes/kanso-zen.theme"
     },
     {
-      "source": "profiles/sway/home/.config/fish/config.fish",
+      "source": ".config/fish/config.fish",
       "destination": ".config/fish/config.fish"
     },
     {
@@ -22,11 +22,11 @@
       "destination": ".config/fish/functions/ta.fish"
     },
     {
-      "source": "profiles/sway/home/.config/foot/foot.ini",
+      "source": ".config/foot/foot.ini",
       "destination": ".config/foot/foot.ini"
     },
     {
-      "source": "profiles/sway/home/.config/fuzzel/fuzzel.ini",
+      "source": ".config/fuzzel/fuzzel.ini",
       "destination": ".config/fuzzel/fuzzel.ini"
     },
     {
@@ -66,7 +66,7 @@
       "destination": ".config/kak/support.py"
     },
     {
-      "source": "profiles/sway/home/.config/mimeapps.list",
+      "source": ".config/mimeapps.list",
       "destination": ".config/mimeapps.list"
     },
     {
@@ -74,7 +74,7 @@
       "destination": ".config/mpv/input.conf"
     },
     {
-      "source": "profiles/sway/home/.config/mpv/mpv.conf",
+      "source": ".config/mpv/mpv.conf",
       "destination": ".config/mpv/mpv.conf"
     },
     {
@@ -102,7 +102,7 @@
       "destination": ".config/nvim/.stylua.toml"
     },
     {
-      "source": "profiles/sway/home/.config/nvim/init.lua",
+      "source": ".config/nvim/init.lua",
       "destination": ".config/nvim/init.lua"
     },
     {
@@ -118,31 +118,31 @@
       "destination": ".config/scripts/watch-media"
     },
     {
-      "source": "profiles/sway/home/.config/sway/config",
+      "source": ".config/sway/config",
       "destination": ".config/sway/config"
     },
     {
-      "source": "profiles/sway/home/.config/sway/extra.conf",
+      "source": ".config/sway/extra.conf",
       "destination": ".config/sway/extra.conf"
     },
     {
-      "source": "profiles/sway/home/.config/sway/monitors.conf",
+      "source": ".config/sway/monitors.conf",
       "destination": ".config/sway/monitors.conf"
     },
     {
-      "source": "profiles/sway/home/.config/swaync/config.json",
+      "source": ".config/swaync/config.json",
       "destination": ".config/swaync/config.json"
     },
     {
-      "source": "profiles/sway/home/.config/swaync/style.css",
+      "source": ".config/swaync/style.css",
       "destination": ".config/swaync/style.css"
     },
     {
-      "source": "profiles/sway/home/.config/swayosd/config.toml",
+      "source": ".config/swayosd/config.toml",
       "destination": ".config/swayosd/config.toml"
     },
     {
-      "source": "profiles/sway/home/.config/swayosd/style.css",
+      "source": ".config/swayosd/style.css",
       "destination": ".config/swayosd/style.css"
     },
     {
@@ -154,19 +154,19 @@
       "destination": ".config/tmux/tmux.conf"
     },
     {
-      "source": "profiles/sway/home/.config/waybar/config.jsonc",
+      "source": ".config/waybar/config.jsonc",
       "destination": ".config/waybar/config.jsonc"
     },
     {
-      "source": "profiles/sway/home/.config/waybar/style.css",
+      "source": ".config/waybar/style.css",
       "destination": ".config/waybar/style.css"
     },
     {
-      "source": "profiles/sway/home/.config/xdg-desktop-portal/sway-portals.conf",
+      "source": ".config/xdg-desktop-portal/sway-portals.conf",
       "destination": ".config/xdg-desktop-portal/sway-portals.conf"
     },
     {
-      "source": "profiles/sway/home/.config/zathura/zathurarc",
+      "source": ".config/zathura/zathurarc",
       "destination": ".config/zathura/zathurarc"
     },
     {
@@ -174,23 +174,23 @@
       "destination": ".gitconfig"
     },
     {
-      "source": "profiles/sway/home/.local/bin/desktopctl",
+      "source": ".local/bin/desktopctl",
       "destination": ".local/bin/desktopctl"
     },
     {
-      "source": "profiles/sway/home/.local/bin/start-sway",
+      "source": ".local/bin/start-sway",
       "destination": ".local/bin/start-sway"
     },
     {
-      "source": "profiles/sway/home/.local/bin/display-mode",
+      "source": ".local/bin/display-mode",
       "destination": ".local/bin/display-mode"
     },
     {
-      "source": "profiles/sway/home/.config/gtk-3.0/settings.ini",
+      "source": ".config/gtk-3.0/settings.ini",
       "destination": ".config/gtk-3.0/settings.ini"
     },
     {
-      "source": "profiles/sway/home/.config/xdg-desktop-portal-wlr/config",
+      "source": ".config/xdg-desktop-portal-wlr/config",
       "destination": ".config/xdg-desktop-portal-wlr/config"
     },
     {

@@ -114,17 +114,5 @@ review; their configurations remain ready for installation. Ruff is a Python
 linter/formatter, not a full Python type/completion server. No extra external
 language servers were installed during this change.
 
-## Checks
-
-```sh
-nvim --headless '+luafile ~/.config/nvim/tests/workflow.lua'
-nvim --headless '+luafile ~/.config/nvim/tests/native-lsp.lua'
-```
-
-Checks use temporary files and a test LSP. They exercise project roots and save
-boundaries, asynchronous compiler output, formatter selection, parser loading,
-sessions, mixed buffer/snippet completion, and LSP import edits plus snippet
-expansion on acceptance. Run in disposable Neovim processes as above.
-
 Restart Neovim to load this configuration. The init file is not intended to
 be repeatedly sourced into an existing editor session.

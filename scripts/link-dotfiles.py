@@ -13,8 +13,8 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-DEFAULT_MANIFEST = Path("profiles/sway/manifest.json")
-BACKUP_PARENT = PurePosixPath(".local/state/sway/backups")
+DEFAULT_MANIFEST = Path("manifest.json")
+BACKUP_PARENT = PurePosixPath(".local/state/dotfiles/backups")
 
 
 @dataclass(frozen=True)
@@ -431,7 +431,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--manifest",
         type=Path,
-        help="manifest to use (default: profiles/sway/manifest.json in the repository)",
+        help="manifest to use (default: manifest.json in the repository)",
     )
     return parser.parse_args(argv)
 
