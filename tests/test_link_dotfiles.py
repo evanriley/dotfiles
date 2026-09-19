@@ -11,7 +11,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-SOURCE_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "link-sway.py"
+SOURCE_SCRIPT = Path(__file__).resolve().parents[1] / "scripts" / "link-dotfiles.py"
 
 
 class LinkArchSwayTest(unittest.TestCase):
@@ -20,7 +20,7 @@ class LinkArchSwayTest(unittest.TestCase):
         self.root = Path(self.temporary.name)
         self.repo = self.root / "dotfiles"
         (self.repo / "scripts").mkdir(parents=True)
-        shutil.copy2(SOURCE_SCRIPT, self.repo / "scripts" / "link-sway.py")
+        shutil.copy2(SOURCE_SCRIPT, self.repo / "scripts" / "link-dotfiles.py")
         self.manifest = self.repo / "profiles/sway/manifest.json"
 
     def tearDown(self) -> None:
@@ -49,7 +49,7 @@ class LinkArchSwayTest(unittest.TestCase):
         return subprocess.run(
             [
                 "python3",
-                os.fspath(self.repo / "scripts/link-sway.py"),
+                os.fspath(self.repo / "scripts/link-dotfiles.py"),
                 "--target-home",
                 os.fspath(home),
                 *arguments,

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Safely link the explicit Arch/Sway profile into a home directory."""
+"""Safely link the configured dotfiles into a home directory."""
 
 from __future__ import annotations
 

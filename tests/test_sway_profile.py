@@ -10,7 +10,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 MANIFEST = REPO / "profiles/sway/manifest.json"
-INSTALLER = REPO / "scripts/link-sway.py"
+INSTALLER = REPO / "scripts/link-dotfiles.py"
 
 
 class ArchSwayProfileTest(unittest.TestCase):
