@@ -206,7 +206,7 @@
       "destination": ".config/xdg-desktop-portal-wlr/config"
     },
     {
-      "source": ".config/darkman/lockscreen-dark.png",
+      "source": ".config/swaylock/lockscreen.png",
       "destination": ".config/swaylock/lockscreen.png"
     },
     {

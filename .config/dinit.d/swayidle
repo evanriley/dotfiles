@@ -1,9 +1,0 @@
-type = process
-command = /usr/bin/swayidle -w before-sleep "swaylock -f" timeout 600 "swaylock -f" timeout 900 "niri msg action power-off-monitors"
-restart = yes
-smooth-recovery = yes
-restart-delay = 2
-restart-limit-count = 0
-log-type = buffer
-log-buffer-size = 65536
-depends-on = graphical.target

@@ -1,9 +1,0 @@
-type = process
-command = /usr/bin/wl-paste --type image --watch cliphist store
-restart = yes
-smooth-recovery = yes
-restart-delay = 2
-restart-limit-count = 0
-log-type = buffer
-log-buffer-size = 65536
-depends-on = graphical.target
