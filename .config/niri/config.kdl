@@ -36,8 +36,7 @@ input {
 }
 
 output "DP-2" {
-    mode "5120x1440@119.979"
-    scale 1
+    mode "6144x3456@164.997"
     transform "normal"
 }
 cursor {
@@ -52,10 +51,10 @@ layout {
     preset-column-widths {
         proportion 0.25
         proportion 0.5
-        proportion 0.75
+        proportion 1.0
     }
     default-column-width {
-        proportion 0.5
+        proportion 1.0
     }
     focus-ring {
         off
@@ -297,7 +296,7 @@ window-rule {
 window-rule {
     match app-id="^foot$"
     default-column-width {
-        proportion 0.25
+        proportion 0.5
     }
 }
 window-rule {
