@@ -196,6 +196,7 @@ exec nm-applet --indicator
 exec steam -silent
 exec sh -c 'command -v discord >/dev/null 2>&1 && exec discord'
 exec swayosd-server
+exec sh -c 'command -v scapectl >/dev/null 2>&1 && exec scapectl'
 exec wl-paste --type text --watch cliphist store
 exec wl-paste --type image --watch cliphist store
 # No automatic locking until the manual lock test has been recorded.

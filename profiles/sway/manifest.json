@@ -200,6 +200,18 @@
     {
       "source": ".config/pipewire/pipewire.conf.d/clock.rate.conf",
       "destination": ".config/pipewire/pipewire.conf.d/clock.rate.conf"
+    },
+    {
+      "source": ".config/wireplumber/wireplumber.conf.d/51-disable-usb-audio-suspend.conf",
+      "destination": ".config/wireplumber/wireplumber.conf.d/51-disable-usb-audio-suspend.conf"
+    },
+    {
+      "source": ".config/scapectl/config.toml",
+      "destination": ".config/scapectl/config.toml"
+    },
+    {
+      "source": ".config/scripts/scapectl-audio",
+      "destination": ".config/scripts/scapectl-audio"
     }
   ]
 }
