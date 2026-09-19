@@ -4,16 +4,13 @@
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import stat
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
-from typing import Any
 
-DEFAULT_MANIFEST = Path("manifest.json")
 BACKUP_PARENT = PurePosixPath(".local/state/dotfiles/backups")
 
 
@@ -49,100 +46,21 @@ def is_within(path: Path, directory: Path) -> bool:
     return True
 
 
-def parse_relative_path(value: Any, field: str) -> PurePosixPath:
-    if not isinstance(value, str) or not value:
-        raise PreflightError(f"{field} must be a non-empty string")
-    if "\\" in value or "\0" in value:
-        raise PreflightError(f"{field} is not a canonical POSIX path: {value!r}")
-    raw_parts = value.split("/")
-    path = PurePosixPath(value)
-    if path.is_absolute() or any(part in {"", ".", ".."} for part in raw_parts):
-        raise PreflightError(f"{field} must be a canonical relative path: {value!r}")
-    if path.as_posix() != value:
-        raise PreflightError(f"{field} must be a canonical relative path: {value!r}")
-    return path
-
-
-def load_manifest(manifest: Path, repo: Path, target_home: Path) -> list[Link]:
-    try:
-        raw = json.loads(manifest.read_text(encoding="utf-8"))
-    except (OSError, UnicodeError, json.JSONDecodeError) as error:
-        raise PreflightError(f"cannot read manifest {manifest}: {error}") from error
-
-    if not isinstance(raw, dict) or set(raw) != {"version", "links"}:
-        raise PreflightError("manifest must contain exactly 'version' and 'links'")
-    if type(raw["version"]) is not int or raw["version"] != 1:
-        raise PreflightError(f"unsupported manifest version: {raw['version']!r}")
-    if not isinstance(raw["links"], list):
-        raise PreflightError("manifest 'links' must be a list")
-
-    repo_resolved = repo.resolve(strict=True)
-    links: list[Link] = []
-    destinations: dict[PurePosixPath, int] = {}
-    errors: list[str] = []
-    for index, entry in enumerate(raw["links"], start=1):
-        label = f"manifest link {index}"
-        if not isinstance(entry, dict) or set(entry) != {"source", "destination"}:
-            errors.append(f"{label} must contain exactly 'source' and 'destination'")
-            continue
-        try:
-            source_relative = parse_relative_path(entry["source"], f"{label} source")
-            destination_relative = parse_relative_path(
-                entry["destination"], f"{label} destination"
-            )
-        except PreflightError as error:
-            errors.append(str(error))
-            continue
-
-        if destination_relative in destinations:
-            errors.append(
-                f"duplicate destination in links {destinations[destination_relative]} "
-                f"and {index}: {destination_relative}"
-            )
-            continue
-        destinations[destination_relative] = index
-
-        source = repo.joinpath(*source_relative.parts)
-        try:
-            source_resolved = source.resolve(strict=True)
-        except (OSError, RuntimeError) as error:
-            errors.append(
-                f"{label} source is missing or cannot be resolved: {source}: {error}"
-            )
-            continue
-        if not is_within(source_resolved, repo_resolved):
-            errors.append(f"{label} source resolves outside the repository: {source}")
-            continue
-        if not source_resolved.is_file():
-            errors.append(f"{label} source is not a file: {source}")
-            continue
-
-        links.append(
-            Link(
-                source_relative=source_relative,
-                destination_relative=destination_relative,
-                source=source,
-                destination=target_home.joinpath(*destination_relative.parts),
-            )
-        )
-
-    destination_paths = sorted(destinations, key=lambda item: len(item.parts))
-    for index, first in enumerate(destination_paths):
-        for second in destination_paths[index + 1 :]:
-            if second.parts[: len(first.parts)] == first.parts:
-                errors.append(f"nested destinations conflict: {first} and {second}")
-    for destination in destination_paths:
-        if BACKUP_PARENT.parts[: len(destination.parts)] == destination.parts:
-            errors.append(
-                f"destination conflicts with the reserved backup path: {destination}"
-            )
-        elif destination.parts[: len(BACKUP_PARENT.parts)] == BACKUP_PARENT.parts:
-            errors.append(
-                f"destination is inside the reserved backup path: {destination}"
-            )
-
-    if errors:
-        raise PreflightError("\n".join(errors))
+def discover_links(repo: Path, target_home: Path) -> list[Link]:
+    # Link each application directory (and files such as mimeapps.list),
+    # each local executable, and the Git configuration.
+    sources = [repo / ".gitconfig"]
+    for directory in (repo / ".config", repo / ".local/bin"):
+        sources.extend(sorted(p for p in directory.iterdir()
+                              if not p.name.startswith(".") and p.name != "__pycache__"))
+    links = []
+    for source in sources:
+        if not source.exists():
+            raise PreflightError(f"source does not exist: {source}")
+        if source.is_symlink() or not (source.is_file() or source.is_dir()):
+            raise PreflightError(f"source must be a regular file or directory: {source}")
+        relative = PurePosixPath(source.relative_to(repo).as_posix())
+        links.append(Link(relative, relative, source, target_home / relative))
     return links
 
 
@@ -239,13 +157,13 @@ def make_plan(
             continue
         if lexists(link.destination):
             mode = os.lstat(link.destination).st_mode
-            can_back_up = stat.S_ISREG(mode) or stat.S_ISLNK(mode)
+            can_back_up = stat.S_ISREG(mode) or stat.S_ISLNK(mode) or stat.S_ISDIR(mode)
             if backup_conflicts and can_back_up:
                 conflicts.append(link)
                 planned.append(link)
             elif backup_conflicts:
                 errors.append(
-                    f"conflicting destination is not a regular file or symlink: {link.destination}"
+                    f"conflicting destination is not a regular file, directory, or symlink: {link.destination}"
                 )
             else:
                 errors.append(f"destination already exists: {link.destination}")
@@ -374,13 +292,12 @@ def apply_plan(plan: Plan, target_home: Path) -> tuple[bool, Path | None, str | 
 
 def run(
     repo: Path,
-    manifest: Path,
     target_home: Path,
     apply: bool,
     backup_conflicts: bool,
 ) -> int:
     try:
-        links = load_manifest(manifest, repo, target_home)
+        links = discover_links(repo, target_home)
         plan = make_plan(links, target_home, repo, backup_conflicts)
     except PreflightError as error:
         for line in str(error).splitlines():
@@ -420,7 +337,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--backup-conflicts",
         action="store_true",
-        help="preserve conflicting regular files and symlinks before linking",
+        help="preserve existing files and directories before linking",
     )
     parser.add_argument(
         "--target-home",
@@ -428,22 +345,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=Path.home(),
         help="home directory to populate (default: the current user's home)",
     )
-    parser.add_argument(
-        "--manifest",
-        type=Path,
-        help="manifest to use (default: manifest.json in the repository)",
-    )
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     repo = Path(__file__).resolve().parent.parent
-    manifest = args.manifest or repo / DEFAULT_MANIFEST
-    if not manifest.is_absolute():
-        manifest = Path.cwd() / manifest
     target_home = Path(os.path.abspath(args.target_home.expanduser()))
-    return run(repo, manifest, target_home, args.apply, args.backup_conflicts)
+    return run(repo, target_home, args.apply, args.backup_conflicts)
 
 
 if __name__ == "__main__":
